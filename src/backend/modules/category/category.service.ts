@@ -1,0 +1,89 @@
+import { initDB } from "@/backend/utils/dbInit.util";
+import CategoryEntity from "./entities/category.entity";
+import { CreateCategoryDto } from "./dto/create-category.dto";
+import mongoose from "mongoose";
+
+export class CategoryService {
+  private readonly categoryEntity = CategoryEntity;
+
+  async findById(id: mongoose.Types.ObjectId) {
+    await initDB();
+
+    const data = await this.categoryEntity
+      .findById(id)
+      .lean({ virtuals: true });
+
+    if (!data) {
+      throw new Error(`Category with id ${id} not found`);
+    }
+
+    return data;
+  }
+
+  async findByName(name: string) {
+    await initDB();
+
+    return await this.categoryEntity.findOne({
+      name: name?.trim()?.toLowerCase(),
+    });
+  }
+
+  async create(payload: CreateCategoryDto) {
+    const { name } = payload;
+
+    await initDB();
+
+    const existingData = await this.findByName(name);
+
+    if (existingData) {
+      throw new Error(
+        `Category with name ${name} already exists, please use a different name.`,
+      );
+    }
+
+    return await this.categoryEntity.create(payload);
+  }
+
+  async findAll({
+    search,
+    page = 1,
+    limit = 10,
+  }: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    await initDB();
+
+    const query: Record<string, any> = {};
+
+    if (search) {
+      query["$or"] = [{ name: { $regex: search, $options: "i" } }];
+    }
+
+    const skip = (page - 1) * limit;
+    const totalRecords = await this.categoryEntity.countDocuments(query);
+
+    const data = await this.categoryEntity
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return { data, meta: { page, totalRecords, totalPages } };
+  }
+
+  async delete(id: string) {
+    await initDB();
+    const deletedData = await this.categoryEntity.findByIdAndDelete(id);
+
+    if (!deletedData) {
+      throw new Error(`Category with id ${id} not found`);
+    }
+
+    return deletedData;
+  }
+}
