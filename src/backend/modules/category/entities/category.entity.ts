@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export enum CategoryTypeEnum {
   INCOME = "income",
   EXPENSE = "expense",
+  INVESTMENT = "investment",
 }
 
 export interface ICategory extends Document {

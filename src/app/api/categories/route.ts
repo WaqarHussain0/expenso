@@ -2,6 +2,7 @@ import { CategoryService } from "@/backend/modules/category/category.service";
 import { CreateCategoryDto } from "@/backend/modules/category/dto/create-category.dto";
 import { validateDto } from "@/backend/utils/input-validator.util";
 import { NextRequest, NextResponse } from "next/server";
+import "reflect-metadata";
 
 const categoryService = new CategoryService();
 
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     // Parse JSON body
     const body = await req.json();
+
 
     // Transform to DTO and validate
     const dto = await validateDto(CreateCategoryDto, body);
