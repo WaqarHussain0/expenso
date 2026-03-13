@@ -3,17 +3,17 @@ import 'reflect-metadata';
 import { CreateTransactionDto } from '@/backend/modules/transaction/dto/create-transaction.dto';
 import { TransactionService } from '@/backend/modules/transaction/transaction.service';
 import { validateDto } from '@/backend/utils/input-validator.util';
-import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 
 const transactionService = new TransactionService();
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: mongoose.Types.ObjectId }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-
+  const monogoObjectId = new mongoose.Types.ObjectId(id);
   try {
     // Parse JSON body
     const body = await req.json();
@@ -22,7 +22,7 @@ export async function PUT(
     const dto = await validateDto(CreateTransactionDto, body);
 
     // Update user using the service
-    const data = await transactionService.update(id, dto);
+    const data = await transactionService.update(monogoObjectId, dto);
 
     // Return success response
     return NextResponse.json({ data }, { status: 201 });
@@ -38,7 +38,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: mongoose.Types.ObjectId }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 

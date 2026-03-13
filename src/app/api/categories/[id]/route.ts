@@ -10,7 +10,7 @@ const categoryService = new CategoryService();
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: mongoose.Types.ObjectId }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
@@ -32,9 +32,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: mongoose.Types.ObjectId }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const monogoObjectId = new mongoose.Types.ObjectId(id);
 
   try {
     // Parse JSON body
@@ -44,7 +45,7 @@ export async function PUT(
     const dto = await validateDto(CreateCategoryDto, body);
 
     // Update user using the service
-    const data = await categoryService.update(id, dto);
+    const data = await categoryService.update(monogoObjectId, dto);
 
     // Return success response
     return NextResponse.json({ data }, { status: 201 });
@@ -60,12 +61,13 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: mongoose.Types.ObjectId }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const monogoObjectId = new mongoose.Types.ObjectId(id);
 
   try {
-    const data = await categoryService.delete(id);
+    const data = await categoryService.delete(monogoObjectId);
     return NextResponse.json({ data }, { status: 201 });
   } catch (err: any) {
     // Handle validation errors or service errors

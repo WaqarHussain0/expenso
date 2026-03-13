@@ -17,7 +17,7 @@ export const forgotPasswordEmailTemplate = (
         <p>We received a request to reset your password. Click the button below to reset it:</p>    
         <a href="${resetPasswordLink}" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Reset Password</a>
         <p>If you didn't request a password reset, please ignore this email.</p>
-        <p>Best regards,<br/>The Gymtal Team</p>
+        <p>Best regards,<br/>Expenso Team</p>
     </div>
     `;
 };
