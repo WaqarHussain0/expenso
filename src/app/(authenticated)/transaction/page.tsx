@@ -24,12 +24,19 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const transactionPayload = {
     page: Number(page),
-    limit: 6,
+    limit: 5,
     search: search,
     categoryType: normalizedType,
   };
 
   const data = await transactionService.findAll(transactionPayload);
+
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  const stats = await transactionService.getMonthlyStats(month, year);
+
 
   if (
     data.data.length !== 0 &&
@@ -44,6 +51,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       transactions={data.data || []}
       meta={data?.meta || {}}
       currentPage={Number(page)}
+      monthStats={stats}
     />
   );
 };

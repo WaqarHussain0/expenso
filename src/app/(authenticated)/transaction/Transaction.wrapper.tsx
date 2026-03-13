@@ -6,6 +6,9 @@ import Pagination from '@/components/common/Pagination';
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
 import TransactionDialog from '@/components/feature/transaction/Transaction.dialog';
+import TransactionStats, {
+  IMonthTransactionStats,
+} from '@/components/feature/transaction/Transaction.stats';
 import TransactionTable from '@/components/feature/transaction/Transaction.table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
-import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
 import { Filter, PlusIcon, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -32,12 +35,14 @@ interface ITransactionWrapperProps {
     page: number;
   };
   currentPage: number;
+  monthStats: IMonthTransactionStats;
 }
 
 const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
   currentPage,
   meta,
   transactions,
+  monthStats,
 }) => {
   const router = useRouter();
   const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
@@ -78,6 +83,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
   const handleClearFilter = () => {
     clearSearch();
+    setSelectedType('all');
     router.push(PAGE_ROUTES.transaction);
   };
 
@@ -96,6 +102,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
     { id: CategoryTypeEnum.EXPENSE, name: CategoryTypeEnum.EXPENSE },
     { id: CategoryTypeEnum.INVESTMENT, name: CategoryTypeEnum.INVESTMENT },
   ];
+
   return (
     <div className="w-full space-y-3">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
@@ -114,12 +121,16 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
           Add Transaction
         </Button>
       </Row>
+
       <CustomBreadcrumb
         items={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
           { label: 'Transactions' },
         ]}
       />
+
+      {/* Stats  */}
+      <TransactionStats monthStats={monthStats} />
 
       <Card className="gap-3">
         <CardHeader>
@@ -167,7 +178,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
             <TextElement
               className={`flex cursor-pointer items-center gap-1 text-blue-600 transition hover:underline ${
-                !searchInput ? 'hidden' : ''
+                !searchInput && selectedType === 'all' ? 'hidden' : ''
               }`}
               as="span"
               onClick={handleClearFilter}
@@ -176,7 +187,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             </TextElement>
           </div>
           <TransactionTable
-            className="h-[45vh] overflow-y-auto"
+            className="h-[40vh] overflow-y-auto"
             transactions={transactions || []}
           />
 

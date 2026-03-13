@@ -22,6 +22,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import CategoryStats, {
+  ICategoryStats,
+} from '@/components/feature/category/Category.stats';
 
 interface ICategoryWrapperProps {
   categories: ICategory[];
@@ -31,12 +34,15 @@ interface ICategoryWrapperProps {
     page: number;
   };
   currentPage: number;
+
+  categoryStats: ICategoryStats;
 }
 
 const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
   categories,
   currentPage,
   meta,
+  categoryStats,
 }) => {
   const router = useRouter();
 
@@ -122,6 +128,9 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
         ]}
       />
 
+      {/* Stats  */}
+      <CategoryStats categoryStats={categoryStats} />
+
       <Card className="gap-3">
         <CardHeader>
           <CardTitle className="flex items-center gap-1">
@@ -178,7 +187,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           </div>
 
           <CategoryTable
-            className="h-[45vh] overflow-y-auto"
+            className="h-[40vh] overflow-y-auto"
             categories={categories || []}
           />
 

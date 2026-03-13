@@ -160,4 +160,63 @@ export class TransactionService {
 
     return { data, meta: { page, totalRecords, totalPages } };
   }
+
+  // get month stats for income, expense and investment
+
+  async getMonthlyStats(month: number, year: number) {
+    await initDB();
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1);
+
+    const stats = await this.transactionEntity.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: '$category',
+      },
+      {
+        $group: {
+          _id: '$category.type',
+          total: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    const result = {
+      income: 0,
+      expense: 0,
+      investment: 0,
+    };
+
+    stats.forEach(item => {
+      if (item._id === CategoryTypeEnum.INCOME) {
+        result.income = item.total;
+      }
+
+      if (item._id === CategoryTypeEnum.EXPENSE) {
+        result.expense = item.total;
+      }
+
+      if (item._id === CategoryTypeEnum.INVESTMENT) {
+        result.investment = item.total;
+      }
+    });
+
+    return result;
+  }
 }

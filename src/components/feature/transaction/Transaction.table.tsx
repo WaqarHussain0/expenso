@@ -135,7 +135,9 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
           {transactions.length > 0 ? (
             transactions.map(trx => (
               <TableRow key={trx._id}>
-                <TableCell className="capitalize">{trx?.amount}</TableCell>
+                <TableCell className="capitalize">
+                  {trx?.amount?.toLocaleString()}
+                </TableCell>
                 <TableCell className="capitalize">
                   <Badge
                     variant={

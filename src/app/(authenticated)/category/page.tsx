@@ -24,10 +24,12 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const data = await categoryService.findAll({
     page: Number(page),
-    limit: 6,
+    limit: 5,
     search: search || '',
     type: normalizedType,
   });
+
+  const stats = await categoryService.getCategoryStats();
 
   if (
     data.data.length !== 0 &&
@@ -42,6 +44,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       categories={data.data || []}
       meta={data?.meta || {}}
       currentPage={Number(page)}
+      categoryStats={stats}
     />
   );
 };

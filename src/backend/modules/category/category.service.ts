@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initDB } from '@/backend/utils/dbInit.util';
 import CategoryEntity, { CategoryTypeEnum } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -47,7 +48,7 @@ export class CategoryService {
   async findAll({
     search,
     page = 1,
-    limit=10,
+    limit = 10,
     type,
   }: {
     search?: string;
@@ -124,5 +125,40 @@ export class CategoryService {
       payload,
       { new: true }, // return updated document
     );
+  }
+
+  async getCategoryStats() {
+    await initDB();
+
+    const stats = await mongoose.model('Category').aggregate([
+      {
+        $group: {
+          _id: '$type',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const result = {
+      income: 0,
+      expense: 0,
+      investment: 0,
+    };
+
+    stats.forEach(item => {
+      if (item._id === CategoryTypeEnum.INCOME) {
+        result.income = item.total;
+      }
+
+      if (item._id === CategoryTypeEnum.EXPENSE) {
+        result.expense = item.total;
+      }
+
+      if (item._id === CategoryTypeEnum.INVESTMENT) {
+        result.investment = item.total;
+      }
+    });
+
+    return result;
   }
 }
