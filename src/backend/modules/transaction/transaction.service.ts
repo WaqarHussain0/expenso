@@ -4,7 +4,10 @@ import TransactionEntity from './entities/transaction.entity';
 import mongoose from 'mongoose';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { CategoryService } from '../category/category.service';
-import { CategoryTypeEnum } from '../category/entities/category.entity';
+import {
+  CategoryTypeEnum,
+  ICategory,
+} from '../category/entities/category.entity';
 
 const categoryService = new CategoryService();
 
@@ -38,7 +41,10 @@ export class TransactionService {
       );
     }
 
-    return await this.transactionEntity.create(payload);
+    return await this.transactionEntity.create({
+      ...payload,
+      categoryId: new mongoose.Types.ObjectId(categoryId),
+    });
   }
 
   async delete(id: mongoose.Types.ObjectId) {
@@ -95,7 +101,26 @@ export class TransactionService {
     }
 
     const skip = (page - 1) * limit;
-    const totalRecords = await this.transactionEntity.countDocuments(query);
+
+    let totalRecords = 0;
+
+    // ✅ FIX COUNT
+    if (categoryType) {
+      const categories = await mongoose
+        .model('Category')
+        .find({ type: categoryType })
+        .select('_id')
+        .lean();
+
+      const categoryIds = categories.map(c => c._id);
+
+      totalRecords = await this.transactionEntity.countDocuments({
+        ...query,
+        categoryId: { $in: categoryIds },
+      });
+    } else {
+      totalRecords = await this.transactionEntity.countDocuments(query);
+    }
 
     const transactions = await this.transactionEntity
       .find(query)
@@ -112,15 +137,17 @@ export class TransactionService {
       ? transactions.filter(t => t.categoryId)
       : transactions;
 
-    const data = filteredTransactions?.map(item => {
+    const data = filteredTransactions.map(item => {
+      const category = item.categoryId as ICategory;
+
       return {
         _id: item._id?.toString(),
         category: {
-          _id: item?.categoryId?._id.toString(),
-          name: item?.categoryId?.name,
-          type: item?.categoryId?.type,
+          _id: category?._id?.toString(),
+          name: category?.name,
+          type: category?.type,
         },
-        categoryId: item?.categoryId?._id?.toString(),
+        categoryId: category?._id?.toString(),
         amount: item.amount,
         date: item.date,
         note: item.note,

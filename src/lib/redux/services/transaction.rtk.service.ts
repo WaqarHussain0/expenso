@@ -4,7 +4,7 @@ import { api } from '@/lib/rtk';
 interface ICreateOrUpdatePayload {
   categoryId: string;
   amount: number;
-  date: Date;
+  date: Date|string;
   note?: string;
 }
 

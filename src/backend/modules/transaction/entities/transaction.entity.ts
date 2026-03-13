@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import mongooseAutopopulate from 'mongoose-autopopulate';
+import { ICategory } from '../../category/entities/category.entity';
 
 export interface ITransaction extends Document {
-  categoryId: mongoose.Types.ObjectId;
+  categoryId: mongoose.Types.ObjectId | ICategory;
   amount: number;
   date: Date;
   note?: string;
   createdAt: Date;
   updatedAt: Date;
- 
 }
 
 const TransactionSchema = new Schema<ITransaction>(

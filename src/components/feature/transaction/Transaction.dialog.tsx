@@ -21,7 +21,6 @@ import {
   useUpdateTransactionMutation,
 } from '@/lib/redux/services/transaction.rtk.service';
 import { CategorySelect } from '@/components/select/Category.select';
-import { useGetCategoryByIdQuery } from '@/lib/redux/services/category.rtk.service';
 
 interface ITransactionDialogProps {
   open: boolean;

@@ -14,6 +14,7 @@ import {
   useGetAllCategoriesQuery,
   useGetCategoryByIdQuery,
 } from '@/lib/redux/services/category.rtk.service';
+import { ICategory } from '@/types/category.type';
 
 interface ICategorySelectProps {
   value?: string;
@@ -55,7 +56,8 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
   /**
    * fetch selected category if not in list
    */
-  const shouldFetchSingle = !!value && !categories.some(c => c._id === value);
+  const shouldFetchSingle =
+    !!value && !categories.some((c: ICategory) => c._id === value);
 
   const { data: singleCategoryResponse } = useGetCategoryByIdQuery(value!, {
     skip: !shouldFetchSingle,

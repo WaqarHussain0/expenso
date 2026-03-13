@@ -26,7 +26,6 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     page: Number(page),
     limit: 6,
     search: search,
-    isServerSide: true,
     categoryType: normalizedType,
   };
 

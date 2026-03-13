@@ -27,7 +27,6 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     limit: 6,
     search: search || '',
     type: normalizedType,
-    isServerSide: true,
   });
 
   if (

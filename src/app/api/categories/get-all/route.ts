@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
 
     // Create category using the service
     const category = await categoryService.findAll({
-      isServerSide: false,
       limit: body.limit || 5,
       page: 1,
       search: body.name,

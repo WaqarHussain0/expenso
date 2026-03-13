@@ -41,9 +41,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  const monogoObjectId = new mongoose.Types.ObjectId(id);
 
   try {
-    const data = await transactionService.delete(id);
+    const data = await transactionService.delete(monogoObjectId);
     return NextResponse.json({ data }, { status: 201 });
   } catch (err: any) {
     // Handle validation errors or service errors
