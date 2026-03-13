@@ -16,7 +16,9 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { page = 1, search, type } = await searchParams;
 
   const normalizedType =
-    type === CategoryTypeEnum.INCOME || type === CategoryTypeEnum.EXPENSE
+    type === CategoryTypeEnum.INCOME ||
+    type === CategoryTypeEnum.EXPENSE ||
+    type === CategoryTypeEnum.INVESTMENT
       ? type
       : undefined;
 

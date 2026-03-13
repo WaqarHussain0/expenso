@@ -1,8 +1,9 @@
-import { CategoryService } from "@/backend/modules/category/category.service";
-import { CreateCategoryDto } from "@/backend/modules/category/dto/create-category.dto";
-import { validateDto } from "@/backend/utils/input-validator.util";
-import { NextRequest, NextResponse } from "next/server";
-import "reflect-metadata";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import 'reflect-metadata';
+import { CategoryService } from '@/backend/modules/category/category.service';
+import { CreateCategoryDto } from '@/backend/modules/category/dto/create-category.dto';
+import { validateDto } from '@/backend/utils/input-validator.util';
+import { NextRequest, NextResponse } from 'next/server';
 
 const categoryService = new CategoryService();
 
@@ -10,7 +11,6 @@ export async function POST(req: NextRequest) {
   try {
     // Parse JSON body
     const body = await req.json();
-
 
     // Transform to DTO and validate
     const dto = await validateDto(CreateCategoryDto, body);
@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
     // Return success response
     return NextResponse.json({ data: category }, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating user:", error);
+    console.error('Error creating category:', error);
     return NextResponse.json(
-      { error: error.message || "Something went wrong" },
+      { error: error.message || 'Something went wrong' },
       { status: 400 },
     );
   }

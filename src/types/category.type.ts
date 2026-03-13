@@ -8,6 +8,6 @@ export interface ICategory {
   _id: string;
   name: string;
   type: CategoryTypeEnum;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

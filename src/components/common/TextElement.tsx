@@ -26,7 +26,7 @@ const defaultClasses: Record<TextVariants, string> = {
   h5: "font-body text-sm",
   h6: "font-body",
   p: "text-muted-foreground font-body",
-  span: "text-[#52545B] font-400] text-[12px] font-body",
+  span: "text-blue-800 hover:underline font-body cursor-pointer underline",
   label: "text-[14px] font-[400] text-[#4D4D4D] font-body",
   blockquote: "",
   small: "",

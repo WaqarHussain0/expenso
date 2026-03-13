@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongooseAutopopulate from 'mongoose-autopopulate';
 
 export interface ITransaction extends Document {
   categoryId: mongoose.Types.ObjectId;
@@ -7,6 +8,7 @@ export interface ITransaction extends Document {
   note?: string;
   createdAt: Date;
   updatedAt: Date;
+ 
 }
 
 const TransactionSchema = new Schema<ITransaction>(
@@ -16,6 +18,7 @@ const TransactionSchema = new Schema<ITransaction>(
       ref: 'Category',
       required: true,
       index: true,
+      autopopulate: true,
     },
 
     amount: {
@@ -37,6 +40,8 @@ const TransactionSchema = new Schema<ITransaction>(
     timestamps: true,
   },
 );
+
+TransactionSchema.plugin(mongooseAutopopulate);
 
 const TransactionEntity: Model<ITransaction> =
   mongoose.models.Transaction ||

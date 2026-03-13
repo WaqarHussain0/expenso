@@ -1,8 +1,8 @@
 import connectToDB from "./database.util";
 
-export async function initDB(isServerSide=false) {
+export async function initDB() {
   try {
-    await connectToDB(isServerSide);
+    await connectToDB();
     console.log("MongoDB connected ✅");
   } catch (err) {
     console.error("MongoDB connection failed ❌", err);

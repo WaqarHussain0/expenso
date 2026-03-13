@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -15,18 +16,24 @@ import { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
 import { ITransaction } from '@/types/transaction.type';
-import { createTransactionService, updateTransactionService } from './service';
+import {
+  useCreateTransactionMutation,
+  useUpdateTransactionMutation,
+} from '@/lib/redux/services/transaction.rtk.service';
+import { CategorySelect } from '@/components/select/Category.select';
+import { useGetCategoryByIdQuery } from '@/lib/redux/services/category.rtk.service';
 
 interface ITransactionDialogProps {
   open: boolean;
   onClose: () => void;
   transaction?: ITransaction | null;
+  defaultCategoryId?: string;
 }
 
 type FormValues = {
   categoryId: string;
   amount: number;
-  date: Date;
+  date: string;
   note?: string;
 };
 
@@ -35,18 +42,27 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
   open,
   transaction,
 }) => {
+  const formatDateForInput = (date: string | Date) =>
+    new Date(date).toISOString().split('T')[0];
+
   const router = useRouter();
+
+  const [createTransaction, { isLoading: isCreating }] =
+    useCreateTransactionMutation();
+
+  const [updateTransaction, { isLoading: isUpdating }] =
+    useUpdateTransactionMutation();
 
   const {
     register,
     handleSubmit,
-    control,
     reset,
-    formState: { errors, isSubmitting },
+    control,
+    formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       amount: 0,
-      date: new Date(),
+      date: formatDateForInput(new Date()),
       note: '',
     },
   });
@@ -55,16 +71,19 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
     let response: any;
 
     if (transaction && transaction?._id) {
-      response = await updateTransactionService(transaction?._id, data);
+      response = await updateTransaction({
+        id: transaction?._id,
+        payload: data,
+      }).unwrap();
     } else {
       // For creation, include password if it's in the data
-      response = await createTransactionService(data);
+      response = await createTransaction(data).unwrap();
     }
 
-    if (response.ok) {
+    if (response.data) {
       onClose();
       reset();
-      toast.success('Category saved successfully');
+      toast.success('Transaction saved successfully');
       router.refresh();
     } else {
       const error = await response.json();
@@ -76,28 +95,33 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
 
   // Reset when editing
   useEffect(() => {
+    if (!open) return;
     if (transaction) {
       reset({
         amount: transaction.amount,
-        date: transaction.date,
+        date: formatDateForInput(transaction.date),
         note: transaction.note,
         categoryId: transaction.categoryId,
       });
     } else {
       reset({
         amount: 0,
-        date: new Date(),
+        date: formatDateForInput(new Date()),
         note: '',
       });
     }
-  }, [transaction, reset]);
+  }, [transaction, reset, open]);
+
+  const isSubmitting = isCreating || isUpdating;
 
   return (
     <Dialog
       open={open}
-      onOpenChange={() => {
-        onClose();
-        reset();
+      onOpenChange={isOpen => {
+        if (!isOpen) {
+          onClose();
+          reset();
+        }
       }}
     >
       <DialogContent className="">
@@ -151,6 +175,23 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
                 <p className="text-sm text-red-500">{errors.date.message}</p>
               )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Category *</Label>
+            <Controller
+              name="categoryId"
+              control={control}
+              rules={{ required: 'Please select a category' }}
+              render={({ field }) => (
+                <CategorySelect value={field.value} onChange={field.onChange} />
+              )}
+            />
+            {errors.categoryId && (
+              <p className="text-sm text-red-500">
+                {errors.categoryId.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

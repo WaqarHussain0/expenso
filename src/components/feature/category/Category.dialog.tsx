@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import {
@@ -13,7 +14,6 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { createCategoryService, updateCategoryService } from './service';
 import {
   Select,
   SelectContent,
@@ -22,6 +22,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import {
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from '@/lib/redux/services/category.rtk.service';
 
 interface ICategoryDialogProps {
   open: boolean;
@@ -52,7 +56,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
     handleSubmit,
     control,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -60,17 +64,26 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
     },
   });
 
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
+
   const onSubmit = async (data: FormValues) => {
     let response: any;
 
     if (category && category?._id) {
-      response = await updateCategoryService(category?._id, data);
+      response = await updateCategory({
+        id: category?._id,
+        payload: data,
+      }).unwrap();
     } else {
       // For creation, include password if it's in the data
-      response = await createCategoryService(data);
+      response = await createCategory(data).unwrap();
     }
 
-    if (response.ok) {
+    if (response.data) {
       onClose();
       reset();
       toast.success('Category saved successfully');
@@ -97,6 +110,8 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
       });
     }
   }, [category, reset]);
+
+  const isSubmitting = isCreating || isUpdating;
 
   return (
     <Dialog
@@ -164,6 +179,8 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               <p className="text-sm text-red-500">{errors.type.message}</p>
             )}
           </div>
+
+         
 
           {/* Actions */}
           <div className="flex justify-end gap-3">

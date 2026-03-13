@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initDB } from '@/backend/utils/dbInit.util';
 import TransactionEntity from './entities/transaction.entity';
 import mongoose from 'mongoose';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { CategoryService } from '../category/category.service';
+import { CategoryTypeEnum } from '../category/entities/category.entity';
 
 const categoryService = new CategoryService();
 
@@ -77,19 +79,19 @@ export class TransactionService {
     search,
     page = 1,
     limit = 10,
-    isServerSide = false,
+    categoryType,
   }: {
     search?: string;
     page?: number;
     limit?: number;
-    isServerSide: boolean;
+    categoryType?: CategoryTypeEnum;
   }) {
-    await initDB(isServerSide);
+    await initDB();
 
     const query: Record<string, any> = {};
 
     if (search) {
-      query['$or'] = [{ notes: { $regex: search, $options: 'i' } }];
+      query['$or'] = [{ note: { $regex: search, $options: 'i' } }];
     }
 
     const skip = (page - 1) * limit;
@@ -100,12 +102,25 @@ export class TransactionService {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 })
+      .populate({
+        path: 'categoryId',
+        match: categoryType ? { type: categoryType } : {},
+      })
       .lean();
 
-    const data = transactions?.map(item => {
+    const filteredTransactions = categoryType
+      ? transactions.filter(t => t.categoryId)
+      : transactions;
+
+    const data = filteredTransactions?.map(item => {
       return {
         _id: item._id?.toString(),
-        categoryId: item.categoryId?.toString(),
+        category: {
+          _id: item?.categoryId?._id.toString(),
+          name: item?.categoryId?.name,
+          type: item?.categoryId?.type,
+        },
+        categoryId: item?.categoryId?._id?.toString(),
         amount: item.amount,
         date: item.date,
         note: item.note,

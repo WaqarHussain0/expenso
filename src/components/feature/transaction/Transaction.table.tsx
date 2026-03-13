@@ -31,8 +31,11 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { deleteTransactionService } from './service';
 import { ITransaction } from '@/types/transaction.type';
+import { useDeleteTransactionMutation } from '@/lib/redux/services/transaction.rtk.service';
+import TransactionDialog from './Transaction.dialog';
+import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import { Badge } from '@/components/ui/badge';
 
 interface ITransactionTableProps {
   transactions: ITransaction[];
@@ -43,6 +46,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   className,
 }) => {
   const router = useRouter();
+  const [deleteTransaction] = useDeleteTransactionMutation();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
@@ -61,10 +65,14 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
         label: 'Amount',
       },
       {
-        label: 'Type',
+        label: 'Source',
       },
       {
         label: 'Date',
+      },
+
+      {
+        label: 'Note',
       },
 
       {
@@ -101,9 +109,9 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   };
   const handleDelete = async (transaction: ITransaction | null) => {
     if (!transaction || !transaction._id) return;
-    const res = await deleteTransactionService(transaction._id);
+    const res = await deleteTransaction(transaction._id).unwrap();
 
-    if (res.ok) {
+    if (res.data) {
       toast.success('Transaction deleted successfully');
       router.refresh();
       setIsDeleteModalOpen(false);
@@ -128,6 +136,18 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
             transactions.map(trx => (
               <TableRow key={trx._id}>
                 <TableCell className="capitalize">{trx?.amount}</TableCell>
+                <TableCell className="capitalize">
+                  <Badge
+                    variant={
+                      trx?.category.type === CategoryTypeEnum.INCOME
+                        ? 'default'
+                        : 'destructive'
+                    }
+                  >
+                    {trx?.category.name}
+                  </Badge>
+                </TableCell>
+
                 <TableCell className="capitalize">
                   {trx?.date.toDateString()}
                 </TableCell>
@@ -171,11 +191,14 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
         </TableBody>
       </Table>
 
-      {/* <CategoryDialog
-        onClose={handleCloseDialog}
-        open={isEditModalOpen}
-        category={selectedTransaction}
-      /> */}
+      {isEditModalOpen && (
+        <TransactionDialog
+          onClose={handleCloseDialog}
+          open={isEditModalOpen}
+          transaction={selectedTransaction}
+          defaultCategoryId={selectedTransaction?.categoryId}
+        />
+      )}
 
       {/* Delete Modal */}
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

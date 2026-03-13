@@ -47,17 +47,15 @@ export class CategoryService {
   async findAll({
     search,
     page = 1,
-    limit = 10,
+    limit,
     type,
-    isServerSide = false,
   }: {
     search?: string;
     page?: number;
     limit?: number;
     type: CategoryTypeEnum | undefined;
-    isServerSide: boolean;
   }) {
-    await initDB(isServerSide);
+    await initDB();
 
     const query: Record<string, any> = {};
     // ✅ add type filter

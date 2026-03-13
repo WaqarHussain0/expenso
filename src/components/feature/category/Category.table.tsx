@@ -34,7 +34,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { deleteCategoryService } from './service';
+import { useDeleteCategoryMutation } from '@/lib/redux/services/category.rtk.service';
 
 interface ICategoryTableProps {
   categories: ICategory[];
@@ -45,6 +45,8 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
   className,
 }) => {
   const router = useRouter();
+
+  const [deleteCategory] = useDeleteCategoryMutation();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
@@ -101,9 +103,9 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
   };
   const handleDelete = async (category: ICategory | null) => {
     if (!category || !category._id) return;
-    const res = await deleteCategoryService(category._id);
+    const res = await deleteCategory(category._id).unwrap();
 
-    if (res.ok) {
+    if (res.data) {
       toast.success('Category deleted successfully');
       router.refresh();
       setIsDeleteModalOpen(false);
@@ -178,11 +180,13 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
         </TableBody>
       </Table>
 
-      <CategoryDialog
-        onClose={handleCloseDialog}
-        open={isEditModalOpen}
-        category={selectedCategory}
-      />
+      {isEditModalOpen && (
+        <CategoryDialog
+          onClose={handleCloseDialog}
+          open={isEditModalOpen}
+          category={selectedCategory}
+        />
+      )}
 
       {/* Delete Modal */}
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
