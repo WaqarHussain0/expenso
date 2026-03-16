@@ -101,31 +101,29 @@ export class TransactionService {
       userId: new mongoose.Types.ObjectId(userId),
     };
 
+    // Add search filter
     if (search) {
       query['$or'] = [{ note: { $regex: search, $options: 'i' } }];
     }
 
-    const skip = (page - 1) * limit;
-
-    let totalRecords = 0;
-
-    // ✅ FIX COUNT
+    // If filtering by categoryType (income/expense/investment)
     if (categoryType) {
+      // 1️⃣ Find category IDs with that type
       const categories = await mongoose
         .model('Category')
-        .find({ type: categoryType })
+        .find({ type: categoryType, userId: userId })
         .select('_id')
         .lean();
 
       const categoryIds = categories.map(c => c._id);
 
-      totalRecords = await this.transactionEntity.countDocuments({
-        ...query,
-        categoryId: { $in: categoryIds },
-      });
-    } else {
-      totalRecords = await this.transactionEntity.countDocuments(query);
+      // 2️⃣ Filter transactions by these category IDs
+      query['categoryId'] = { $in: categoryIds };
     }
+
+    const skip = (page - 1) * limit;
+
+    const totalRecords = await this.transactionEntity.countDocuments(query);
 
     const transactions = await this.transactionEntity
       .find(query)
@@ -134,23 +132,19 @@ export class TransactionService {
       .sort({ createdAt: -1 })
       .populate({
         path: 'categoryId',
-        match: categoryType ? { type: categoryType } : {},
+        select: '_id name type', // populate only relevant fields
       })
       .lean();
 
-    const filteredTransactions = categoryType
-      ? transactions.filter(t => t.categoryId)
-      : transactions;
-
-    const data = filteredTransactions.map(item => {
+    const data = transactions.map(item => {
       const category = item.categoryId as ICategory;
 
       return {
         _id: item._id?.toString(),
         category: {
-          _id: category?._id?.toString(),
-          name: category?.name,
-          type: category?.type,
+          _id: category._id?.toString(),
+          name: category.name,
+          type: category.type,
         },
         categoryId: category?._id?.toString(),
         amount: item.amount,
@@ -167,7 +161,6 @@ export class TransactionService {
   }
 
   // get month stats for income, expense and investment
-
   async getMonthlyStats(month: number, year: number) {
     await initDB();
 
@@ -223,5 +216,117 @@ export class TransactionService {
     });
 
     return result;
+  }
+
+  async getDashboardData(
+    startDate: Date,
+    endDate: Date,
+    userId: mongoose.Types.ObjectId,
+  ) {
+    await initDB();
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const matchStage = {
+      $match: {
+        userId,
+        date: { $gte: startDate, $lte: end },
+      },
+    };
+
+    // existing daily series aggregation
+    const stats = await this.transactionEntity.aggregate([
+      matchStage,
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      {
+        $group: {
+          _id: {
+            type: '$category.type',
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          },
+          total: { $sum: '$amount' },
+        },
+      },
+      { $sort: { '_id.date': 1 } },
+    ]);
+
+    // new — group by category name + type
+    const categoryStats = await this.transactionEntity.aggregate([
+      matchStage,
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      {
+        $group: {
+          _id: {
+            categoryId: '$categoryId',
+            name: '$category.name',
+            type: '$category.type',
+          },
+          total: { $sum: '$amount' },
+        },
+      },
+      { $sort: { total: -1 } },
+    ]);
+
+    const chartData: Record<
+      string,
+      { date: string; income: number; expense: number; investment: number }
+    > = {};
+
+    stats.forEach(item => {
+      const { type, date } = item._id;
+      if (!chartData[date])
+        chartData[date] = { date, income: 0, expense: 0, investment: 0 };
+      if (type === CategoryTypeEnum.INCOME) chartData[date].income = item.total;
+      if (type === CategoryTypeEnum.EXPENSE)
+        chartData[date].expense = item.total;
+      if (type === CategoryTypeEnum.INVESTMENT)
+        chartData[date].investment = item.total;
+    });
+
+    const series = Object.values(chartData).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
+
+    const totals = series.reduce(
+      (acc, day) => {
+        acc.income += day.income;
+        acc.expense += day.expense;
+        acc.investment += day.investment;
+        return acc;
+      },
+      { income: 0, expense: 0, investment: 0 },
+    );
+
+    // shape category breakdown by type
+    const categoryBreakdown = {
+      income: categoryStats
+        .filter(c => c._id.type === CategoryTypeEnum.INCOME)
+        .map(c => ({ name: c._id.name, total: c.total })),
+      expense: categoryStats
+        .filter(c => c._id.type === CategoryTypeEnum.EXPENSE)
+        .map(c => ({ name: c._id.name, total: c.total })),
+      investment: categoryStats
+        .filter(c => c._id.type === CategoryTypeEnum.INVESTMENT)
+        .map(c => ({ name: c._id.name, total: c.total })),
+    };
+
+    return { series, totals, categoryBreakdown };
   }
 }

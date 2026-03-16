@@ -25,7 +25,7 @@ import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
-} from '@/lib/redux/services/category.rtk.service';
+} from '@/lib/rtk/services/category.rtk.service';
 
 interface ICategoryDialogProps {
   open: boolean;

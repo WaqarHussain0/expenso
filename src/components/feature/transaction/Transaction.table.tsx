@@ -32,7 +32,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { ITransaction } from '@/types/transaction.type';
-import { useDeleteTransactionMutation } from '@/lib/redux/services/transaction.rtk.service';
+import { useDeleteTransactionMutation } from '@/lib/rtk/services/transaction.rtk.service';
 import TransactionDialog from './Transaction.dialog';
 import { CategoryTypeEnum } from '@/types/category.type';
 import { Badge } from '@/components/ui/badge';

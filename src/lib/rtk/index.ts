@@ -6,7 +6,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:3000/api',
-    
+
     prepareHeaders: async (headers: any) => {
       const session = await getSession();
       if (session && session.accessToken) {
@@ -15,6 +15,6 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['categories', 'transactions'],
+  tagTypes: ['categories', 'transactions', 'dashboard'],
   endpoints: () => ({}),
 });

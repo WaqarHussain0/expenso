@@ -34,7 +34,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { useDeleteCategoryMutation } from '@/lib/redux/services/category.rtk.service';
+import { useDeleteCategoryMutation } from '@/lib/rtk/services/category.rtk.service';
 
 interface ICategoryTableProps {
   categories: ICategory[];

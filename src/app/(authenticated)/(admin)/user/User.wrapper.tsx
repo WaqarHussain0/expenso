@@ -71,10 +71,10 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
             {' '}
-            All Categories
+            All Users
           </TextElement>
           <TextElement as="p" className="sm">
-            Manage your categories here
+            Manage users here
           </TextElement>
         </Row>
       </Row>

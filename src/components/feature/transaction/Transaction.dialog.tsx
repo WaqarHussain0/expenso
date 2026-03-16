@@ -19,7 +19,7 @@ import { ITransaction } from '@/types/transaction.type';
 import {
   useCreateTransactionMutation,
   useUpdateTransactionMutation,
-} from '@/lib/redux/services/transaction.rtk.service';
+} from '@/lib/rtk/services/transaction.rtk.service';
 import { CategorySelect } from '@/components/select/Category.select';
 
 interface ITransactionDialogProps {

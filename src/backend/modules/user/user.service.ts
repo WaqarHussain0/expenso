@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import { after } from 'next/server';
 import { sendEmail } from '@/lib/email.util';
 import { forgotPasswordEmailTemplate } from '@/app/constants/email-templates/forgot-password.email-template';
+import { welcomeEmailTemplate } from '@/app/constants/email-templates/welcome.email-template';
 
 export class UserService {
   private readonly userEntity = UserEntity;
@@ -46,12 +47,30 @@ export class UserService {
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
-    return await this.userEntity.create({
+    const savedUser = await this.userEntity.create({
       name,
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: role || UserRoleEnum.USER,
     });
+
+    const loginPageLink = `${process.env.NEXTAUTH_URL}/login}`;
+
+    // prepare email template
+    const html = welcomeEmailTemplate({
+      name: savedUser?.name || 'there',
+      loginPageLink,
+    });
+
+    after(async () => {
+      await sendEmail({
+        to: savedUser?.email,
+        subject: 'Welcome to Expenso',
+        html,
+      });
+    });
+
+    return savedUser;
   }
 
   async deleteUser(id: string) {
@@ -163,12 +182,10 @@ export class UserService {
     search,
     page = 1,
     limit = 10,
-    userId,
   }: {
     search?: string;
     page?: number;
     limit?: number;
-    userId: string;
   }) {
     await initDB();
 

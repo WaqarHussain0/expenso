@@ -13,7 +13,7 @@ import { Loader2 } from 'lucide-react';
 import {
   useGetAllCategoriesQuery,
   useGetCategoryByIdQuery,
-} from '@/lib/redux/services/category.rtk.service';
+} from '@/lib/rtk/services/category.rtk.service';
 import { ICategory } from '@/types/category.type';
 
 interface ICategorySelectProps {
