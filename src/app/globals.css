@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,9 +128,6 @@
   }
 }
 
-
-
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -141,8 +138,6 @@
   scrollbar-width: none;
   /* Firefox */
 }
-
-
 
 /* ===== Global Scrollbar Styles ===== */
 * {
@@ -170,3 +165,11 @@
   background-color: #555; /* darker on hover */
 }
 
+.poppins {
+  font-family: var(--font-poppins);
+}
+
+.poppinsRegular {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+}

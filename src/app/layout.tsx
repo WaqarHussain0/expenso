@@ -3,6 +3,14 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import RTKProvider from '@/components/providers/RTK.provider';
 import NextAuthProvider from '@/components/providers/NextAuth.provider';
+import { Poppins } from 'next/font/google';
+
+export const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
 
 const appURL = 'https://expenso-pi.vercel.app';
 export const metadata: Metadata = {
@@ -58,7 +66,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${poppins.variable} antialiased`}>
         <Toaster position="bottom-right" richColors />
 
         <NextAuthProvider>

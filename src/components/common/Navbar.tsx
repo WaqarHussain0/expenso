@@ -125,7 +125,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
               const Icon = item.icon;
               return (
                 <Link
-                  className={`font-body flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                  className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
                     isActive
                       ? 'bg-white/10 text-white'
                       : 'text-blue-100 hover:bg-white/5 hover:text-white'
@@ -144,11 +144,11 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
         {/* Logout */}
         <div className="w-full space-y-1 border-t border-blue-800 px-4 py-4">
           <Row className="gap-2">
-            <div className="flex size-9 items-center justify-center rounded-full bg-blue-700 text-white capitalize shadow-sm">
+            <div className="poppins flex size-9 items-center justify-center rounded-full bg-blue-700 text-white capitalize shadow-sm">
               {user?.name?.slice(0, 1)}
             </div>
 
-            <TextElement as="h5" className="text-white capitalize">
+            <TextElement as="h5" className="poppins text-white capitalize">
               {user?.name}
             </TextElement>
           </Row>
@@ -158,7 +158,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
             className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-blue-100 transition-colors hover:bg-white/5 hover:text-white"
           >
             <LogOut className="h-5 w-5" />
-            <span>Logout</span>
+            <span className='poppins'>Logout</span>
           </button>
         </div>
 
