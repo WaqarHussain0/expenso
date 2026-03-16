@@ -83,7 +83,12 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
 
-      <SelectContent>
+      <SelectContent
+        position="popper"
+        side="bottom"
+        align="start"
+        className="max-h-60 overflow-y-auto"
+      >
         <div className="p-2">
           <Input
             value={search}
@@ -91,6 +96,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             placeholder="Search categories..."
             className="mb-2"
             onKeyDown={e => e.stopPropagation()}
+            onPointerDown={e => e.stopPropagation()}
           />
         </div>
 

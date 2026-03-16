@@ -6,7 +6,7 @@ import 'reflect-metadata';
 
 const categoryService = new CategoryService();
 
-export const POST = withAuth(async (req: NextRequest) => {
+export const POST = withAuth(async (req: NextRequest, user) => {
   try {
     // Parse JSON body
     const body = await req.json();
@@ -16,6 +16,7 @@ export const POST = withAuth(async (req: NextRequest) => {
       page: 1,
       search: body.name,
       type: undefined,
+      userId: user.id,
     });
 
     // Return success response
