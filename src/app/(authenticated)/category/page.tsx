@@ -3,6 +3,7 @@ import CategoryWrapper from './Category.wrapper';
 import { redirect } from 'next/navigation';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { CategoryTypeEnum } from '@/types/category.type';
+import { getServerSideSession } from '@/lib/next-auth.util';
 
 type SearchParams = Promise<{
   page?: string;
@@ -15,6 +16,13 @@ const categoryService = new CategoryService();
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { page = 1, search, type } = await searchParams;
 
+  const session = await getServerSideSession();
+  const user = session?.user;
+
+  if (!user?.id) {
+    redirect(PAGE_ROUTES.dashboard);
+  }
+
   const normalizedType =
     type === CategoryTypeEnum.INCOME ||
     type === CategoryTypeEnum.EXPENSE ||
@@ -22,14 +30,18 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       ? type
       : undefined;
 
-  const data = await categoryService.findAll({
+  const catPayload = {
     page: Number(page),
     limit: 5,
     search: search || '',
     type: normalizedType,
-  });
+    userId: user.id,
+  };
 
-  const stats = await categoryService.getCategoryStats();
+  const [data, stats] = await Promise.all([
+    categoryService.findAll(catPayload),
+    categoryService.getCategoryStats(user.id),
+  ]);
 
   if (
     data.data.length !== 0 &&

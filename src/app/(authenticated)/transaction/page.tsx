@@ -3,6 +3,7 @@ import TransactionWrapper from './Transaction.wrapper';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { TransactionService } from '@/backend/modules/transaction/transaction.service';
 import { CategoryTypeEnum } from '@/types/category.type';
+import { getServerSideSession } from '@/lib/next-auth.util';
 
 type SearchParams = Promise<{
   page?: string;
@@ -14,6 +15,13 @@ const transactionService = new TransactionService();
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { page = 1, search = '', type } = await searchParams;
+
+  const session = await getServerSideSession();
+  const user = session?.user;
+
+  if (!user?.id) {
+    redirect(PAGE_ROUTES.dashboard);
+  }
 
   const normalizedType =
     type === CategoryTypeEnum.INCOME ||
@@ -27,16 +35,17 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     limit: 5,
     search: search,
     categoryType: normalizedType,
+    userId: user.id,
   };
-
-  const data = await transactionService.findAll(transactionPayload);
 
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  const stats = await transactionService.getMonthlyStats(month, year);
-
+  const [data, stats] = await Promise.all([
+    transactionService.findAll(transactionPayload),
+    transactionService.getMonthlyStats(month, year),
+  ]);
 
   if (
     data.data.length !== 0 &&

@@ -3,7 +3,13 @@ import Link from 'next/link';
 import Row from './Row';
 import TextElement from './TextElement';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { ChartPie, HandCoins, LayoutDashboard, LogOut } from 'lucide-react';
+import {
+  ChartPie,
+  HandCoins,
+  LayoutDashboard,
+  LogOut,
+  Users,
+} from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
@@ -39,9 +45,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
   const { data: session } = useSession();
   const user = session?.user;
 
-  const isAdminUser = user?.role === UserRoleEnum.ADMIN;
-
-  console.log(isAdminUser);
+  const isAdminUser = user?.role === UserRoleEnum.ADMIN || false;
 
   const navItems = [
     {
@@ -61,6 +65,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       icon: HandCoins,
       linkTo: PAGE_ROUTES.transaction,
       show: true,
+    },
+
+    {
+      title: 'Users',
+      linkTo: PAGE_ROUTES.user,
+      icon: Users,
+      show: isAdminUser,
     },
   ];
 

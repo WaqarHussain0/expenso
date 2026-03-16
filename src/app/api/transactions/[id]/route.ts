@@ -5,53 +5,64 @@ import { TransactionService } from '@/backend/modules/transaction/transaction.se
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
+import { withAuth } from '@/backend/utils/guard/withAuth';
 
 const transactionService = new TransactionService();
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  const monogoObjectId = new mongoose.Types.ObjectId(id);
-  try {
-    // Parse JSON body
-    const body = await req.json();
+export const PUT = withAuth(
+  async (
+    req: NextRequest,
+    user,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
+    const monogoObjectId = new mongoose.Types.ObjectId(id);
 
-    // Transform to DTO and validate
-    const dto = await validateDto(CreateTransactionDto, body);
+    try {
+      const body = await req.json();
 
-    // Update user using the service
-    const data = await transactionService.update(monogoObjectId, dto);
+      const dto = await validateDto(CreateTransactionDto, body);
 
-    // Return success response
-    return NextResponse.json({ data }, { status: 201 });
-  } catch (err: any) {
-    // Handle validation errors or service errors
-    console.error('Error updating category:', err);
-    return NextResponse.json(
-      { error: err.message || 'Something went wrong' },
-      { status: 400 },
-    );
-  }
-}
+      await transactionService.update(monogoObjectId, dto);
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  const monogoObjectId = new mongoose.Types.ObjectId(id);
+      return NextResponse.json(
+        {
+          message: 'Transaction updated!',
+          success: true,
+        },
+        { status: 200 },
+      );
+    } catch (err: any) {
+      console.error('Error updating transaction:', err);
 
-  try {
-    const data = await transactionService.delete(monogoObjectId);
-    return NextResponse.json({ data }, { status: 201 });
-  } catch (err: any) {
-    // Handle validation errors or service errors
-    console.error('Error deleting category:', err);
-    return NextResponse.json(
-      { error: err.message || 'Something went wrong' },
-      { status: 400 },
-    );
-  }
-}
+      return NextResponse.json(
+        { error: err.message || 'Something went wrong' },
+        { status: 400 },
+      );
+    }
+  },
+);
+
+export const DELETE = withAuth(
+  async (
+    req: NextRequest,
+    user,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
+    const monogoObjectId = new mongoose.Types.ObjectId(id);
+
+    try {
+      const data = await transactionService.delete(monogoObjectId);
+
+      return NextResponse.json({ data }, { status: 200 });
+    } catch (err: any) {
+      console.error('Error deleting transaction:', err);
+
+      return NextResponse.json(
+        { error: err.message || 'Something went wrong' },
+        { status: 400 },
+      );
+    }
+  },
+);

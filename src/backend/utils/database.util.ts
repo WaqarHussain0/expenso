@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import CategoryEntity from '../modules/category/entities/category.entity';
 import TransactionEntity from '../modules/transaction/entities/transaction.entity';
@@ -32,7 +33,6 @@ async function connectToDB() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    console.log('MONGODB_URI : ', MONGODB_URI, '!!!!!!!!!!!!!!!!!!!!!!');
     cached.promise = mongoose
       .connect(MONGODB_URI)
       .then(async mongooseInstance => {

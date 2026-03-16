@@ -1,18 +1,31 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import mongooseAutopopulate from 'mongoose-autopopulate';
 import { ICategory } from '../../category/entities/category.entity';
+import { IUser } from '../../user/entities/user.entity';
 
 export interface ITransaction extends Document {
-  categoryId: mongoose.Types.ObjectId | ICategory;
   amount: number;
   date: Date;
   note?: string;
+
+  categoryId: mongoose.Types.ObjectId | ICategory;
+  userId: mongoose.Types.ObjectId | IUser;
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 const TransactionSchema = new Schema<ITransaction>(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
+      default: null,
+      index: true,
+      autopopulate: true,
+    },
+
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',

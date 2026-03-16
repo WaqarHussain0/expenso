@@ -8,6 +8,9 @@ const PAGE_ROUTES = {
   dashboard: '/dashboard',
   category: '/category',
   transaction: '/transaction',
+
+  // Admin Routes
+  user: '/user',
 };
 
 export default PAGE_ROUTES;

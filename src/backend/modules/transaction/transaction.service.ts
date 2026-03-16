@@ -28,7 +28,7 @@ export class TransactionService {
     return data;
   }
 
-  async create(payload: CreateTransactionDto) {
+  async create(payload: CreateTransactionDto, userId: mongoose.Types.ObjectId) {
     const { categoryId } = payload;
 
     await initDB();
@@ -43,6 +43,7 @@ export class TransactionService {
 
     return await this.transactionEntity.create({
       ...payload,
+      userId,
       categoryId: new mongoose.Types.ObjectId(categoryId),
     });
   }
@@ -86,15 +87,19 @@ export class TransactionService {
     page = 1,
     limit = 10,
     categoryType,
+    userId,
   }: {
     search?: string;
     page?: number;
     limit?: number;
     categoryType?: CategoryTypeEnum;
+    userId: string;
   }) {
     await initDB();
 
-    const query: Record<string, any> = {};
+    const query: Record<string, any> = {
+      userId: new mongoose.Types.ObjectId(userId),
+    };
 
     if (search) {
       query['$or'] = [{ note: { $regex: search, $options: 'i' } }];

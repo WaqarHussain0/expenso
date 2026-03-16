@@ -34,7 +34,7 @@ import {
 import { ITransaction } from '@/types/transaction.type';
 import { useDeleteTransactionMutation } from '@/lib/redux/services/transaction.rtk.service';
 import TransactionDialog from './Transaction.dialog';
-import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import { CategoryTypeEnum } from '@/types/category.type';
 import { Badge } from '@/components/ui/badge';
 
 interface ITransactionTableProps {
@@ -107,6 +107,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
       },
     ];
   };
+
   const handleDelete = async (transaction: ITransaction | null) => {
     if (!transaction || !transaction._id) return;
     const res = await deleteTransaction(transaction._id).unwrap();
@@ -120,6 +121,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
       toast.error('Failed to delete transaction');
     }
   };
+  
   return (
     <div className={className}>
       <Table>
@@ -144,6 +146,11 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
                       trx?.category.type === CategoryTypeEnum.INCOME
                         ? 'default'
                         : 'destructive'
+                    }
+                    className={
+                      trx.category.type === CategoryTypeEnum.INVESTMENT
+                        ? 'bg-yellow-100 text-yellow-500'
+                        : ''
                     }
                   >
                     {trx?.category.name}

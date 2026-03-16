@@ -137,6 +137,11 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
                         ? 'destructive'
                         : 'default'
                     }
+                    className={
+                      category.type === CategoryTypeEnum.INVESTMENT
+                        ? 'bg-yellow-100 text-yellow-500'
+                        : ''
+                    }
                   >
                     {category?.type}
                   </Badge>

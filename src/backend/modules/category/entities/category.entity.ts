@@ -1,9 +1,11 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import { IUser } from '../../user/entities/user.entity';
+import mongooseAutopopulate from 'mongoose-autopopulate';
 
 export enum CategoryTypeEnum {
-  INCOME = "income",
-  EXPENSE = "expense",
-  INVESTMENT = "investment",
+  INCOME = 'income',
+  EXPENSE = 'expense',
+  INVESTMENT = 'investment',
 }
 
 export interface ICategory extends Document {
@@ -11,6 +13,8 @@ export interface ICategory extends Document {
   type: CategoryTypeEnum;
   createdAt: Date;
   updatedAt: Date;
+
+  userId: mongoose.Types.ObjectId | IUser;
 }
 
 const CategorySchema = new Schema<ICategory>(
@@ -29,14 +33,24 @@ const CategorySchema = new Schema<ICategory>(
       required: true,
       index: true,
     },
+
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+      autopopulate: true,
+    },
   },
   {
     timestamps: true,
   },
 );
 
+CategorySchema.plugin(mongooseAutopopulate);
+
 const CategoryEntity: Model<ICategory> =
   mongoose.models.Category ||
-  mongoose.model<ICategory>("Category", CategorySchema);
+  mongoose.model<ICategory>('Category', CategorySchema);
 
 export default CategoryEntity;

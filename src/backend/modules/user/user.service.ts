@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { initDB } from '@/backend/utils/dbInit.util';
 import mongoose from 'mongoose';
 import UserEntity, { UserRoleEnum } from './entities/user.entity';
@@ -156,5 +157,89 @@ export class UserService {
     return {
       message: 'Password reset successfully',
     };
+  }
+
+  async findAll({
+    search,
+    page = 1,
+    limit = 10,
+    userId,
+  }: {
+    search?: string;
+    page?: number;
+    limit?: number;
+    userId: string;
+  }) {
+    await initDB();
+
+    const query: Record<string, any> = {
+      // _id: { $ne: new mongoose.Types.ObjectId(userId) }, // exclude logged-in user
+    };
+
+    if (search) {
+      query['$or'] = [{ name: { $regex: search, $options: 'i' } }];
+      query['$or'] = [{ email: { $regex: search, $options: 'i' } }];
+    }
+
+    const skip = (page - 1) * limit;
+
+    let totalRecords = 0;
+
+    // ✅ FIX COUNT
+
+    totalRecords = await this.userEntity.countDocuments(query);
+
+    const users = await this.userEntity
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+
+      .lean();
+
+    const data = users.map(item => {
+      return {
+        id: item._id?.toString(),
+        name: item.name,
+        email: item.email,
+        role: item.role,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      };
+    });
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return { data, meta: { page, totalRecords, totalPages } };
+  }
+
+  async getUserStats() {
+    await initDB();
+
+    const stats = await mongoose.model('User').aggregate([
+      {
+        $group: {
+          _id: '$role',
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const result = {
+      totalAdmin: 0,
+      normalUsers: 0,
+    };
+
+    stats.forEach(item => {
+      if (item._id === UserRoleEnum.ADMIN) {
+        result.totalAdmin = item.total;
+      }
+
+      if (item._id === UserRoleEnum.USER) {
+        result.normalUsers = item.total;
+      }
+    });
+
+    return result;
   }
 }

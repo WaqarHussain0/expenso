@@ -79,7 +79,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
       response = await createTransaction(data).unwrap();
     }
 
-    if (response.data) {
+    if (response.success) {
       onClose();
       reset();
       toast.success('Transaction saved successfully');

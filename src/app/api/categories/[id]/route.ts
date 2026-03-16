@@ -45,10 +45,16 @@ export async function PUT(
     const dto = await validateDto(CreateCategoryDto, body);
 
     // Update user using the service
-    const data = await categoryService.update(monogoObjectId, dto);
+    await categoryService.update(monogoObjectId, dto);
 
     // Return success response
-    return NextResponse.json({ data }, { status: 201 });
+    return NextResponse.json(
+      {
+        message: 'Category updated!',
+        success: true,
+      },
+      { status: 201 },
+    );
   } catch (err: any) {
     // Handle validation errors or service errors
     console.error('Error updating category:', err);

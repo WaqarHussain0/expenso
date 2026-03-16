@@ -83,7 +83,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
       response = await createCategory(data).unwrap();
     }
 
-    if (response.data) {
+    if (response.success) {
       onClose();
       reset();
       toast.success('Category saved successfully');
@@ -98,10 +98,12 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
 
   // Reset when editing
   useEffect(() => {
+    if (!open) return;
+
     if (category) {
       reset({
         name: category.name,
-        type: CategoryTypeEnum.EXPENSE,
+        type: category.type,
       });
     } else {
       reset({
@@ -109,16 +111,18 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
         type: CategoryTypeEnum.EXPENSE,
       });
     }
-  }, [category, reset]);
+  }, [category, reset, open]);
 
   const isSubmitting = isCreating || isUpdating;
 
   return (
     <Dialog
       open={open}
-      onOpenChange={() => {
-        onClose();
-        reset();
+      onOpenChange={isOpen => {
+        if (!isOpen) {
+          onClose();
+          reset();
+        }
       }}
     >
       <DialogContent className="">
@@ -179,8 +183,6 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               <p className="text-sm text-red-500">{errors.type.message}</p>
             )}
           </div>
-
-         
 
           {/* Actions */}
           <div className="flex justify-end gap-3">

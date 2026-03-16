@@ -29,8 +29,8 @@ export class CategoryService {
     });
   }
 
-  async create(payload: CreateCategoryDto) {
-    const { name } = payload;
+  async create(payload: CreateCategoryDto, userId: mongoose.Types.ObjectId) {
+    const { name, type } = payload;
 
     await initDB();
 
@@ -42,7 +42,11 @@ export class CategoryService {
       );
     }
 
-    return await this.categoryEntity.create(payload);
+    return await this.categoryEntity.create({
+      name,
+      type,
+      userId,
+    });
   }
 
   async findAll({
@@ -50,15 +54,20 @@ export class CategoryService {
     page = 1,
     limit = 10,
     type,
+    userId,
   }: {
     search?: string;
     page?: number;
     limit?: number;
     type: CategoryTypeEnum | undefined;
+    userId: string;
   }) {
     await initDB();
 
-    const query: Record<string, any> = {};
+    const query: Record<string, any> = {
+      userId: new mongoose.Types.ObjectId(userId),
+    };
+    
     // ✅ add type filter
     if (type) {
       query.type = type;
@@ -114,7 +123,7 @@ export class CategoryService {
       throw new Error(`Category with id ${id} not found`);
     }
 
-    if (existingName && existingName._id !== id) {
+    if (existingName && existingName._id.toString() !== id.toString()) {
       throw new Error(
         `Category with name ${payload.name} already exists, please use a different name.`,
       );
@@ -127,10 +136,15 @@ export class CategoryService {
     );
   }
 
-  async getCategoryStats() {
+  async getCategoryStats(userId: string) {
     await initDB();
 
     const stats = await mongoose.model('Category').aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+      },
       {
         $group: {
           _id: '$type',
