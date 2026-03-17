@@ -108,7 +108,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       {!toggleMenu && (
         <button
           onClick={handleToggleMenu}
-          className="text-primary-foreground fixed top-4 right-4 z-50 cursor-pointer rounded-md bg-blue-900 px-2 py-1 hover:bg-blue-800 lg:hidden"
+          className="text-primary-foreground bgPrimary hover:bgPrimary/80 fixed top-4 right-4 z-50 cursor-pointer rounded-md px-2 py-1 lg:hidden"
         >
           ☰
         </button>
@@ -118,45 +118,43 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
         ref={navbarRef}
         className={`text-white ${className} fixed top-0 left-0 z-40 flex h-full flex-col justify-between transition-transform duration-300 lg:static ${toggleMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
+        <Row className="w-full flex-col items-start gap-4">
+          <div className="flex w-full items-center gap-3 border-b border-[#D47E30] px-2 py-3">
+            {/* Logo */}
+            <div className="relative flex size-10 items-center justify-center rounded-md border border-[#6F4E37]/30 bg-[#D47E30] backdrop-blur-md">
+              <Coins className="size-6 text-[#F5F5DC]" />
+            </div>
 
-        <Row className='flex-col items-start w-full gap-4'>
-
-        <div className="w-full flex items-center gap-3 border-b border-[#D47E30] px-2 py-3">
-          {/* Logo */}
-          <div className="relative flex size-10 items-center justify-center rounded-md border border-[#6F4E37]/30 bg-[#D47E30] backdrop-blur-md">
-            <Coins className="size-6 text-[#F5F5DC]" />
+            <TextElement
+              as="h1"
+              className="text-xl font-semibold !text-[#F5F5DC]"
+            >
+              Expenso
+            </TextElement>
           </div>
+          <Row className={`gap- w-full flex-col`}>
+            {navItems
+              .filter(item => item.show)
+              .map(item => {
+                const isActive = pathname === item.linkTo;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                      isActive
+                        ? 'bgSecondary text-[#F5F5DC]'
+                        : 'hover:bgSecondary hover:text-[#F5F5DC]'
+                    }`}
+                    key={item.title}
+                    href={item.linkTo}
+                  >
+                    <Icon className="size-5" />
 
-          <TextElement
-            as="h1"
-            className="text-xl font-semibold !text-[#F5F5DC]"
-          >
-            Expenso
-          </TextElement>
-        </div>
-        <Row className={`gap- w-full flex-col`}>
-          {navItems
-            .filter(item => item.show)
-            .map(item => {
-              const isActive = pathname === item.linkTo;
-              const Icon = item.icon;
-              return (
-                <Link
-                  className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                    isActive
-                      ? 'bgSecondary text-[#F5F5DC]'
-                      : 'hover:bgSecondary hover:text-[#F5F5DC]'
-                  }`}
-                  key={item.title}
-                  href={item.linkTo}
-                >
-                  <Icon className="size-5" />
-
-                  <TextElement as="h4">{item.title}</TextElement>
-                </Link>
-              );
-            })}
-        </Row>
+                    <TextElement as="h4">{item.title}</TextElement>
+                  </Link>
+                );
+              })}
+          </Row>
         </Row>
 
         {/* Logout */}
