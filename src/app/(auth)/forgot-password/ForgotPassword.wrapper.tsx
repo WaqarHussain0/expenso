@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import TextElement from '@/components/common/TextElement';
@@ -12,6 +13,7 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { emailInputField } from '@/app/constants/input.constant';
 import { Label } from '@/components/ui/label';
 import { baseUrl } from '@/app/constants/app.constant';
+import Link from 'next/link';
 
 interface IForgotPasswordRequest {
   email: string;
@@ -60,7 +62,7 @@ const ForgotPasswordWrapper = () => {
   };
 
   return (
-    <div className="bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
+    <div className="page-fade bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
       <TextElement as="h1" className="mb-8">
         Forgot Password
       </TextElement>
@@ -68,7 +70,7 @@ const ForgotPasswordWrapper = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Email Input */}
         <div className="space-y-2">
-          <Label>{emailInputField.label}</Label>
+          <Label className="text-[#D47E30]">{emailInputField.label}</Label>
           <Controller
             name={emailInputField.name as 'email'}
             control={control}
@@ -81,7 +83,10 @@ const ForgotPasswordWrapper = () => {
                   placeholder={emailInputField.placeholder}
                 />
                 {errors.email && (
-                  <TextElement as="span" className="mt-1 text-red-400">
+                  <TextElement
+                    as="span"
+                    className="mt-1 text-xs !text-red-500 !no-underline"
+                  >
                     {errors.email.message}
                   </TextElement>
                 )}
@@ -91,13 +96,9 @@ const ForgotPasswordWrapper = () => {
         </div>
 
         <Row className="w-full items-center justify-between">
-          <TextElement
-            as="a"
-            onClick={() => router.push(PAGE_ROUTES.login)}
-            className="cursor-pointer underline"
-          >
-            Login
-          </TextElement>
+          <Link href={PAGE_ROUTES.login}>
+            <TextElement as="span">Login</TextElement>
+          </Link>
 
           <Button type="submit" disabled={loading}>
             {loading ? 'Sending...' : 'Reset Password'}

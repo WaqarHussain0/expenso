@@ -10,10 +10,15 @@ import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, UserRound, UserRoundKey, Users } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
 import UserTable from '@/components/feature/user/User.table';
-import UserStats, { IUserStats } from '@/components/feature/user/User.stats';
+import StatWrapper from '@/components/common/Stat.wrapper';
+
+export interface IUserStats {
+  totalAdmin: number;
+  normalUsers: number;
+}
 
 interface IUserWrapperProps {
   users: IUser[];
@@ -73,7 +78,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             {' '}
             All Users
           </TextElement>
-          <TextElement as="p" className="sm">
+          <TextElement as="p" className="text-[#D47E30]">
             Manage users here
           </TextElement>
         </Row>
@@ -86,7 +91,31 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
       />
 
       {/* Stats  */}
-      <UserStats userStats={userStats} />
+
+      <StatWrapper
+        stats={[
+          {
+            label: `Admin Users`,
+            value: userStats.normalUsers,
+            icon: UserRoundKey,
+            iconClassName: 'text-green-400',
+          },
+
+          {
+            label: `Regular Users`,
+            value: userStats.totalAdmin,
+            icon: UserRound,
+            iconClassName: 'text-red-400',
+          },
+
+          {
+            label: `Total Users`,
+            value: userStats.totalAdmin,
+            icon: Users,
+            iconClassName: 'text-blue-400',
+          },
+        ]}
+      />
 
       <Card className="gap-3">
         <CardHeader>

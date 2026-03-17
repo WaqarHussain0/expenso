@@ -6,7 +6,14 @@ import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
 import CategoryTable from '@/components/feature/category/Category.table';
 import { Button } from '@/components/ui/button';
-import { Filter, PlusIcon, Search } from 'lucide-react';
+import {
+  BanknoteArrowDown,
+  Coins,
+  Filter,
+  PlusIcon,
+  Search,
+  ShoppingCartIcon,
+} from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
@@ -22,9 +29,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import CategoryStats, {
-  ICategoryStats,
-} from '@/components/feature/category/Category.stats';
+
+import StatWrapper from '@/components/common/Stat.wrapper';
+
+export interface ICategoryStats {
+  income: number;
+  investment: number;
+  expense: number;
+}
 
 interface ICategoryWrapperProps {
   categories: ICategory[];
@@ -111,7 +123,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             {' '}
             All Categories
           </TextElement>
-          <TextElement as="p" className="sm">
+          <TextElement as="p" className="text-[#D47E30]">
             Manage your categories here
           </TextElement>
         </Row>
@@ -129,8 +141,30 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       />
 
       {/* Stats  */}
-      <CategoryStats categoryStats={categoryStats} />
+      <StatWrapper
+        stats={[
+          {
+            label: `Income Categories`,
+            value: categoryStats.income,
+            icon: BanknoteArrowDown,
+            iconClassName: 'text-green-400',
+          },
 
+          {
+            label: `Expense Categories`,
+            value: categoryStats.expense,
+            icon: ShoppingCartIcon,
+            iconClassName: 'text-red-400',
+          },
+
+          {
+            label: `Investment Categories`,
+            value: categoryStats.investment,
+            icon: Coins,
+            iconClassName: 'text-yellow-400',
+          },
+        ]}
+      />
       <Card className="gap-3">
         <CardHeader>
           <CardTitle className="flex items-center gap-1">
@@ -176,7 +210,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             </Select>
 
             <TextElement
-              className={`flex cursor-pointer items-center gap-1 text-blue-600 transition hover:underline ${
+              className={` ${
                 !searchInput && selectedType === 'all' ? 'hidden' : ''
               }`}
               as="span"

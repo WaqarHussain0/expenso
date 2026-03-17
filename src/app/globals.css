@@ -54,7 +54,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(49.503% 0.11996 154.946);
+  --primary: oklch(0.4067 0.0919 59.05);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -172,4 +172,50 @@
 .poppinsRegular {
   font-family: var(--font-poppins);
   font-weight: 400;
+}
+
+.manrope {
+  font-family: var(--font-manrope);
+}
+
+.inter {
+  font-family: var(--font-inter);
+}
+
+.manropeBold {
+  font-family: var(--font-manrope);
+  font-weight: 700;
+}
+
+.bgPrimary {
+  background-color: #6D3B07;
+}
+
+.textPrimary {
+  color: #6D3B07;
+}
+
+
+.bgSecondary {
+  background-color: #6f4e37;
+}
+
+.textSecondary {
+  color: #6f4e37;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-fade {
+  animation: fadeInUp 0.4s ease-out;
 }

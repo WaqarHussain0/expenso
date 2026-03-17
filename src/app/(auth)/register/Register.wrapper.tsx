@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 /* eslint-disable react/no-unescaped-entities */
 import {
@@ -68,7 +69,7 @@ const RegisterWrapper = () => {
     }
   };
   return (
-    <div className="bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
+    <div className="page-fade bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
       <TextElement as="h1" className="mb-8">
         Register
       </TextElement>
@@ -77,7 +78,7 @@ const RegisterWrapper = () => {
         {/* Name Input */}
 
         <div className="space-y-2">
-          <Label>{nameInputField.label}</Label>
+          <Label className="text-[#D47E30]">{nameInputField.label}</Label>
           <Controller
             name={nameInputField.name as 'name'}
             control={control}
@@ -90,7 +91,10 @@ const RegisterWrapper = () => {
                   placeholder={nameInputField.placeholder}
                 />
                 {errors.email && (
-                  <TextElement as="span" className="mt-1 text-red-400">
+                  <TextElement
+                    as="span"
+                    className="mt-1 text-xs !text-red-500 !no-underline"
+                  >
                     {errors.email.message}
                   </TextElement>
                 )}
@@ -101,7 +105,7 @@ const RegisterWrapper = () => {
 
         {/* Email Input */}
         <div className="space-y-2">
-          <Label>{emailInputField.label}</Label>
+          <Label className="text-[#D47E30]">{emailInputField.label}</Label>
 
           <Controller
             name={emailInputField.name as 'email'}
@@ -115,7 +119,10 @@ const RegisterWrapper = () => {
                   placeholder={emailInputField.placeholder}
                 />
                 {errors.email && (
-                  <TextElement as="span" className="mt-1 text-red-400">
+                  <TextElement
+                    as="span"
+                    className="mt-1 text-xs !text-red-500 !no-underline"
+                  >
                     {errors.email.message}
                   </TextElement>
                 )}
@@ -126,7 +133,7 @@ const RegisterWrapper = () => {
 
         {/* Password Input */}
         <div className="space-y-2">
-          <Label>{passwordInputField.label}</Label>
+          <Label className="text-[#D47E30]">{passwordInputField.label}</Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -146,7 +153,10 @@ const RegisterWrapper = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
                 {errors.password && (
-                  <TextElement as="span" className="mt-1 text-red-400">
+                  <TextElement
+                    as="span"
+                    className="mt-1 text-xs !text-red-500 !no-underline"
+                  >
                     {errors.password.message}
                   </TextElement>
                 )}
@@ -166,7 +176,9 @@ const RegisterWrapper = () => {
         </Row>
 
         <Row className="flex-col justify-center">
-          <TextElement as="p">Already have an account?</TextElement>
+          <TextElement as="p" className="text-[#D47E30]">
+            Already have an account?
+          </TextElement>
           <Link href={PAGE_ROUTES.login}>
             <TextElement as="span">Login here</TextElement>
           </Link>

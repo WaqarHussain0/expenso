@@ -3,12 +3,26 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import RTKProvider from '@/components/providers/RTK.provider';
 import NextAuthProvider from '@/components/providers/NextAuth.provider';
-import { Poppins } from 'next/font/google';
+import { Poppins, Manrope, Inter } from 'next/font/google';
 
 export const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-poppins',
+  display: 'swap',
+});
+
+export const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+export const manrope = Manrope({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-manrope',
   display: 'swap',
 });
 
@@ -66,7 +80,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} antialiased`}>
+      <body
+        className={`${poppins.variable} ${inter.variable} ${manrope.variable} antialiased`}
+      >
         <Toaster position="bottom-right" richColors />
 
         <NextAuthProvider>

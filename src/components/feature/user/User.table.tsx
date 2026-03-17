@@ -37,7 +37,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
   return (
     <div className={className}>
       <Table>
-        <TableHeader className="bg-slate-100">
+        <TableHeader className="">
           <TableRow>
             {columns.map(column => (
               <TableHead key={column.label}>{column.label}</TableHead>

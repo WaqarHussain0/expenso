@@ -5,6 +5,7 @@ import TextElement from './TextElement';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import {
   ChartPie,
+  Coins,
   HandCoins,
   LayoutDashboard,
   LogOut,
@@ -115,9 +116,25 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
       <div
         ref={navbarRef}
-        className={`bg-blue-900 text-white ${className} fixed top-0 left-0 z-40 flex h-full flex-col justify-between pt-4 transition-transform duration-300 md:pt-6 lg:static ${toggleMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        className={`text-white ${className} fixed top-0 left-0 z-40 flex h-full flex-col justify-between transition-transform duration-300 lg:static ${toggleMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        <Row className={`w-full flex-col gap-1`}>
+
+        <Row className='flex-col items-start w-full gap-4'>
+
+        <div className="w-full flex items-center gap-3 border-b border-[#D47E30] px-2 py-3">
+          {/* Logo */}
+          <div className="relative flex size-10 items-center justify-center rounded-md border border-[#6F4E37]/30 bg-[#D47E30] backdrop-blur-md">
+            <Coins className="size-6 text-[#F5F5DC]" />
+          </div>
+
+          <TextElement
+            as="h1"
+            className="text-xl font-semibold !text-[#F5F5DC]"
+          >
+            Expenso
+          </TextElement>
+        </div>
+        <Row className={`gap- w-full flex-col`}>
           {navItems
             .filter(item => item.show)
             .map(item => {
@@ -127,8 +144,8 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
                 <Link
                   className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-white'
-                      : 'text-blue-100 hover:bg-white/5 hover:text-white'
+                      ? 'bgSecondary text-[#F5F5DC]'
+                      : 'hover:bgSecondary hover:text-[#F5F5DC]'
                   }`}
                   key={item.title}
                   href={item.linkTo}
@@ -140,11 +157,12 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
               );
             })}
         </Row>
+        </Row>
 
         {/* Logout */}
-        <div className="w-full space-y-1 border-t border-blue-800 px-4 py-4">
+        <div className="w-full space-y-1 border-t border-[#D47E30] px-4 py-4">
           <Row className="gap-2">
-            <div className="poppins flex size-9 items-center justify-center rounded-full bg-blue-700 text-white capitalize shadow-sm">
+            <div className="poppins flex size-9 items-center justify-center rounded-full bg-[#D47E30] text-white capitalize shadow-sm">
               {user?.name?.slice(0, 1)}
             </div>
 
@@ -155,10 +173,10 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-blue-100 transition-colors hover:bg-white/5 hover:text-white"
+            className="hover:bgSecondary flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:text-[#F5F5DC]"
           >
             <LogOut className="h-5 w-5" />
-            <span className='poppins'>Logout</span>
+            <span className="poppins">Logout</span>
           </button>
         </div>
 
@@ -175,11 +193,9 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
               Are you sure you want to logout?
             </AlertDialogDescription>
             <AlertDialogFooter>
-              <AlertDialogCancel className="font-body">
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel className="">Cancel</AlertDialogCancel>
               <AlertDialogAction
-                className="bg-destructive hover:bg-destructive/90 font-body"
+                className="!bg-destructive"
                 onClick={handleLogout}
                 disabled={isLoading}
               >

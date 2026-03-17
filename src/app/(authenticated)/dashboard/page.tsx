@@ -11,9 +11,15 @@ import {
 } from '@/components/ui/select';
 import { useGetDashboardStatsQuery } from '@/lib/rtk/services/dashboard.rtk.service';
 
-import DashboardStats from '@/components/feature/dashboard/Dashboard.stats';
 import ExpenseIncomeGraph from '@/components/feature/dashboard/ExpenseIncome.graph';
 import DailyBreakdown from '@/components/feature/dashboard/DailyBreakdown';
+import {
+  Banknote,
+  BanknoteArrowDown,
+  Coins,
+  ShoppingCartIcon,
+} from 'lucide-react';
+import StatWrapper from '@/components/common/Stat.wrapper';
 
 const now = new Date();
 
@@ -110,11 +116,37 @@ const Page = () => {
 
       {/* Summary Cards */}
 
-      <DashboardStats
-        totalExpense={totals.expense}
-        totalIncome={totals.income}
-        totalInvestment={totals.investment}
-        isFetching={isFetching}
+      <StatWrapper
+        stats={[
+          {
+            label: `Income`,
+            value: totals.income,
+            icon: BanknoteArrowDown,
+            iconClassName: 'text-green-400',
+          },
+
+          {
+            label: `Expense`,
+            value: totals.expense,
+            icon: ShoppingCartIcon,
+            iconClassName: 'text-red-400',
+          },
+
+          {
+            label: `Investment`,
+            value: totals.investment,
+            icon: Coins,
+            iconClassName: 'text-yellow-400',
+          },
+
+          {
+            label: `Free Cash`,
+            value: totals.income - (totals.expense + totals.investment),
+            icon: Banknote,
+            iconClassName: 'text-blue-400',
+          },
+        ]}
+        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
       />
 
       {/* Category Breakdown */}

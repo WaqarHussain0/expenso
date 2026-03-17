@@ -4,11 +4,10 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
 import Pagination from '@/components/common/Pagination';
 import Row from '@/components/common/Row';
+import StatWrapper from '@/components/common/Stat.wrapper';
 import TextElement from '@/components/common/TextElement';
 import TransactionDialog from '@/components/feature/transaction/Transaction.dialog';
-import TransactionStats, {
-  IMonthTransactionStats,
-} from '@/components/feature/transaction/Transaction.stats';
+
 import TransactionTable from '@/components/feature/transaction/Transaction.table';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,9 +22,23 @@ import {
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
-import { Filter, PlusIcon, Search } from 'lucide-react';
+import {
+  Banknote,
+  BanknoteArrowDown,
+  Coins,
+  Filter,
+  PlusIcon,
+  Search,
+  ShoppingCartIcon,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
+
+export interface IMonthTransactionStats {
+  income: number;
+  investment: number;
+  expense: number;
+}
 
 interface ITransactionWrapperProps {
   transactions: ITransaction[];
@@ -111,7 +124,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             {' '}
             All Transactions
           </TextElement>
-          <TextElement as="p" className="sm">
+          <TextElement as="p" className="text-[#D47E30]">
             Manage your transactions here
           </TextElement>
         </Row>
@@ -130,7 +143,39 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
       />
 
       {/* Stats  */}
-      <TransactionStats monthStats={monthStats} />
+      <StatWrapper
+        stats={[
+          {
+            label: `Income`,
+            value: monthStats.income,
+            icon: BanknoteArrowDown,
+            iconClassName: 'text-green-400',
+          },
+
+          {
+            label: `Expense`,
+            value: monthStats.expense,
+            icon: ShoppingCartIcon,
+            iconClassName: 'text-red-400',
+          },
+
+          {
+            label: `Investment`,
+            value: monthStats.investment,
+            icon: Coins,
+            iconClassName: 'text-yellow-500',
+          },
+
+          {
+            label: `Free Cash`,
+            value:
+              monthStats.income - (monthStats.expense + monthStats.investment),
+            icon: Banknote,
+            iconClassName: 'text-blue-400',
+          },
+        ]}
+        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
+      />
 
       <Card className="gap-3">
         <CardHeader>
@@ -177,7 +222,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             </Select>
 
             <TextElement
-              className={`flex cursor-pointer items-center gap-1 text-blue-600 transition hover:underline ${
+              className={` ${
                 !searchInput && selectedType === 'all' ? 'hidden' : ''
               }`}
               as="span"

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import TextElement from '@/components/common/TextElement';
@@ -67,14 +68,14 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
   };
 
   return (
-    <div className="bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
+    <div className="page-fade bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
       <TextElement as="h1" className="mb-8">
         Reset Password
       </TextElement>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
-          <Label>{passwordInputField.label}</Label>
+          <Label className="text-[#D47E30]">{passwordInputField.label}</Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -103,7 +104,10 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
                 </button>
 
                 {errors.password && (
-                  <TextElement as="span" className="mt-1 text-red-400">
+                  <TextElement
+                    as="span"
+                    className="mt-1 text-xs !text-red-500 !no-underline"
+                  >
                     {errors.password.message}
                   </TextElement>
                 )}
