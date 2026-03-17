@@ -119,7 +119,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="flex items-center gap-1">
+          <CardTitle className="textPrimary flex items-center gap-1">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>

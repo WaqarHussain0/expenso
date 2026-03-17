@@ -179,7 +179,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="flex items-center gap-1">
+          <CardTitle className="textPrimary flex items-center gap-1">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>
@@ -231,6 +231,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
               Clear All
             </TextElement>
           </div>
+
           <TransactionTable
             className="h-[40vh] overflow-y-auto"
             transactions={transactions || []}

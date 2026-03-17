@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -11,8 +12,6 @@ import {
 } from '@/components/ui/select';
 import { useGetDashboardStatsQuery } from '@/lib/rtk/services/dashboard.rtk.service';
 
-import ExpenseIncomeGraph from '@/components/feature/dashboard/ExpenseIncome.graph';
-import DailyBreakdown from '@/components/feature/dashboard/DailyBreakdown';
 import {
   Banknote,
   BanknoteArrowDown,
@@ -20,6 +19,11 @@ import {
   ShoppingCartIcon,
 } from 'lucide-react';
 import StatWrapper from '@/components/common/Stat.wrapper';
+import Row from '@/components/common/Row';
+import Transactions from '@/components/feature/dashboard/Transaction';
+import ExpenseGraph from '@/components/feature/dashboard/Expense.graph';
+import IncomeGraph from '@/components/feature/dashboard/Income.graph';
+import InvestmentGraph from '@/components/feature/dashboard/Investment.graph';
 
 const now = new Date();
 
@@ -67,6 +71,13 @@ const Page = () => {
 
   // inside Page, below series/totals:
   const categoryBreakdown = data?.response?.categoryBreakdown ?? {
+    income: [],
+    expense: [],
+    investment: [],
+  };
+
+  console.log(categoryBreakdown, '!!!!!!!!!!!!!!!');
+  const allTransactions = data?.response?.monthAllTransactions ?? {
     income: [],
     expense: [],
     investment: [],
@@ -149,15 +160,46 @@ const Page = () => {
         className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
       />
 
-      {/* Category Breakdown */}
-      <ExpenseIncomeGraph
-        categoryBreakdown={categoryBreakdown}
-        isFetching={isFetching}
-      />
+      <Card className="px-4">
+        <CardTitle> Income Data</CardTitle>
+        <Row className="w-full items-start justify-between gap-2">
+          <Transactions
+            className="w-[50%]"
+            transactions={allTransactions.income || []}
+          />
 
-      {/* Bar Chart */}
+          <IncomeGraph className="w-[50%]" income={categoryBreakdown.income} />
+        </Row>
+      </Card>
 
-      <DailyBreakdown isFetching={isFetching} series={series} />
+      <Card className="px-4">
+        <CardTitle>Investment Data</CardTitle>
+
+        <Row className="w-full items-start justify-between gap-2">
+          <InvestmentGraph
+            className="w-[50%]"
+            investment={categoryBreakdown.investment}
+          />
+          <Transactions
+            className="w-[50%]"
+            transactions={allTransactions.investment || []}
+          />
+        </Row>
+      </Card>
+
+      <Card className="px-4">
+        <CardTitle>Expense Data</CardTitle>
+        <Row className="w-full items-start justify-between gap-2">
+          <Transactions
+            className="w-[50%]"
+            transactions={allTransactions.expense || []}
+          />
+          <ExpenseGraph
+            className="w-[50%]"
+            expense={categoryBreakdown.expense}
+          />
+        </Row>
+      </Card>
     </div>
   );
 };

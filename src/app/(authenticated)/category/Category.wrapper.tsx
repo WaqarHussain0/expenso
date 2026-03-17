@@ -133,6 +133,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           Add Category
         </Button>
       </Row>
+
       <CustomBreadcrumb
         items={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
@@ -165,9 +166,10 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           },
         ]}
       />
+      
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="flex items-center gap-1">
+          <CardTitle className="textPrimary flex items-center gap-1">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>
