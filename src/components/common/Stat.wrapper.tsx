@@ -20,14 +20,16 @@ const StatWrapper: React.FC<IStatWrapperProps> = ({ stats, className }) => {
                 <CardTitle className={`${item.iconClassName}`}>
                   {item.label}
                 </CardTitle>
-                {<Icon className={`size-5 ${item.iconClassName}`} />}
+                {<Icon className={`size-4 md:size-5 ${item.iconClassName}`} />}
               </div>
             </CardHeader>
 
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
-                  <span className={`manropeBold text-2xl text-gray-900`}>
+                  <span
+                    className={`manropeBold text-lg text-gray-900 md:text-2xl`}
+                  >
                     {item.value?.toLocaleString()}
                   </span>
                 </div>

@@ -145,28 +145,29 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       <StatWrapper
         stats={[
           {
-            label: `Income Categories`,
+            label: `Income`,
             value: categoryStats.income,
             icon: BanknoteArrowDown,
             iconClassName: 'text-green-400',
           },
 
           {
-            label: `Expense Categories`,
+            label: `Expense`,
             value: categoryStats.expense,
             icon: ShoppingCartIcon,
             iconClassName: 'text-red-400',
           },
 
           {
-            label: `Investment Categories`,
+            label: `Investment`,
             value: categoryStats.investment,
             icon: Coins,
             iconClassName: 'text-yellow-400',
           },
         ]}
+        className="grid-cols-2 gap-2 lg:grid-cols-3"
       />
-      
+
       <Card className="gap-3">
         <CardHeader>
           <CardTitle className="textPrimary flex items-center gap-1">

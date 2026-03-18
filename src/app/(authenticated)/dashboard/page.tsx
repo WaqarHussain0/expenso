@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -21,9 +20,8 @@ import {
 import StatWrapper from '@/components/common/Stat.wrapper';
 import Row from '@/components/common/Row';
 import Transactions from '@/components/feature/dashboard/Transaction';
-import ExpenseGraph from '@/components/feature/dashboard/Expense.graph';
-import IncomeGraph from '@/components/feature/dashboard/Income.graph';
-import InvestmentGraph from '@/components/feature/dashboard/Investment.graph';
+import { CategoryTypeEnum } from '@/types/category.type';
+import PieGraph from '@/components/feature/dashboard/Pie.graph';
 
 const now = new Date();
 
@@ -76,13 +74,19 @@ const Page = () => {
     investment: [],
   };
 
-  console.log(categoryBreakdown, '!!!!!!!!!!!!!!!');
   const allTransactions = data?.response?.monthAllTransactions ?? {
     income: [],
     expense: [],
     investment: [],
   };
 
+  if (isFetching) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-white">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
+      </div>
+    );
+  }
   return (
     <div className="w-full space-y-3">
       {/* Filter */}
@@ -157,46 +161,57 @@ const Page = () => {
             iconClassName: 'text-blue-400',
           },
         ]}
-        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
+        className="grid-cols-2 gap-2 lg:grid-cols-4"
       />
 
       <Card className="px-4">
         <CardTitle> Income Data</CardTitle>
-        <Row className="w-full items-start justify-between gap-2">
+        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
           <Transactions
-            className="w-[50%]"
+            className="w-full md:w-[50%]"
             transactions={allTransactions.income || []}
+            category={CategoryTypeEnum.INCOME}
           />
 
-          <IncomeGraph className="w-[50%]" income={categoryBreakdown.income} />
+          <PieGraph
+            className="w-full md:w-[50%]"
+            data={categoryBreakdown.income}
+            category={CategoryTypeEnum.INCOME}
+          />
         </Row>
       </Card>
 
       <Card className="px-4">
         <CardTitle>Investment Data</CardTitle>
 
-        <Row className="w-full items-start justify-between gap-2">
-          <InvestmentGraph
-            className="w-[50%]"
-            investment={categoryBreakdown.investment}
+        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
+          <PieGraph
+            className="w-full md:w-[50%]"
+            data={categoryBreakdown.investment}
+            category={CategoryTypeEnum.INVESTMENT}
           />
+
           <Transactions
-            className="w-[50%]"
+            className="w-full md:w-[50%]"
             transactions={allTransactions.investment || []}
+            category={CategoryTypeEnum.INVESTMENT}
           />
         </Row>
       </Card>
 
       <Card className="px-4">
         <CardTitle>Expense Data</CardTitle>
-        <Row className="w-full items-start justify-between gap-2">
+        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
           <Transactions
-            className="w-[50%]"
+            className="w-full md:w-[50%]"
             transactions={allTransactions.expense || []}
+            category={CategoryTypeEnum.EXPENSE}
           />
-          <ExpenseGraph
-            className="w-[50%]"
-            expense={categoryBreakdown.expense}
+
+          <PieGraph
+            category={CategoryTypeEnum.EXPENSE}
+            className="w-full md:w-[50%]"
+            data={categoryBreakdown.expense}
           />
         </Row>
       </Card>

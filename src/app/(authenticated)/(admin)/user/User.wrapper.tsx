@@ -115,6 +115,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             iconClassName: 'text-blue-400',
           },
         ]}
+        className="grid-cols-2 gap-2 lg:grid-cols-3"
       />
 
       <Card className="gap-3">

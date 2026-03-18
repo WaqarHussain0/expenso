@@ -147,6 +147,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
                     }`}
                     key={item.title}
                     href={item.linkTo}
+                    onClick={handleToggleMenu}
                   >
                     <Icon className="size-5" />
 

@@ -13,13 +13,17 @@ import { CategoryTypeEnum } from '@/types/category.type';
 interface ITransactionsProps {
   transactions: any[];
   className?: string;
+  category?: CategoryTypeEnum;
 }
 const Transactions: React.FC<ITransactionsProps> = ({
   transactions,
   className = '',
+  category,
 }) => {
   return (
-    <div className={`grid grid-cols-1 gap-1 ${className}`}>
+    <div
+      className={`no-scrollbar grid max-h-87.5 grid-cols-1 gap-2 overflow-y-auto p-1 ${className}`}
+    >
       {transactions.map((item: any) => (
         <Card key={item._id} className="">
           <CardHeader>
@@ -41,7 +45,15 @@ const Transactions: React.FC<ITransactionsProps> = ({
                   {item?.category?.type}
                 </Badge>
               </Row>
-              <TextElement className={`text-red-500`}>
+              <TextElement
+                className={`${
+                  category === CategoryTypeEnum.INVESTMENT
+                    ? 'text-yellow-500'
+                    : category === CategoryTypeEnum.INCOME
+                      ? 'text-green-500'
+                      : 'text-red-500'
+                }`}
+              >
                 {item?.amount?.toLocaleString()}
               </TextElement>
             </CardTitle>
