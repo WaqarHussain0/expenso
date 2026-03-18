@@ -170,7 +170,7 @@ const RegisterWrapper = () => {
             <TextElement as="span">Forgot password</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
             {loading ? 'Registering...' : 'Register'}
           </Button>
         </Row>

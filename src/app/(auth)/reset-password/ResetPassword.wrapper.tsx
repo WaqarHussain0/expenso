@@ -116,7 +116,7 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
           />
         </div>
 
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
           {loading ? 'Saving...' : 'Save Password'}
         </Button>
       </form>

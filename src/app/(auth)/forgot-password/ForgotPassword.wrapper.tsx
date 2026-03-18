@@ -100,7 +100,7 @@ const ForgotPasswordWrapper = () => {
             <TextElement as="span">Login</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
             {loading ? 'Sending...' : 'Reset Password'}
           </Button>
         </Row>

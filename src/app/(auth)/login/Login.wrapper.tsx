@@ -135,7 +135,7 @@ const LoginWrapper = () => {
             <TextElement as="span">Forgot password</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="bg-[#6D3B07]">
             {loading ? 'Logging in...' : 'Login'}
           </Button>
         </Row>
@@ -145,7 +145,9 @@ const LoginWrapper = () => {
             Don't have an account?
           </TextElement>
           <Link href={PAGE_ROUTES.register}>
-            <TextElement as="span" className=''>Signup here</TextElement>
+            <TextElement as="span" className="">
+              Signup here
+            </TextElement>
           </Link>
         </Row>
       </form>

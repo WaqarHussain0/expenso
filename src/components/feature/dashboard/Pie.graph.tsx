@@ -16,12 +16,31 @@ interface IPieGraphProps {
 }
 
 const PieGraph: React.FC<IPieGraphProps> = ({ className, data, category }) => {
-  const COLORS =
-    category === CategoryTypeEnum.EXPENSE
-      ? ['#ef4444', '#f97316', '#eab308', '#84cc16', '#06b6d4', '#8b5cf6']
-      : category === CategoryTypeEnum.INCOME
-        ? ['#16a34a', '#4ade80', '#86efac']
-        : ['#16a34a', '#4ade80', '#86efac'];
+  const COLOR_MAP: Record<CategoryTypeEnum, string[]> = {
+    // 🔴 Expense → Strong reds (no pale tones)
+    [CategoryTypeEnum.EXPENSE]: [
+      '#f87171', // red-400
+      '#ef4444', // red-500
+      '#dc2626', // red-600
+    ],
+
+    // 🟢 Income → Rich greens
+    [CategoryTypeEnum.INCOME]: [
+      '#4ade80', // green-400
+      '#22c55e', // green-500
+      '#16a34a', // green-600
+    ],
+
+    // 🟡 Investment → Deep yellow/amber (no pale yellow)
+    [CategoryTypeEnum.INVESTMENT]: [
+      '#facc15', // yellow-400
+      '#eab308', // yellow-500
+      '#ca8a04', // yellow-600
+    ],
+  };
+
+  const COLORS = [...COLOR_MAP[category]].reverse();
+  const sortedData = [...data].sort((a, b) => b.total - a.total);
 
   const getTitle = (category: CategoryTypeEnum) => {
     return category === CategoryTypeEnum.EXPENSE
@@ -30,7 +49,7 @@ const PieGraph: React.FC<IPieGraphProps> = ({ className, data, category }) => {
         ? 'Income'
         : 'Investment';
   };
-  
+
   return (
     <Card className={`${className}`}>
       <CardHeader>
@@ -40,7 +59,7 @@ const PieGraph: React.FC<IPieGraphProps> = ({ className, data, category }) => {
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie
-              data={data}
+              data={sortedData}
               dataKey="total"
               nameKey="name"
               cx="50%"
@@ -50,10 +69,11 @@ const PieGraph: React.FC<IPieGraphProps> = ({ className, data, category }) => {
                 `${name} ${(percent! * 100).toFixed(0)}%`
               }
             >
-              {data.map((_: any, i: any) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              {sortedData.map((_: any, i: any) => (
+                <Cell key={i} fill={COLORS[Math.min(i, COLORS.length - 1)]} />
               ))}
             </Pie>
+
             <PieTooltip formatter={value => Number(value).toLocaleString()} />
           </PieChart>
         </ResponsiveContainer>
