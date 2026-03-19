@@ -1,15 +1,22 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Input } from '@/components/ui/input';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import {
   useGetAllCategoriesQuery,
   useGetCategoryByIdQuery,
@@ -29,23 +36,15 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
   placeholder = 'Select category',
   className = '',
 }) => {
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  /**
-   * debounce search
-   */
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 400);
-
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(timer);
   }, [search]);
 
-  /**
-   * fetch categories (default 3)
-   */
   const { data, isFetching } = useGetAllCategoriesQuery({
     name: debouncedSearch || undefined,
     limit: 3,
@@ -53,9 +52,6 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
 
   const categories = data?.data?.data ?? [];
 
-  /**
-   * fetch selected category if not in list
-   */
   const shouldFetchSingle =
     !!value && !categories.some((c: ICategory) => c._id === value);
 
@@ -65,70 +61,86 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
 
   const singleCategory = singleCategoryResponse?.data;
 
-  /**
-   * merge options
-   */
   const options = useMemo(() => {
     const merged = [...(singleCategory ? [singleCategory] : []), ...categories];
-
     const map = new Map();
     merged.forEach(c => map.set(c._id, c));
-
     return Array.from(map.values());
   }, [categories, singleCategory]);
 
-  return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={`w-full capitalize ${className}`}>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
+  const selectedLabel = options.find(c => c._id === value)?.name;
 
-      <SelectContent
-        position="popper"
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn('w-full justify-between capitalize font-normal', className)}
+        >
+          {selectedLabel ?? (
+            <span className="text-muted-foreground">{placeholder}</span>
+          )}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        className="w-[--radix-popover-trigger-width] p-0"
         side="bottom"
         align="start"
-        className="max-h-60 overflow-y-auto"
-        onCloseAutoFocus={e => e.preventDefault()} // 👈 IMPORTANT
-        onPointerDownOutside={e => {
+        // Keeps popover open when virtual keyboard pushes layout on mobile
+        onInteractOutside={e => {
+          // Only close if the click is truly outside (not the keyboard appearing)
           const target = e.target as HTMLElement;
-          if (target.closest('input')) {
+          if (target.closest('[data-radix-popper-content-wrapper]')) {
             e.preventDefault();
           }
         }}
       >
-        <div className="p-2">
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+        <Command shouldFilter={false}>
+          {/* CommandInput handles mobile keyboard correctly unlike Input in Select */}
+          <CommandInput
             placeholder="Search categories..."
-            className="mb-2"
-            onKeyDown={e => e.stopPropagation()}
-            onPointerDown={e => e.stopPropagation()}
-            onClick={e => e.stopPropagation()}
-            onTouchStart={e => e.stopPropagation()}
+            value={search}
+            onValueChange={setSearch}
           />
-        </div>
-
-        {isFetching ? (
-          <div className="flex items-center justify-center py-2">
-            <Loader2 className="size-4 animate-spin" />
-          </div>
-        ) : options.length > 0 ? (
-          options.map(category => (
-            <SelectItem
-              key={category._id}
-              value={category._id}
-              className="capitalize"
-            >
-              {category.name}
-            </SelectItem>
-          ))
-        ) : (
-          <div className="text-muted-foreground px-2 py-1 text-sm">
-            No categories found
-          </div>
-        )}
-      </SelectContent>
-    </Select>
+          <CommandList>
+            {isFetching ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="size-4 animate-spin" />
+              </div>
+            ) : (
+              <>
+                <CommandEmpty>No categories found</CommandEmpty>
+                <CommandGroup>
+                  {options.map(category => (
+                    <CommandItem
+                      key={category._id}
+                      value={category._id}
+                      onSelect={() => {
+                        onChange(category._id);
+                        setOpen(false);
+                        setSearch('');
+                      }}
+                      className="capitalize"
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          value === category._id ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
+                      {category.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };
