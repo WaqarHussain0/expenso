@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useGetDashboardStatsQuery } from '@/lib/rtk/services/dashboard.rtk.service';
-
 import {
   Banknote,
   BanknoteArrowDown,
@@ -22,6 +21,7 @@ import Row from '@/components/common/Row';
 import Transactions from '@/components/feature/dashboard/Transaction';
 import { CategoryTypeEnum } from '@/types/category.type';
 import PieGraph from '@/components/feature/dashboard/Pie.graph';
+import TextElement from '@/components/common/TextElement';
 
 const now = new Date();
 
@@ -49,6 +49,28 @@ const getRange = (month: number, year: number) => ({
   endDate: toInputDate(new Date(year, month + 1, 0)),
 });
 
+// ✅ Config drives all three section cards
+const SECTION_CONFIG = [
+  {
+    key: 'income' as const,
+    label: 'Income',
+    category: CategoryTypeEnum.INCOME,
+    pieFirst: false, // Transactions left, Pie right
+  },
+  {
+    key: 'investment' as const,
+    label: 'Investment',
+    category: CategoryTypeEnum.INVESTMENT,
+    pieFirst: true, // Pie left, Transactions right
+  },
+  {
+    key: 'expense' as const,
+    label: 'Expense',
+    category: CategoryTypeEnum.EXPENSE,
+    pieFirst: false,
+  },
+];
+
 const Page = () => {
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
@@ -60,33 +82,24 @@ const Page = () => {
     endDate,
   });
 
-  const series = data?.response?.series ?? [];
   const totals = data?.response?.totals ?? {
     income: 0,
     expense: 0,
     investment: 0,
   };
 
-  // inside Page, below series/totals:
   const categoryBreakdown = data?.response?.categoryBreakdown ?? {
     income: [],
     expense: [],
     investment: [],
   };
-
+  
   const allTransactions = data?.response?.monthAllTransactions ?? {
     income: [],
     expense: [],
     investment: [],
   };
 
-  if (isFetching) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
-      </div>
-    );
-  }
   return (
     <div className="w-full space-y-3">
       {/* Filter */}
@@ -130,32 +143,29 @@ const Page = () => {
       </Card>
 
       {/* Summary Cards */}
-
       <StatWrapper
+        isLoading={isFetching}
         stats={[
           {
-            label: `Income`,
+            label: 'Income',
             value: totals.income,
             icon: BanknoteArrowDown,
             iconClassName: 'text-green-400',
           },
-
           {
-            label: `Expense`,
+            label: 'Expense',
             value: totals.expense,
             icon: ShoppingCartIcon,
             iconClassName: 'text-red-400',
           },
-
           {
-            label: `Investment`,
+            label: 'Investment',
             value: totals.investment,
             icon: Coins,
             iconClassName: 'text-yellow-400',
           },
-
           {
-            label: `Free Cash`,
+            label: 'Free Cash',
             value: totals.income - (totals.expense + totals.investment),
             icon: Banknote,
             iconClassName: 'text-blue-400',
@@ -164,57 +174,52 @@ const Page = () => {
         className="grid-cols-2 gap-2 lg:grid-cols-4"
       />
 
-      <Card className="px-4">
-        <CardTitle> Income Data</CardTitle>
-        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
+      {/* ✅ Single loop replaces three identical card blocks */}
+      {SECTION_CONFIG.map(({ key, label, category, pieFirst }) => {
+        const transactions = allTransactions[key] ?? [];
+        const breakdown = categoryBreakdown[key] ?? [];
+
+        const transactionsEl = (
           <Transactions
             className="w-full md:w-[50%]"
-            transactions={allTransactions.income || []}
-            category={CategoryTypeEnum.INCOME}
+            transactions={transactions}
+            category={category}
+            isLoading={isFetching}
           />
+        );
 
+        const pieEl = (
           <PieGraph
             className="w-full md:w-[50%]"
-            data={categoryBreakdown.income}
-            category={CategoryTypeEnum.INCOME}
+            data={breakdown}
+            category={category}
+            isLoading={isFetching}
           />
-        </Row>
-      </Card>
+        );
 
-      <Card className="px-4">
-        <CardTitle>Investment Data</CardTitle>
-
-        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
-          <PieGraph
-            className="w-full md:w-[50%]"
-            data={categoryBreakdown.investment}
-            category={CategoryTypeEnum.INVESTMENT}
-          />
-
-          <Transactions
-            className="w-full md:w-[50%]"
-            transactions={allTransactions.investment || []}
-            category={CategoryTypeEnum.INVESTMENT}
-          />
-        </Row>
-      </Card>
-
-      <Card className="px-4">
-        <CardTitle>Expense Data</CardTitle>
-        <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
-          <Transactions
-            className="w-full md:w-[50%]"
-            transactions={allTransactions.expense || []}
-            category={CategoryTypeEnum.EXPENSE}
-          />
-
-          <PieGraph
-            category={CategoryTypeEnum.EXPENSE}
-            className="w-full md:w-[50%]"
-            data={categoryBreakdown.expense}
-          />
-        </Row>
-      </Card>
+        return (
+          <Card key={key} className="px-4">
+            <CardTitle>{label}</CardTitle>
+            {transactions.length === 0 && !isFetching ? (
+              <TextElement>No data available</TextElement>
+            ) : (
+              <Row className="w-full flex-col items-start justify-between gap-2 md:flex-row">
+                {pieFirst ? (
+                  <>
+                    {pieEl}
+                    {transactionsEl}
+                  </>
+                ) : (
+                  <>
+                    {transactionsEl}
+                    {pieEl}
+                  </>
+                )}
+              </Row>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 };

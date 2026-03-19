@@ -1,3 +1,4 @@
+import 'react-loading-skeleton/dist/skeleton.css';
 import Navbar from '@/components/common/Navbar';
 import Row from '@/components/common/Row';
 
