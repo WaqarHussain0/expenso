@@ -137,7 +137,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
       <CustomBreadcrumb
         items={[
-          { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
+          { label: 'Dashboard', linkTo: PAGE_ROUTES.monthStats },
           { label: 'Transactions' },
         ]}
       />

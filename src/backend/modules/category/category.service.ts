@@ -3,6 +3,7 @@ import { initDB } from '@/backend/utils/dbInit.util';
 import CategoryEntity, { CategoryTypeEnum } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import mongoose from 'mongoose';
+import { IUser } from '../user/entities/user.entity';
 
 export class CategoryService {
   private readonly categoryEntity = CategoryEntity;
@@ -36,7 +37,9 @@ export class CategoryService {
 
     const existingData = await this.findByName(name);
 
-    if (existingData) {
+    const user = existingData?.userId as IUser;
+
+    if (existingData && existingData.userId === user._id) {
       throw new Error(
         `Category with name ${name} already exists, please use a different name.`,
       );
@@ -67,7 +70,7 @@ export class CategoryService {
     const query: Record<string, any> = {
       userId: new mongoose.Types.ObjectId(userId),
     };
-    
+
     // ✅ add type filter
     if (type) {
       query.type = type;

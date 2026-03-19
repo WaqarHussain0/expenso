@@ -136,7 +136,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
 
       <CustomBreadcrumb
         items={[
-          { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
+          { label: 'Dashboard', linkTo: PAGE_ROUTES.monthStats },
           { label: 'Categories' },
         ]}
       />

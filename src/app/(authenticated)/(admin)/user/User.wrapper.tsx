@@ -85,7 +85,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
       </Row>
       <CustomBreadcrumb
         items={[
-          { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
+          { label: 'Dashboard', linkTo: PAGE_ROUTES.monthStats },
           { label: 'Users' },
         ]}
       />

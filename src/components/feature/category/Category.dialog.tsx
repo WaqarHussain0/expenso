@@ -73,25 +73,28 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
   const onSubmit = async (data: FormValues) => {
     let response: any;
 
-    if (category && category?._id) {
-      response = await updateCategory({
-        id: category?._id,
-        payload: data,
-      }).unwrap();
-    } else {
-      // For creation, include password if it's in the data
-      response = await createCategory(data).unwrap();
-    }
+    try {
+      if (category && category?._id) {
+        response = await updateCategory({
+          id: category?._id,
+          payload: data,
+        }).unwrap();
+      } else {
+        // For creation, include password if it's in the data
+        response = await createCategory(data).unwrap();
+      }
 
-    if (response.success) {
-      onClose();
-      reset();
-      toast.success('Category saved successfully');
-      router.refresh();
-    } else {
-      const error = await response.json();
+      if (response.success) {
+        onClose();
+        reset();
+        toast.success('Category saved successfully');
+        router.refresh();
+        return;
+      }
+    } catch (err: any) {
+      console.log('err : ', err);
       toast.error('Request failed', {
-        description: error?.error || 'Something went wrong',
+        description: err?.data?.error || 'Something went wrong',
       });
     }
   };

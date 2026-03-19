@@ -49,7 +49,7 @@ const ForgotPasswordWrapper = () => {
       }
 
       toast.success('Request Successful', {
-        description: result?.message || 'Check your inbox for the reset link',
+        description: result?.message || 'Check your email for further actions',
       });
 
       reset();

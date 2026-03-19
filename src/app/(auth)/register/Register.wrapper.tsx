@@ -57,13 +57,13 @@ const RegisterWrapper = () => {
       }
 
       toast.success('Request Successful', {
-        description: result?.message || 'Check your inbox for the reset link',
+        description: result?.message || 'Your account has been created.',
       });
 
       reset();
       router.push(PAGE_ROUTES.login);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset link');
+      toast.error(error.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,7 @@ const RegisterWrapper = () => {
             <TextElement as="span">Forgot password</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
+          <Button type="submit" disabled={loading} className="bg-[#6D3B07]">
             {loading ? 'Registering...' : 'Register'}
           </Button>
         </Row>

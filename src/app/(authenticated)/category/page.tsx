@@ -20,7 +20,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = session?.user;
 
   if (!user?.id) {
-    redirect(PAGE_ROUTES.dashboard);
+    redirect(PAGE_ROUTES.monthStats);
   }
 
   const normalizedType =

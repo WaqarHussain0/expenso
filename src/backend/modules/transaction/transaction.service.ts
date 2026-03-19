@@ -161,19 +161,15 @@ export class TransactionService {
   }
 
   // get month stats for income, expense and investment
-  async getMonthlyStats(month: number, year: number) {
-    await initDB();
+  async getMonthlyStats(userId: string) {
+    const userMongoObjectId = new mongoose.Types.ObjectId(userId);
 
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 1);
+    await initDB();
 
     const stats = await this.transactionEntity.aggregate([
       {
         $match: {
-          date: {
-            $gte: startDate,
-            $lt: endDate,
-          },
+          userId: userMongoObjectId,
         },
       },
       {

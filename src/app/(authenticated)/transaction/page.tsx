@@ -20,7 +20,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = session?.user;
 
   if (!user?.id) {
-    redirect(PAGE_ROUTES.dashboard);
+    redirect(PAGE_ROUTES.monthStats);
   }
 
   const normalizedType =
@@ -38,13 +38,9 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     userId: user.id,
   };
 
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-
   const [data, stats] = await Promise.all([
     transactionService.findAll(transactionPayload),
-    transactionService.getMonthlyStats(month, year),
+    transactionService.getMonthlyStats(user.id),
   ]);
 
   if (

@@ -50,12 +50,6 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
   const navItems = [
     {
-      title: 'Dashboard',
-      linkTo: PAGE_ROUTES.dashboard,
-      icon: ChartPie,
-      show: true,
-    },
-    {
       title: 'Category',
       icon: LayoutDashboard,
       linkTo: PAGE_ROUTES.category,
@@ -65,6 +59,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       title: 'Transaction',
       icon: HandCoins,
       linkTo: PAGE_ROUTES.transaction,
+      show: true,
+    },
+
+    {
+      title: 'Stats',
+      linkTo: PAGE_ROUTES.monthStats,
+      icon: ChartPie,
       show: true,
     },
 

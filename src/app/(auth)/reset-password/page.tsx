@@ -19,7 +19,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   // If user is already authenticated, redirect to dashboard
   if (session?.user) {
-    redirect(PAGE_ROUTES.dashboard);
+    redirect(PAGE_ROUTES.monthStats);
   }
 
   return <ResetPasswordWrapper token={token} />;
