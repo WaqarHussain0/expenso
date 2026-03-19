@@ -27,19 +27,19 @@ const Stats = () => {
     },
   ];
   return (
-    <div className="w-full bg-[#6D3B07] p-4">
-      <span className="mb-3 text-[12px] font-medium tracking-widest !text-green-500 uppercase md:text-[14px]">
+    <div className="w-full bg-[#F5F5DC] p-4 lg:p-8">
+      <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase md:text-[14px]">
         Built for clarity
       </span>
 
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+      <div className="mt-3 grid grid-cols-3 gap-1 md:gap-2">
         {items.map(item => (
           <Card
-            className="gap-0 rounded-none border-none bg-transparent p-0 shadow-none"
+            className="gap-0 rounded-none border-none bg-transparent p-0 shadow-none ring-0"
             key={item.id}
           >
             <CardHeader className="p-0">
-              <div className="text-[52px] text-white">
+              <div className="textPrimary text-[52px]">
                 {item.title}
                 {item.subTitle && (
                   <span className="text-[#D47E30]">{item.subTitle}</span>
@@ -47,7 +47,7 @@ const Stats = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <CardDescription className="text-[14px] text-[#F5F5DC]">
+              <CardDescription className="text-[14px]">
                 {item.description}
               </CardDescription>
             </CardContent>

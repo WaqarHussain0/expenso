@@ -51,7 +51,7 @@ const Feature = () => {
   ];
   return (
     <section
-      className="flex w-full flex-col items-center justify-between gap-3 bg-[#6D3B07] p-4 lg:flex-row"
+      className="flex w-full flex-col items-center justify-between gap-3 bg-[#6D3B07] p-4 lg:p-8 lg:flex-row"
       id="features"
     >
       <Row className="w-full flex-col lg:w-[30%] lg:items-start">
@@ -75,7 +75,7 @@ const Feature = () => {
         {allFeatures.map(item => {
           const Icon = item.icon;
           return (
-            <Card className="" key={item.title}>
+            <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg" key={item.title}>
               <CardHeader>
                 <CardTitle className="flex items-center text-[#6D3B07]">
                   <div className="mr-2 flex size-10 items-center justify-center rounded-lg shadow bg-[#F5F5DC]">

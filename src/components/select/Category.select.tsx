@@ -88,6 +88,13 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
         side="bottom"
         align="start"
         className="max-h-60 overflow-y-auto"
+        onCloseAutoFocus={e => e.preventDefault()} // 👈 IMPORTANT
+        onPointerDownOutside={e => {
+          const target = e.target as HTMLElement;
+          if (target.closest('input')) {
+            e.preventDefault();
+          }
+        }}
       >
         <div className="p-2">
           <Input
@@ -97,6 +104,8 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             className="mb-2"
             onKeyDown={e => e.stopPropagation()}
             onPointerDown={e => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
+            onTouchStart={e => e.stopPropagation()}
           />
         </div>
 

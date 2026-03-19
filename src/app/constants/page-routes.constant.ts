@@ -1,4 +1,7 @@
 const PAGE_ROUTES = {
+  // landing page
+  home: '/',
+
   // Auth Routes
   login: '/login',
   register: '/register',

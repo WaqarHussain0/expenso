@@ -1,3 +1,4 @@
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
 import Link from 'next/link';
 
@@ -5,7 +6,7 @@ const Header = () => {
   return (
     <section className="relative flex w-full flex-col items-center justify-center gap-4 bg-[#F5F5DC] py-16 text-center">
       <Row className="w-full flex-col">
-        <span className="rounded-full px-4 py-2 text-[12px] font-semibold tracking-wider text-[#D47E30] uppercase md:text-[14px]">
+        <span className="rounded-full px-4 py-2 text-[12px] font-medium tracking-wider text-green-500 uppercase md:text-[14px]">
           Free Personal Finance Tracker
         </span>
 
@@ -22,8 +23,8 @@ const Header = () => {
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-4">
           <Link
-            href="#signup"
-            className="inline-block rounded-[8px]  px-4 py-2 text-[14px] font-medium text-[#F5F5DC] transition-all duration-200 bg-[#6D3B07]/90 hover:bg-[#6D3B07] active:scale-95 md:px-5 md:py-4"
+            href={PAGE_ROUTES.register}
+            className="inline-block rounded-[8px] bg-[#6D3B07]/90 px-4 py-2 text-[14px] font-medium text-[#F5F5DC] transition-all duration-200 hover:bg-[#6D3B07] active:scale-95 md:px-5 md:py-3"
           >
             Start for free →
           </Link>

@@ -65,9 +65,9 @@ const HowItWork = () => {
     total: 89818,
   };
   return (
-    <section className="w-full space-y-3 p-4" id="how">
+    <section className="w-full space-y-3 p-4 lg:p-8" id="how">
       <div className="flex flex-col items-center md:items-start">
-        <span className="text-[12px] font-medium tracking-widest text-[#D47E30] uppercase">
+        <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase">
           How it works
         </span>
 
@@ -81,7 +81,7 @@ const HowItWork = () => {
       <Row className="w-full flex-col justify-between items-start gap-2 md:flex-row">
         <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-2 md:w-[60%]">
           {steps.map(item => (
-            <Card key={item.number} className="lg:min-h-[203px]">
+            <Card key={item.number} className="lg:min-h-[200px]">
               <CardHeader>
                 <CardTitle>{item.label}</CardTitle>
               </CardHeader>
@@ -94,9 +94,9 @@ const HowItWork = () => {
         </div>
 
         <Row className="w-full md:w-[40%]">
-          <Card className="w-full lg:min-h-[203px]">
+          <Card className="w-full ">
             <CardHeader>
-              <CardTitle>{stats.title}</CardTitle>
+              <CardTitle className='text-slate-600 text-xs'>{stats.title}</CardTitle>
             </CardHeader>
 
             <CardContent>

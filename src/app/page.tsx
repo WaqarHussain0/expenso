@@ -9,7 +9,7 @@ import Row from '@/components/common/Row';
 
 const Page = async () => {
   return (
-    <Row className="w-full flex-col">
+    <Row className="no-scrollbar w-full flex-col">
       <Nav />
       <Header />
       <Feature />
