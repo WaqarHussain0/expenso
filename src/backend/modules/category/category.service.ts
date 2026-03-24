@@ -3,7 +3,6 @@ import { initDB } from '@/backend/utils/dbInit.util';
 import CategoryEntity, { CategoryTypeEnum } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import mongoose from 'mongoose';
-import { IUser } from '../user/entities/user.entity';
 
 export class CategoryService {
   private readonly categoryEntity = CategoryEntity;
@@ -37,9 +36,11 @@ export class CategoryService {
 
     const existingData = await this.findByName(name);
 
-    const user = existingData?.userId as IUser;
-
-    if (existingData && existingData.userId === user._id) {
+    if (
+      existingData &&
+      existingData.userId._id.toString() === userId.toString() &&
+      existingData.type === type
+    ) {
       throw new Error(
         `Category with name ${name} already exists, please use a different name.`,
       );

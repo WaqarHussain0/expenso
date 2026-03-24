@@ -5,7 +5,7 @@ import Row from './Row';
 import Skeleton from 'react-loading-skeleton';
 
 interface IStatWrapperProps {
-  stats: { label: string; icon: any; value: number; iconClassName?: string }[];
+  stats: { label: string; icon: any; value: number|string; iconClassName?: string }[];
   className?: string;
   isLoading?: boolean;
 }

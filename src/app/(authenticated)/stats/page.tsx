@@ -9,7 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useGetDashboardStatsQuery } from '@/lib/rtk/services/dashboard.rtk.service';
+import {
+  FilterOptionEnum,
+  useGetDashboardStatsQuery,
+} from '@/lib/rtk/services/dashboard.rtk.service';
 
 import MonthStatsWrapper from '@/components/feature/stats/MonthStats.wrapper';
 import { Label } from '@/components/ui/label';
@@ -17,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import Row from '@/components/common/Row';
 import YearStatsWrapper from '@/components/feature/stats/YearStats.wrapper';
 import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
+import { Input } from '@/components/ui/input';
 
 const now = new Date();
 
@@ -34,12 +38,6 @@ const MONTHS = [
   'November',
   'December',
 ];
-
-enum FilterOptionEnum {
-  MONTH = 'Month',
-  YEAR = 'Year',
-  CUSTOM = 'Custom',
-}
 
 const DATE_FILTER_OPTIONS = [
   FilterOptionEnum.MONTH,
@@ -63,17 +61,6 @@ const getRangeForYear = (year: number) => ({
   endDate: toInputDate(new Date(year, 11, 31)),
 });
 
-// Custom filter: first day of startMonth/startYear → last day of endMonth/endYear
-const getRangeForCustom = (
-  startMonth: number,
-  startYear: number,
-  endMonth: number,
-  endYear: number,
-) => ({
-  startDate: toInputDate(new Date(startYear, startMonth, 1)),
-  endDate: toInputDate(new Date(endYear, endMonth + 1, 0)),
-});
-
 const Page = () => {
   const [filterOption, setFilterOption] = useState<FilterOptionEnum>(
     FilterOptionEnum.MONTH,
@@ -84,10 +71,8 @@ const Page = () => {
   const [year, setYear] = useState(now.getFullYear());
 
   // Custom filter state
-  const [customStartMonth, setCustomStartMonth] = useState(now.getMonth());
-  const [customStartYear, setCustomStartYear] = useState(now.getFullYear());
-  const [customEndMonth, setCustomEndMonth] = useState(now.getMonth());
-  const [customEndYear, setCustomEndYear] = useState(now.getFullYear());
+  const [fromDate, setFromDate] = useState(toInputDate(now));
+  const [toDate, setToDate] = useState(toInputDate(now));
 
   // Derive the date range based on active filter
   const { startDate, endDate } = (() => {
@@ -95,12 +80,10 @@ const Page = () => {
       case FilterOptionEnum.YEAR:
         return getRangeForYear(year);
       case FilterOptionEnum.CUSTOM:
-        return getRangeForCustom(
-          customStartMonth,
-          customStartYear,
-          customEndMonth,
-          customEndYear,
-        );
+        return {
+          startDate: fromDate,
+          endDate: toDate,
+        };
       case FilterOptionEnum.MONTH:
       default:
         return getRangeForMonth(month, year);
@@ -109,11 +92,45 @@ const Page = () => {
 
   const { data, isFetching } = useGetDashboardStatsQuery(
     {
-      startDate,
-      endDate,
+      payload: {
+        startDate,
+        endDate,
+      },
+      filterBy: FilterOptionEnum.MONTH,
     },
-    { skip: filterOption !== FilterOptionEnum.MONTH },
+    {
+      skip: filterOption !== FilterOptionEnum.MONTH,
+    },
   );
+
+  const { data: yearData, isFetching: yearDataFetching } =
+    useGetDashboardStatsQuery(
+      {
+        payload: {
+          year,
+        },
+        filterBy: FilterOptionEnum.YEAR,
+      },
+      {
+        skip: filterOption !== FilterOptionEnum.YEAR,
+      },
+    );
+
+  const { data: customDateData, isFetching: customDateDataFetching } =
+    useGetDashboardStatsQuery(
+      {
+        payload: {
+          startDate: fromDate,
+          endDate: toDate,
+        },
+        filterBy: FilterOptionEnum.CUSTOM,
+      },
+      {
+        skip: filterOption !== FilterOptionEnum.CUSTOM,
+      },
+    );
+
+  console.log('customDateData : ', customDateData);
 
   const totals = data?.response?.totals ?? {
     income: 0,
@@ -134,39 +151,39 @@ const Page = () => {
   };
 
   const renderData = (filterOption: FilterOptionEnum) => {
-    if (filterOption === FilterOptionEnum.MONTH) {
-      return (
-        <MonthStatsWrapper
-          allTransactions={allTransactions}
-          categoryBreakdown={categoryBreakdown}
-          isLoading={isFetching}
-          totals={totals}
-        />
-      );
-    }
+    switch (filterOption) {
+      case FilterOptionEnum.MONTH:
+        return (
+          <MonthStatsWrapper
+            allTransactions={allTransactions}
+            categoryBreakdown={categoryBreakdown}
+            isLoading={isFetching}
+            totals={totals}
+          />
+        );
 
-    if (filterOption === FilterOptionEnum.YEAR) {
-      return (
-        <YearStatsWrapper
-          isLoading={false}
-          totals={{
-            expense: 0,
-            income: 0,
-            investment: 0,
-          }}
-        />
-      );
-    } else {
-      return (
-        <CustomDateStatsWrapper
-          isLoading={false}
-          totals={{
-            expense: 0,
-            income: 0,
-            investment: 0,
-          }}
-        />
-      );
+      case FilterOptionEnum.YEAR:
+        return (
+          <YearStatsWrapper
+            isLoading={yearDataFetching}
+            monthlySeries={yearData?.response?.monthlySeries}
+            expenseBreakdown={yearData?.response?.expenseBreakdown}
+            totals={yearData?.response?.totals}
+          />
+        );
+
+      case FilterOptionEnum.CUSTOM:
+      default:
+        return (
+          <CustomDateStatsWrapper
+            isLoading={customDateDataFetching}
+            totals={customDateData?.response?.totals}
+            counts={customDateData?.response?.counts}
+            expenseBreakdown={customDateData?.response?.expenseBreakdown}
+            savingsRate={customDateData?.response?.savingsRate}
+            topExpenseCategory={customDateData?.response?.topExpenseCategory}
+          />
+        );
     }
   };
 
@@ -184,12 +201,9 @@ const Page = () => {
                 <Button
                   key={f}
                   type="button"
+                  variant={filterOption === f ? 'default' : 'outline'}
                   onClick={() => setFilterOption(f)}
-                  className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                    filterOption === f
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-background text-muted-foreground border-input hover:bg-muted'
-                  }`}
+                  className="px-4 capitalize"
                 >
                   {f}
                 </Button>
@@ -267,82 +281,22 @@ const Page = () => {
           {/* ── CUSTOM filter inputs ── */}
           {filterOption === FilterOptionEnum.CUSTOM && (
             <Row className="gap-2">
-              {/* Start */}
               <div className="space-y-2">
-                <Label>Start Month</Label>
-                <Select
-                  value={String(customStartMonth)}
-                  onValueChange={val => setCustomStartMonth(Number(val))}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="h-40">
-                    {MONTHS.map((m, i) => (
-                      <SelectItem key={m} value={String(i)}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>From</Label>
+                <Input
+                  type="date"
+                  value={fromDate}
+                  onChange={e => setFromDate(e.target.value)}
+                />
               </div>
 
               <div className="space-y-2">
-                <Label>Start Year</Label>
-                <Select
-                  value={String(customStartYear)}
-                  onValueChange={val => setCustomStartYear(Number(val))}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {YEARS.map(y => (
-                      <SelectItem key={y} value={String(y)}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* End */}
-              <div className="space-y-2">
-                <Label>End Month</Label>
-                <Select
-                  value={String(customEndMonth)}
-                  onValueChange={val => setCustomEndMonth(Number(val))}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="h-40">
-                    {MONTHS.map((m, i) => (
-                      <SelectItem key={m} value={String(i)}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>End Year</Label>
-                <Select
-                  value={String(customEndYear)}
-                  onValueChange={val => setCustomEndYear(Number(val))}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {YEARS.map(y => (
-                      <SelectItem key={y} value={String(y)}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>To</Label>
+                <Input
+                  type="date"
+                  value={toDate}
+                  onChange={e => setToDate(e.target.value)}
+                />
               </div>
             </Row>
           )}

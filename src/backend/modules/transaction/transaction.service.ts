@@ -427,7 +427,7 @@ export class TransactionService {
     };
   }
 
-  async getDashboardData(
+  async getMonthlyDashboardData(
     startDate: Date,
     endDate: Date,
     userId: mongoose.Types.ObjectId,
@@ -459,5 +459,148 @@ export class TransactionService {
     const monthAllTransactions = this.splitTransactionsByType(transactions);
 
     return { series, totals, categoryBreakdown, monthAllTransactions };
+  }
+
+  async getYearlyDashboardData(userId: mongoose.Types.ObjectId, year: number) {
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31, 23, 59, 59);
+
+    const transactions = await TransactionEntity.find({
+      userId,
+      date: { $gte: startDate, $lte: endDate },
+    });
+
+    // ── 1. Totals (for cards) ────────────────────────────────────
+    const totals = { income: 0, expense: 0, investment: 0 };
+
+    // ── 2. Monthly series - 12 points for line chart ─────────────
+    // Pre-fill all 12 months so every month appears even with no transactions
+    const MONTH_NAMES = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    const monthlySeriesMap = new Map<
+      number,
+      {
+        month: string;
+        income: number;
+        expense: number;
+        investment: number;
+        freeCash: number;
+      }
+    >();
+
+    for (let m = 0; m < 12; m++) {
+      monthlySeriesMap.set(m, {
+        month: MONTH_NAMES[m],
+        income: 0,
+        expense: 0,
+        investment: 0,
+        freeCash: 0,
+      });
+    }
+
+    // ── 3. Expense category breakdown (for expense graph) ────────
+    const expenseCategoryMap = new Map<string, number>();
+
+    for (const tx of transactions) {
+      const category = tx.categoryId as ICategory;
+      const type = category.type as CategoryTypeEnum;
+      const month = tx.date.getMonth(); // 0-11
+
+      // totals
+      totals[type] += tx.amount;
+
+      // monthly series
+      monthlySeriesMap.get(month)![type] += tx.amount;
+
+      // expense category breakdown
+      if (type === CategoryTypeEnum.EXPENSE) {
+        expenseCategoryMap.set(
+          category.name,
+          (expenseCategoryMap.get(category.name) ?? 0) + tx.amount,
+        );
+      }
+    }
+
+    return {
+      // 1. Cards
+      totals,
+
+      // 2. Line chart — 12 months, 3 lines
+      monthlySeries: [...monthlySeriesMap.values()].map(m => ({
+        ...m,
+        freeCash: m.income - (m.expense + m.investment),
+      })),
+
+      // 3. Expense graph — one entry per expense category
+      expenseBreakdown: [...expenseCategoryMap.entries()]
+        .map(([name, total]) => ({ name, total }))
+        .sort((a, b) => b.total - a.total), // highest first
+    };
+  }
+
+  async getCustomDateDashboardData(
+    userId: mongoose.Types.ObjectId,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const transactions = await TransactionEntity.find({
+      userId,
+      date: { $gte: start, $lte: end },
+    });
+
+    const totals = { income: 0, expense: 0, investment: 0, freeCash: 0 };
+    const counts = { income: 0, expense: 0, investment: 0 };
+    const expenseCategoryMap = new Map<string, number>();
+
+    for (const tx of transactions) {
+      const category = tx.categoryId as ICategory;
+      const type = category.type as CategoryTypeEnum;
+
+      totals[type] += tx.amount;
+      counts[type]++;
+
+      if (type === CategoryTypeEnum.EXPENSE) {
+        expenseCategoryMap.set(
+          category.name,
+          (expenseCategoryMap.get(category.name) ?? 0) + tx.amount,
+        );
+      }
+    }
+
+    totals.freeCash = totals.income - (totals.expense + totals.investment);
+
+    const expenseBreakdown = [...expenseCategoryMap.entries()]
+      .map(([name, total]) => ({ name, total }))
+      .sort((a, b) => b.total - a.total);
+
+    return {
+      totals,
+      counts,
+      savingsRate:
+        totals.income > 0
+          ? Math.round(((totals.income - totals.expense) / totals.income) * 100)
+          : 0,
+      topExpenseCategory: expenseBreakdown[0] ?? null,
+      expenseBreakdown,
+    };
   }
 }
