@@ -142,9 +142,9 @@ export class TransactionService {
       return {
         _id: item._id?.toString(),
         category: {
-          _id: category._id?.toString(),
-          name: category.name,
-          type: category.type,
+          _id: category?._id?.toString(),
+          name: category?.name,
+          type: category?.type,
         },
         categoryId: category?._id?.toString(),
         amount: item.amount,
