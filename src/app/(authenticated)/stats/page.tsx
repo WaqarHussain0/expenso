@@ -130,8 +130,6 @@ const Page = () => {
       },
     );
 
-  console.log('customDateData : ', customDateData);
-
   const totals = data?.response?.totals ?? {
     income: 0,
     expense: 0,
