@@ -56,7 +56,10 @@ export class TransactionService {
       throw new Error(`Transaction with id ${id} not found`);
     }
 
-    return deletedData;
+    return {
+      success: true,
+      message: 'Transaction deleted successfully!',
+    };
   }
 
   async update(id: mongoose.Types.ObjectId, payload: CreateTransactionDto) {

@@ -13,6 +13,7 @@ export interface ICategory extends Document {
   type: CategoryTypeEnum;
   createdAt: Date;
   updatedAt: Date;
+  isActive?: boolean;
 
   userId: mongoose.Types.ObjectId | IUser;
 }
@@ -33,6 +34,8 @@ const CategorySchema = new Schema<ICategory>(
       required: true,
       index: true,
     },
+
+    isActive: { type: Boolean, default: true },
 
     userId: {
       type: Schema.Types.ObjectId,

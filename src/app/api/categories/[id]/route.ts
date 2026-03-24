@@ -73,8 +73,8 @@ export async function DELETE(
   const monogoObjectId = new mongoose.Types.ObjectId(id);
 
   try {
-    const data = await categoryService.delete(monogoObjectId);
-    return NextResponse.json({ data }, { status: 201 });
+    const response = await categoryService.delete(monogoObjectId);
+    return NextResponse.json(response, { status: 201 });
   } catch (err: any) {
     // Handle validation errors or service errors
     console.error('Error deleting category:', err);

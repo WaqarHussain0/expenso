@@ -105,7 +105,7 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
     if (!category || !category._id) return;
     const res = await deleteCategory(category._id).unwrap();
 
-    if (res.data) {
+    if (res.success) {
       toast.success('Category deleted successfully');
       router.refresh();
       setIsDeleteModalOpen(false);

@@ -53,9 +53,10 @@ export const DELETE = withAuth(
     const monogoObjectId = new mongoose.Types.ObjectId(id);
 
     try {
-      const data = await transactionService.delete(monogoObjectId);
+      const response = await transactionService.delete(monogoObjectId);
 
-      return NextResponse.json({ data }, { status: 200 });
+
+      return NextResponse.json(response, { status: 200 });
     } catch (err: any) {
       console.error('Error deleting transaction:', err);
 

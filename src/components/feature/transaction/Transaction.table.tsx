@@ -112,7 +112,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
     if (!transaction || !transaction._id) return;
     const res = await deleteTransaction(transaction._id).unwrap();
 
-    if (res.data) {
+    if (res.success) {
       toast.success('Transaction deleted successfully');
       router.refresh();
       setIsDeleteModalOpen(false);
@@ -121,7 +121,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
       toast.error('Failed to delete transaction');
     }
   };
-  
+
   return (
     <div className={className}>
       <Table>

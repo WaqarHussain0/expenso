@@ -41,6 +41,16 @@ export class CategoryService {
       existingData.userId._id.toString() === userId.toString() &&
       existingData.type === type
     ) {
+      // If it exists but is inactive, reactivate it
+      if (!existingData.isActive) {
+        return await this.categoryEntity.findByIdAndUpdate(
+          existingData._id,
+          { $set: { isActive: true } },
+          { new: true },
+        );
+      }
+
+      // If it exists and is active, throw as before
       throw new Error(
         `Category with name ${name} already exists, please use a different name.`,
       );
@@ -70,6 +80,7 @@ export class CategoryService {
 
     const query: Record<string, any> = {
       userId: new mongoose.Types.ObjectId(userId),
+      isActive: true,
     };
 
     // ✅ add type filter
@@ -108,13 +119,22 @@ export class CategoryService {
 
   async delete(id: mongoose.Types.ObjectId) {
     await initDB();
-    const deletedData = await this.categoryEntity.findByIdAndDelete(id);
+    const deletedData = await this.categoryEntity.findByIdAndUpdate(
+      id,
+      {
+        isActive: false,
+      },
+      { new: true }, // return updated document
+    );
 
     if (!deletedData) {
       throw new Error(`Category with id ${id} not found`);
     }
 
-    return deletedData;
+    return {
+      success: true,
+      message: 'Category deleted successfully!',
+    };
   }
 
   async update(id: mongoose.Types.ObjectId, payload: CreateCategoryDto) {
