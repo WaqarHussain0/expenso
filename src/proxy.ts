@@ -39,5 +39,5 @@ export default withAuth(
 
 // 🛡️ Apply middleware to specific routes
 export const config = {
-  matcher: ['/month-stats', '/category', '/transaction'],
+  matcher: ['/dashboard', '/month-stats', '/category', '/transaction'],
 };

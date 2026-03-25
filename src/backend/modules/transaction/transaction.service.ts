@@ -606,4 +606,25 @@ export class TransactionService {
       expenseBreakdown,
     };
   }
+
+  // Get all the income, expense and investment total for a user
+  async getUserStats(userId: string) {
+    const userMongoObjectId = new mongoose.Types.ObjectId(userId);
+
+    const transactions = await TransactionEntity.find({
+      userId: userMongoObjectId,
+    });
+
+    const totals = { income: 0, expense: 0, investment: 0, freeCash: 0 };
+
+    for (const tx of transactions) {
+      const category = tx.categoryId as ICategory;
+      const type = category.type as CategoryTypeEnum;
+      totals[type] += tx.amount;
+    }
+
+    totals.freeCash = totals.income - (totals.expense + totals.investment);
+
+    return { totals };
+  }
 }

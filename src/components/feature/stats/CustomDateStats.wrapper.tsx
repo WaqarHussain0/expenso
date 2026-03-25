@@ -1,14 +1,6 @@
 import StatWrapper from '@/components/common/Stat.wrapper';
 import { Card, CardTitle } from '@/components/ui/card';
-import {
-  Banknote,
-  BanknoteArrowDown,
-  Coins,
-  ShoppingCartIcon,
-  TrendingUp,
-  Flame,
-  Hash,
-} from 'lucide-react';
+import { TrendingUp, Flame, Hash } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -20,6 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
+import StatCard from '@/components/common/StatCard';
 
 interface ICustomDateStatsWrapperProps {
   isLoading: boolean;
@@ -58,42 +51,54 @@ const formatCurrency = (value: number) =>
 
 const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
   isLoading,
-  totals,
+  totals = { income: 0, expense: 0, investment: 0, freeCash: 0 },
   counts,
   savingsRate,
   topExpenseCategory,
   expenseBreakdown,
 }) => {
+  const { expense, income, investment, freeCash } = totals;
+  const total = income || 1;
+
+  const stats = [
+    {
+      label: 'Income',
+      value: income,
+      percent: 100,
+      color: '#22c55e',
+    },
+    {
+      label: 'Expense',
+      value: expense,
+      percent: (expense / total) * 100,
+      color: '#ef4444',
+    },
+    {
+      label: 'Investment',
+      value: investment,
+      percent: (investment / total) * 100,
+      color: '#3b82f6',
+    },
+    {
+      label: 'Free Cash',
+      value: freeCash,
+      percent: (freeCash / total) * 100,
+      color: '#a855f7',
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        {stats.map(item => (
+          <StatCard key={item.label} isLoading={isLoading} stat={item} />
+        ))}
+      </div>
+
       {/* ── 1. Totals ── */}
       <StatWrapper
         isLoading={isLoading}
         stats={[
-          {
-            label: 'Income',
-            value: totals?.income,
-            icon: BanknoteArrowDown,
-            iconClassName: 'text-green-400',
-          },
-          {
-            label: 'Expense',
-            value: totals?.expense,
-            icon: ShoppingCartIcon,
-            iconClassName: 'text-red-400',
-          },
-          {
-            label: 'Investment',
-            value: totals?.investment,
-            icon: Coins,
-            iconClassName: 'text-yellow-400',
-          },
-          {
-            label: 'Free Cash',
-            value: totals?.freeCash,
-            icon: Banknote,
-            iconClassName: 'text-blue-400',
-          },
           {
             label: 'Savings Rate',
             value: `${savingsRate}%`,
@@ -113,6 +118,7 @@ const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
             iconClassName: 'text-purple-400',
           },
         ]}
+        skeletonCount={3}
         className="grid-cols-2 gap-2 lg:grid-cols-4"
       />
 

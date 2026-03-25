@@ -5,13 +5,7 @@ import PieGraph from './Pie.graph';
 import { Card, CardTitle } from '@/components/ui/card';
 import TextElement from '@/components/common/TextElement';
 import Row from '@/components/common/Row';
-import StatWrapper from '@/components/common/Stat.wrapper';
-import {
-  Banknote,
-  BanknoteArrowDown,
-  Coins,
-  ShoppingCartIcon,
-} from 'lucide-react';
+import StatCard from '@/components/common/StatCard';
 
 interface IMonthStatsWrapperProps {
   isLoading: boolean;
@@ -37,7 +31,7 @@ const MonthStatsWrapper: React.FC<IMonthStatsWrapperProps> = ({
   isLoading,
   allTransactions,
   categoryBreakdown,
-  totals
+  totals = { income: 0, expense: 0, investment: 0 },
 }) => {
   // ✅ Config drives all three section cards
   const SECTION_CONFIG = [
@@ -61,38 +55,46 @@ const MonthStatsWrapper: React.FC<IMonthStatsWrapperProps> = ({
     },
   ];
 
+  const { expense, income, investment } = totals;
+
+  const total = income || 1;
+  const freeCash = income - (expense + investment);
+
+  const stats = [
+    {
+      label: 'Income',
+      value: income,
+      percent: 100,
+      color: '#22c55e',
+    },
+    {
+      label: 'Expense',
+      value: expense,
+      percent: (expense / total) * 100,
+      color: '#ef4444',
+    },
+    {
+      label: 'Investment',
+      value: investment,
+      percent: (investment / total) * 100,
+      color: '#3b82f6',
+    },
+    {
+      label: 'Free Cash',
+      value: freeCash,
+      percent: (freeCash / total) * 100,
+      color: '#a855f7',
+    },
+  ];
+
   return (
     <>
-      <StatWrapper
-        isLoading={isLoading}
-        stats={[
-          {
-            label: 'Income',
-            value: totals.income,
-            icon: BanknoteArrowDown,
-            iconClassName: 'text-green-400',
-          },
-          {
-            label: 'Expense',
-            value: totals.expense,
-            icon: ShoppingCartIcon,
-            iconClassName: 'text-red-400',
-          },
-          {
-            label: 'Investment',
-            value: totals.investment,
-            icon: Coins,
-            iconClassName: 'text-yellow-400',
-          },
-          {
-            label: 'Free Cash',
-            value: totals.income - (totals.expense + totals.investment),
-            icon: Banknote,
-            iconClassName: 'text-blue-400',
-          },
-        ]}
-        className="grid-cols-2 gap-2 lg:grid-cols-4"
-      />
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        {stats.map(item => (
+          <StatCard key={item.label} isLoading={isLoading} stat={item} />
+        ))}
+      </div>
+
       {/* ✅ Single loop replaces three identical card blocks */}
       {SECTION_CONFIG.map(({ key, label, category, pieFirst }) => {
         const transactions = allTransactions[key] ?? [];

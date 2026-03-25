@@ -8,6 +8,8 @@ const PAGE_ROUTES = {
   forgotPassword: 'forgot-password',
 
   // Authenticated Routes
+  dashboard: '/dashboard',
+
   monthStats: '/stats',
   category: '/category',
   transaction: '/transaction',

@@ -5,20 +5,27 @@ import Row from './Row';
 import Skeleton from 'react-loading-skeleton';
 
 interface IStatWrapperProps {
-  stats: { label: string; icon: any; value: number|string; iconClassName?: string }[];
+  stats: {
+    label: string;
+    icon: any;
+    value: number | string;
+    iconClassName?: string;
+  }[];
   className?: string;
   isLoading?: boolean;
+  skeletonCount?: number;
 }
 
 const StatWrapper: React.FC<IStatWrapperProps> = ({
   stats,
   className,
   isLoading = false,
+  skeletonCount = 4,
 }) => {
   return (
     <Row className={`grid grid-cols-1 gap-2 md:grid-cols-3 ${className}`}>
       {isLoading
-        ? Array.from({ length: 4 }).map((_, index) => (
+        ? Array.from({ length: skeletonCount }).map((_, index) => (
             <Card key={index} className="gap-1">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -40,13 +47,15 @@ const StatWrapper: React.FC<IStatWrapperProps> = ({
                     <CardTitle className={`${item.iconClassName}`}>
                       {item.label}
                     </CardTitle>
-                    <Icon className={`size-4 md:size-5 ${item.iconClassName}`} />
+                    <Icon
+                      className={`size-4 md:size-5 ${item.iconClassName}`}
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="manropeBold text-lg text-gray-900 md:text-2xl">
+                      <span className="manropeBold text-lg text-gray-900 capitalize md:text-2xl">
                         {item.value?.toLocaleString()}
                       </span>
                     </div>

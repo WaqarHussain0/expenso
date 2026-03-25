@@ -7,8 +7,12 @@ import {
   ChartPie,
   Coins,
   HandCoins,
+  House,
   LayoutDashboard,
   LogOut,
+  Menu,
+  MenuIcon,
+  MenuSquare,
   Users,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -26,6 +30,7 @@ import {
   AlertDialogAction,
 } from '../ui/alert-dialog';
 import { UserRoleEnum } from '@/types/user.type';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 interface INavbar {
   className?: string;
@@ -49,6 +54,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
   const isAdminUser = user?.role === UserRoleEnum.ADMIN || false;
 
   const navItems = [
+    {
+      title: 'Dashboard',
+      linkTo: PAGE_ROUTES.dashboard,
+      icon: House,
+      show: true,
+    },
+
     {
       title: 'Stats',
       linkTo: PAGE_ROUTES.monthStats,
@@ -102,16 +114,20 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
     };
   }, [toggleMenu]);
 
+  const initials = user?.name
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
   return (
     <>
       {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
+
       {!toggleMenu && (
-        <button
-          onClick={handleToggleMenu}
-          className="text-primary-foreground bgPrimary hover:bgPrimary/80 fixed top-4 right-4 z-50 cursor-pointer rounded-md px-2 py-1 lg:hidden"
-        >
-          ☰
-        </button>
+        <div className="text-primary-foreground bgPrimary cursor-pointerss fixed top-2 left-2 z-50 rounded-sm p-2 lg:hidden">
+          <Menu onClick={handleToggleMenu} className="size-4" />
+        </div>
       )}
 
       <div
@@ -132,6 +148,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
               Expenso
             </TextElement>
           </div>
+
           <Row className={`gap- w-full flex-col`}>
             {navItems
               .filter(item => item.show)
@@ -161,9 +178,11 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
         {/* Logout */}
         <div className="w-full space-y-1 border-t border-[#D47E30] px-4 py-4">
           <Row className="gap-2">
-            <div className="poppins flex size-9 items-center justify-center rounded-full bg-[#D47E30] text-white capitalize shadow-sm">
-              {user?.name?.slice(0, 1)}
-            </div>
+            <Avatar>
+              <AvatarFallback className="poppins bg-[#D47E30] text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
             <TextElement as="h5" className="poppins text-white capitalize">
               {user?.name}

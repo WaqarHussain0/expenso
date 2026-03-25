@@ -57,7 +57,7 @@ const LoginWrapper = () => {
       description: 'You are now logged in',
     });
 
-    router.push(PAGE_ROUTES.monthStats);
+    router.push(PAGE_ROUTES.dashboard);
 
     setLoading(false);
   };

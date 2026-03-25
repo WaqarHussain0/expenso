@@ -293,6 +293,7 @@ const Page = () => {
                 <Input
                   type="date"
                   value={toDate}
+                  min={fromDate} // prevent selecting before 'fromDate'
                   onChange={e => setToDate(e.target.value)}
                 />
               </div>
