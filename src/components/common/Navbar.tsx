@@ -123,8 +123,8 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
 
       {!toggleMenu && (
-        <div className="text-primary-foreground bgPrimary cursor-pointerss fixed top-2 left-2 z-50 rounded-sm p-2 lg:hidden">
-          <Menu onClick={handleToggleMenu} className="size-4" />
+        <div className="text-primary-foreground bg-[#D47E30] cursor-pointerss fixed top-2 left-2 z-50 w-[20%] flex justify-center items-center rounded-sm p-2 lg:hidden">
+          <Menu onClick={handleToggleMenu} className="size-4 textPrimary" />
         </div>
       )}
 

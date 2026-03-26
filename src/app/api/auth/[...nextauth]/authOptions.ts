@@ -77,7 +77,6 @@ export const authOptions: NextAuthOptions = {
           email: customUser.email!,
           name: customUser.name,
           role: customUser.role,
-          isFirstLogin: customUser.isFirstLogin,
         };
 
         token.accessToken = customUser.accessToken ?? null;
