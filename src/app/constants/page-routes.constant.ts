@@ -14,6 +14,8 @@ const PAGE_ROUTES = {
   category: '/category',
   transaction: '/transaction',
 
+  preferences:"/preferences",
+
   // Admin Routes
   user: '/user',
 };

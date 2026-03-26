@@ -54,6 +54,18 @@ export const categoryApi = api.injectEndpoints({
       }),
       invalidatesTags: ['categories'],
     }),
+
+    setPreferences: category.mutation<
+      any,
+      { payload: ICreateOrUpdatePayload[] }
+    >({
+      query: ({ payload }) => ({
+        url: `/categories/set-preferences`,
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: ['categories'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -63,5 +75,6 @@ export const {
   useGetAllCategoriesQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
+  useSetPreferencesMutation,
   useDeleteCategoryMutation,
 } = categoryApi;

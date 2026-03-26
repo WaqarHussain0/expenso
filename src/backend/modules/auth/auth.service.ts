@@ -48,6 +48,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       role: user.role,
+      isFirstLogin: user.isFirstLogin,
     };
 
     return { user: userData, accessToken: token };

@@ -11,8 +11,6 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  MenuIcon,
-  MenuSquare,
   Users,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';

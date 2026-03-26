@@ -11,6 +11,7 @@ export interface IUser extends Document {
   role: UserRoleEnum;
   password?: string | null;
   isActive?: boolean;
+  isFirstLogin?: boolean;
   createdAt: Date;
   updatedAt: Date;
 
@@ -35,6 +36,7 @@ const UserSchema = new Schema<IUser>(
     },
     password: { type: String, default: null },
     isActive: { type: Boolean, default: true },
+    isFirstLogin: { type: Boolean, default: false },
 
     role: {
       type: String,

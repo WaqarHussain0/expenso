@@ -52,6 +52,7 @@ export class UserService {
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: role || UserRoleEnum.USER,
+      isFirstLogin: true,
     });
 
     const loginPageLink = `${process.env.NEXTAUTH_URL}/login}`;
@@ -258,5 +259,23 @@ export class UserService {
     });
 
     return result;
+  }
+
+  async isFirstLogin(userId: string) {
+    const user = await this.findById(userId);
+
+    return user.isFirstLogin;
+  }
+
+  async update(userId: mongoose.Types.ObjectId) {
+    return await this.userEntity.findByIdAndUpdate(
+      userId,
+      {
+        isFirstLogin: false,
+      },
+      {
+        new: true,
+      },
+    );
   }
 }

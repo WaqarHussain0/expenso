@@ -3,7 +3,9 @@ import { initDB } from '@/backend/utils/dbInit.util';
 import CategoryEntity, { CategoryTypeEnum } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import mongoose from 'mongoose';
+import { UserService } from '../user/user.service';
 
+const userService = new UserService();
 export class CategoryService {
   private readonly categoryEntity = CategoryEntity;
 
@@ -198,5 +200,48 @@ export class CategoryService {
     });
 
     return result;
+  }
+
+  async setPreferences(
+    userId: mongoose.Types.ObjectId,
+    payload: {
+      name: string;
+      type: CategoryTypeEnum;
+    }[],
+  ) {
+    // verify if user exist with the given id
+    await userService.findById(userId);
+    // 1. Start a Session for Atomicity
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 2. Prepare categories with the owner ID
+      const categoriesToCreate = payload.map(cat => ({
+        ...cat,
+        userId, // Ensure your Category schema has a 'user' or 'owner' field
+      }));
+
+      // 3. Bulk Insert Categories
+      await this.categoryEntity.insertMany(categoriesToCreate, { session });
+
+      // 4. Update User status
+      const updatedUser = await userService.update(userId);
+
+      // 5. Commit the changes
+      await session.commitTransaction();
+
+      return {
+        success: true,
+        user: updatedUser,
+      };
+    } catch (error) {
+      // Rollback if anything goes wrong
+      await session.abortTransaction();
+      console.error('Preference Service Error:', error);
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }

@@ -3,8 +3,10 @@ import { TransactionService } from '@/backend/modules/transaction/transaction.se
 import { getServerSideSession } from '@/lib/next-auth.util';
 import { redirect } from 'next/navigation';
 import DashboardWrapper from './Dashboard.wrapper';
+import { UserService } from '@/backend/modules/user/user.service';
 
 const transactionService = new TransactionService();
+const userService = new UserService();
 
 const Page = async () => {
   // Get the user session on the server
@@ -23,9 +25,10 @@ const Page = async () => {
     userId: activeUser?.id || '',
   };
 
-  const [data, stats] = await Promise.all([
+  const [data, stats, isFirstLogin] = await Promise.all([
     transactionService.findAll(transactionPayload),
     transactionService.getUserStats(activeUser?.id || ''),
+    userService.isFirstLogin(session.user.id)
   ]);
 
   return (
@@ -34,6 +37,7 @@ const Page = async () => {
         user={activeUser}
         transactions={data.data || []}
         totals={stats.totals}
+        isFirstLogin={isFirstLogin}
       />
     </>
   );

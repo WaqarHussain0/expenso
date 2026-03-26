@@ -21,12 +21,14 @@ const UserProfile: React.FC<IUserProfileProps> = ({ className, user }) => {
       <CardHeader className="flex items-center justify-between gap-2">
         <CardTitle className="text-primary">Welcome back!</CardTitle>
 
-        <Row className='gap-2'>
+        <Row className="gap-2">
           <Avatar>
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="uppercase">{initials}</AvatarFallback>
           </Avatar>
 
-          <CardTitle className="text-primary">{user?.name}</CardTitle>
+          <CardTitle className="text-primary capitalize">
+            {user?.name}
+          </CardTitle>
         </Row>
       </CardHeader>
     </Card>
