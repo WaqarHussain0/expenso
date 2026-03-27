@@ -6,15 +6,21 @@ import Stats from '@/components/feature/landing-page/Stats';
 import CTA from '@/components/feature/landing-page/CTA';
 import Footer from '@/components/feature/landing-page/Footer';
 import Row from '@/components/common/Row';
+import Pricing from '@/components/feature/landing-page/Pricing';
+import ShareableStats from '@/components/feature/landing-page/ShareableStats';
 
 const Page = async () => {
   return (
     <Row className="no-scrollbar w-full flex-col">
       <Nav />
       <Header />
-      <Feature />
-      <HowItWork />
       <Stats />
+
+      <Feature />
+      <ShareableStats />
+      <HowItWork />
+
+      <Pricing />
       <CTA />
       <Footer />
     </Row>

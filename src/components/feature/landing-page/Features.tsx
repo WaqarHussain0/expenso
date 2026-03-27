@@ -13,6 +13,12 @@ import {
 const Feature = () => {
   const allFeatures = [
     {
+      title: 'Visual Dashboard',
+      icon: ChartArea,
+      description:
+        'See your income vs expenses vs investments at a glance with pie charts, bar graphs, and daily breakdowns.',
+    },
+    {
       title: 'Smart Categories',
       icon: LayoutDashboard,
       description:
@@ -24,12 +30,7 @@ const Feature = () => {
       description:
         'Log any transaction in seconds. Add amount, pick a category, set the date, and optionally add a note.',
     },
-    {
-      title: 'Visual Dashboard',
-      icon: ChartArea,
-      description:
-        'See your income vs expenses vs investments at a glance with pie charts, bar graphs, and daily breakdowns.',
-    },
+
     {
       title: 'Free Cash Tracking',
       icon: Target,
@@ -51,41 +52,50 @@ const Feature = () => {
   ];
   return (
     <section
-      className="flex w-full flex-col items-center justify-between gap-3 bg-[#6D3B07] p-4 lg:p-8 lg:flex-row"
+      className="flex w-full flex-col items-center justify-between gap-3 p-4 lg:flex-row lg:p-8"
       id="features"
     >
       <Row className="w-full flex-col lg:w-[30%] lg:items-start">
-        <span className="text-[12px] font-medium tracking-widest !text-green-500 uppercase md:text-[14px]">
+        <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase md:text-[14px]">
           Features
-        </span>
+        </div>
 
-        <h2 className="section-title max-w-[560px] text-[28px] tracking-tighter text-white md:text-[36px]">
+        <h2 className="section-title max-w-[520px] text-[28px] tracking-tighter md:text-[36px]">
           Everything you need to
           <br />
-          <em className="text-green-500 italic">understand your money</em>
+          <em className="text-[#1a7f5a] italic">understand your money</em>
         </h2>
 
-        <p className="text-center text-[14px] font-extralight text-[#F5F5DC] md:text-start md:text-[16px]">
+        <p className="text-center text-[14px] font-extralight text-[#5a6070] md:text-start md:text-[16px]">
           Built around how people actually think about their finances — not how
           accountants do.
         </p>
       </Row>
 
       <div className="grid w-full grid-cols-2 gap-2 md:grid-cols-3 lg:w-[60%]">
-        {allFeatures.map(item => {
+        {allFeatures.map((item, index) => {
           const Icon = item.icon;
           return (
-            <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg" key={item.title}>
+            <Card
+              className={`px-4 py-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
+              key={item.title}
+            >
               <CardHeader>
-                <CardTitle className="flex items-center text-[#6D3B07]">
-                  <div className="mr-2 flex size-10 items-center justify-center rounded-lg shadow bg-[#F5F5DC]">
-                    <Icon className="size-5 text-[#6D3B07]" />
+                <CardTitle
+                  className={`flex items-center ${index === 0 ? 'text-white' : 'text-[#0d1117]'}`}
+                >
+                  <div className="mr-2 flex size-10 items-center justify-center rounded-lg bg-white shadow">
+                    <Icon className="size-5 text-[#1a7f5a]" />
                   </div>
                   {item.title}
                 </CardTitle>
               </CardHeader>
 
-              <CardContent className="">{item.description}</CardContent>
+              <CardContent
+                className={` ${index === 0 ? 'text-[#dededf]' : 'text-[#5a6070]'}`}
+              >
+                {item.description}
+              </CardContent>
             </Card>
           );
         })}

@@ -1,40 +1,37 @@
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import Row from '@/components/common/Row';
 import Link from 'next/link';
 
 const CTA = () => {
   return (
     <section
       id="signup"
-      className="flex w-full items-center justify-center p-4"
+      className="flex w-full flex-col items-center justify-center bg-[#0d1117] px-4 py-12 md:px-8"
     >
-      <Row className="w-full flex-col items-start justify-between rounded-2xl bg-[#6D3B07] px-4 py-3 md:w-[90%] md:flex-row md:items-center md:px-8 md:py-6 lg:w-[70%]">
-        <Row className="flex-col items-start">
-          <h2 className="cta-title text-[28px] text-[#F5F5DC] md:text-[36px]">
-            Start tracking today.
-            <br />
-            <em className="text-green-500">Future you will thank you.</em>
-          </h2>
+      <p className="rounded-full bg-[#FFFFFF1A] px-4 py-1 text-xs font-medium tracking-wider text-[#FFFFFFB3] uppercase">
+        Free forever · No card needed
+      </p>
 
-          <p className="cta-sub mt-3 text-[14px] text-[#F5F5DC] md:text-[16px]">
-            Join Expenso and finally understand where your money goes every
-            month.
-          </p>
-        </Row>
+      <h2 className="text-center text-[28px] text-[#F5F5DC] md:text-[36px]">
+        Start tracking today.
+        <br />
+        <em className="text-[#2ea878]">Future you will thank you.</em>
+      </h2>
 
-        <Row className="mt-4 flex-col items-start gap-2 md:mt-0">
-          <Link
-            href={PAGE_ROUTES.register}
-            className="inline-block rounded-[8px] bg-[#D47E30]/90 px-4 py-3 text-[14px] font-medium text-white transition-all duration-200 hover:bg-[#D47E30] active:scale-95 lg:px-8"
-          >
-            Create free account →
-          </Link>
+      <p className="mt-3 text-center text-[14px] text-[#FFFFFF80] md:text-[16px]">
+        Join Expenso and finally understand where your money goes every month.
+        Setup takes 2 minutes.
+      </p>
 
-          <span className="text-[14px] text-[#F5F5DC] md:text-[16px]">
-            No credit card · Ready in 2 min
-          </span>
-        </Row>
-      </Row>
+      <Link
+        href={PAGE_ROUTES.register}
+        className="my-2 inline-flex items-center gap-2 rounded-full bg-white px-9 py-2 text-[15px] font-medium text-[var(--ink)] no-underline shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] active:scale-95"
+      >
+        Create free account →
+      </Link>
+
+      <p className="text-sm text-[#FFFFFF4D]">
+        No credit card · Ready in 2 min
+      </p>
     </section>
   );
 };

@@ -1,56 +1,51 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardDescription } from '@/components/ui/card';
 
 const Stats = () => {
   const items = [
     {
       id: 1,
-      description:
-        'Custom categories you can create to match your life exactly',
+      description: 'Custom categories',
       title: '∞',
     },
     {
       id: 2,
-      description: 'Average time to log a transaction and keep your data fresh',
+      description: 'Average time to log a transaction',
       title: '5',
       subTitle: 's',
     },
     {
       id: 3,
-      description: 'Cost to get started — completely free, no card required',
+      description: 'Cost to get started',
       title: '0',
       subTitle: 'Rs',
     },
+
+    {
+      id: 4,
+      description: 'Setup time',
+      title: '2',
+      subTitle: 'm',
+    },
   ];
   return (
-    <div className="w-full bg-[#F5F5DC] p-4 lg:p-8">
-      <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase md:text-[14px]">
-        Built for clarity
-      </span>
-
-      <div className="mt-3 grid grid-cols-3 gap-1 md:gap-2">
-        {items.map(item => (
+    <div className="items- mb-4 flex w-full flex-col justify-center bg-[#f7f8fa] p-4">
+      <div className="mt-3 grid grid-cols-2 gap-1 md:grid-cols-4 md:gap-2">
+        {items.map((item, index) => (
           <Card
-            className="gap-0 rounded-none border-none bg-transparent p-0 shadow-none ring-0"
             key={item.id}
+            className={`items-center gap-0 rounded-none bg-transparent p-0 pb-2 shadow-none ring-0 ${
+              index !== items.length - 1 ? 'md:border-r-2' : 'border-r-0'
+            }`}
           >
-            <CardHeader className="p-0">
-              <div className="textPrimary text-[52px]">
-                {item.title}
-                {item.subTitle && (
-                  <span className="text-[#D47E30]">{item.subTitle}</span>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <CardDescription className="text-[14px]">
-                {item.description}
-              </CardDescription>
-            </CardContent>
+            <div className="text-[52px] text-[#0d1117]">
+              {item.title}
+              {item.subTitle && (
+                <span className="text-[#1a7f5a]">{item.subTitle}</span>
+              )}
+            </div>
+            <CardDescription className="text-center text-[14px] text-[#5a6070]">
+              {item.description}
+            </CardDescription>
           </Card>
         ))}
       </div>

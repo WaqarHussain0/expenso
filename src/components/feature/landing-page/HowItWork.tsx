@@ -1,10 +1,8 @@
 import Row from '@/components/common/Row';
-import TextElement from '@/components/common/TextElement';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -31,97 +29,41 @@ const HowItWork = () => {
     },
   ];
 
-  const stats = {
-    title: 'March 2026 — Expense Breakdown',
-    breadown: [
-      {
-        category: 'Shopping',
-        bgColor: 'bg-red-400',
-        amount: 52095,
-        barWidth: 'w-[58%]',
-      },
-      {
-        category: 'Home',
-        bgColor: 'bg-orange-400',
-        amount: 27843,
-        barWidth: 'w-[31%]',
-      },
-
-      {
-        category: 'Fuel',
-        bgColor: 'bg-yellow-400',
-        amount: 8980,
-        barWidth: 'w-[10%]',
-      },
-
-      {
-        category: 'Grocery',
-        bgColor: 'bg-green-400',
-        amount: 900,
-        barWidth: 'w-[1%]',
-      },
-    ],
-
-    total: 89818,
-  };
   return (
-    <section className="w-full space-y-3 p-4 lg:p-8" id="how">
-      <div className="flex flex-col items-center md:items-start">
-        <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase">
-          How it works
-        </span>
+    <>
+      <section className="w-full flex flex-col justify-center items-center space-y-3 p-4 lg:p-8" id="how">
+        <div className="flex flex-col items-center">
+          <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase">
+            How it works
+          </span>
 
-        <h2 className="section-title max-w-[560px] text-center md:text-left text-[28px] md:text-[36px] tracking-tighter">
-          Up and running in
-          <br />
-          <em className="text-[#D47E30] italic">three steps</em>
-        </h2>
-      </div>
+          <h2 className="section-title text-center max-w-[560px] text-[28px] tracking-tighter md:text-[36px]">
+            Up and running in
+            <em className="ml-2 text-[#D47E30] italic">three steps</em>
+          </h2>
 
-      <Row className="w-full flex-col justify-between items-start gap-2 md:flex-row">
-        <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-2 md:w-[60%]">
-          {steps.map(item => (
-            <Card key={item.number} className="lg:min-h-[200px]">
-              <CardHeader>
-                <CardTitle>{item.label}</CardTitle>
-              </CardHeader>
-
-              <CardContent>
-                <CardDescription>{item.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+          <CardDescription className='text-center'>
+            No complicated setup. No onboarding calls. Just open it and go.
+          </CardDescription>
         </div>
 
-        <Row className="w-full md:w-[40%]">
-          <Card className="w-full ">
-            <CardHeader>
-              <CardTitle className='text-slate-600 text-xs'>{stats.title}</CardTitle>
-            </CardHeader>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+          {steps.map(item => (
+            <div
+              key={item.number}
+              className="flex flex-col items-center gap-2 text-center"
+            >
+              <div className="step-num border-primary flex size-12 items-center justify-center rounded-full border-[2px] bg-white text-2xl font-bold">
+                {item.number}
+              </div>
 
-            <CardContent>
-              {stats.breadown.map(item => (
-                <Row key={item.category} className="gap-3">
-                  <div className={`size-3 rounded-full ${item.bgColor}`} />
-                  <TextElement>{item.category}</TextElement>
-
-                  <div className="h-1 flex-2 overflow-hidden rounded-[3px] bg-slate-200">
-                    <div
-                      className={`h-full rounded-[3px] ${item.bgColor} ${item.barWidth}`}
-                    ></div>
-                  </div>
-                  <TextElement>{item.amount.toLocaleString()}</TextElement>
-                </Row>
-              ))}
-            </CardContent>
-
-            <CardFooter>
-              Total Spent : {stats.total.toLocaleString()}
-            </CardFooter>
-          </Card>
-        </Row>
-      </Row>
-    </section>
+              <CardTitle>{item.label}</CardTitle>
+              <CardDescription>{item.description}</CardDescription>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 };
 
