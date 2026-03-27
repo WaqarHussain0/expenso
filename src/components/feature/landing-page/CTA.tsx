@@ -24,7 +24,7 @@ const CTA = () => {
 
       <Link
         href={PAGE_ROUTES.register}
-        className="my-2 inline-flex items-center gap-2 rounded-full bg-white px-9 py-2 text-[15px] font-medium text-[var(--ink)] no-underline shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] active:scale-95"
+        className="my-2 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-[var(--ink)] no-underline shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] active:scale-95"
       >
         Create free account →
       </Link>

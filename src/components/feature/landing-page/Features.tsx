@@ -77,15 +77,15 @@ const Feature = () => {
           const Icon = item.icon;
           return (
             <Card
-              className={`px-4 py-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
+              className={`px-2 md:px-4 py-4 md:py-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
               key={item.title}
             >
               <CardHeader>
                 <CardTitle
                   className={`flex items-center ${index === 0 ? 'text-white' : 'text-[#0d1117]'}`}
                 >
-                  <div className="mr-2 flex size-10 items-center justify-center rounded-lg bg-white shadow">
-                    <Icon className="size-5 text-[#1a7f5a]" />
+                  <div className="mr-2 flex size-9 md:size-10 items-center justify-center rounded-md md:rounded-lg bg-white shadow">
+                    <Icon className="size-4 md:size-5 text-[#1a7f5a] shrink-no" />
                   </div>
                   {item.title}
                 </CardTitle>

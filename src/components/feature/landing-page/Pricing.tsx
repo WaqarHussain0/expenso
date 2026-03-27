@@ -1,7 +1,9 @@
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader } from '@/components/ui/card';
 import { Check } from 'lucide-react';
+import Link from 'next/link';
 
 const Pricing = () => {
   const options = [
@@ -19,55 +21,66 @@ const Pricing = () => {
     'Secure private storage',
   ];
   return (
-    <Row className="w-full my-3 justify-center bg-[#F5F5DC]">
-      <Row className="w-full flex-col gap-3 md:gap-0 md:flex-row justify-between p-4 lg:p-8">
-        <div className="flex w-full md:w-[55%] flex-col items-start gap-3">
-          <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase">
+    <Row className="my-3 w-full justify-center bg-[#]">
+      <Row className="w-full flex-col justify-between gap-3 p-4 md:flex-row md:gap-0 lg:p-8">
+        <div className="flex w-full flex-col items-start gap-3 md:w-[55%]">
+          <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
             Pricing
-          </span>
+          </div>
 
-          <h2 className="section-title max-w-[560px] text-center text-[28px] tracking-tighter md:text-[36px]">
+          <h2 className="section-title max-w-[560px] text-center text-[28px] tracking-tighter text-[#0d1117] md:text-[36px]">
             Completely free.
             <em className="ml-2 text-[#D47E30] italic">No tricks</em>
           </h2>
 
-          <CardDescription className="max-w-[70%] text-center text-start">
+          <CardDescription className="max-w-[520px] text-start text-[#5a6070]">
             No freemium walls. No premium tiers. No credit card required.
             Expenso is free because everyone deserves to understand their
             finances.
           </CardDescription>
 
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-4 flex flex-col gap-2">
             {options.map(item => (
               <div key={item} className="flex items-center gap-1">
-                <Check className="size-4 text-green-500" />
+                <Check className="size-4 text-[#1a7f5a]" />
 
-                <CardDescription>{item}</CardDescription>
+                <CardDescription className="text-[#5a6070]">
+                  {item}
+                </CardDescription>
               </div>
             ))}
           </div>
         </div>
 
-        <Card className="w-full md:w-[40%] px-2 py-6">
+        <Card className="w-full bg-[#f7f8fa] px-2 py-6 md:w-[40%]">
           <CardHeader>
-            <span className="text-[12px] font-medium tracking-widest text-green-500 uppercase">
-              Free forever
-            </span>
+            <div className="w-fit rounded-full bg-[#e6f5ef] px-3 py-1 text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
+              ✓ Free forever
+            </div>
 
-            <h2 className='text-6xl font-black'>0Rs</h2>
+            <h2 className="text-6xl font-black text-[#0d1117]">0Rs</h2>
 
-            <CardDescription>Cost to get started — and stay</CardDescription>
+            <CardDescription className="text-[#5a6070]">
+              Cost to get started — and stay
+            </CardDescription>
 
-            <div className="flex flex-col gap-2 my-2 bg-slate-100 p-3 rounded-md">
+            <div className="my-2 flex flex-col gap-2 rounded-md bg-[#eef0f4] p-3">
               {accountOptions.map(item => (
                 <div key={item} className="flex items-center gap-1">
-                  <Check className="size-4 text-green-500" />
-                  <CardDescription>{item}</CardDescription>
+                  <Check className="size-4 text-[#1a7f5a]" />
+                  <CardDescription className="text-[#5a6070]">
+                    {item}
+                  </CardDescription>
                 </div>
               ))}
             </div>
 
-            <Button className="">Create Free Account →</Button>
+            <Link
+              href={PAGE_ROUTES.register}
+              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#0d1117] px-6 py-3 text-[15px] font-medium text-white no-underline shadow-[0_4px_20px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(13,17,23,0.3)]"
+            >
+              Create Free Account →
+            </Link>
           </CardHeader>
         </Card>
       </Row>
