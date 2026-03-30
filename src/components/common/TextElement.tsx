@@ -19,14 +19,14 @@ type TextVariants =
 
 // Default Tailwind utility classes per element
 const defaultClasses: Record<TextVariants, string> = {
-  h1: 'poppins text-3xl font-semibold textPrimary',
+  h1: 'poppins text-3xl font-semibold text-[#0d1117]',
   h2: 'text-3xl font-bold',
-  h3: 'poppins textPrimary text-xl font-bold',
+  h3: 'poppins text-[#0d1117] text-xl font-bold',
   h4: ' text-md ',
   h5: ' text-sm',
   h6: '',
-  p: 'text-sm inter ',
-  span: 'inter text-sm textSecondary hover:underline  cursor-pointer underline',
+  p: 'text-sm inter text-[#5a6070]',
+  span: 'inter text-sm text-primary hover:underline  cursor-pointer underline',
   label: 'text-[14px] font-[400] text-[#4D4D4D] ',
   blockquote: '',
   small: '',

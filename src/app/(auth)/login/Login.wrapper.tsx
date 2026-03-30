@@ -71,7 +71,7 @@ const LoginWrapper = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Email Input */}
         <div className="space-y-2">
-          <Label className="text-[#D47E30]">{emailInputField.label}</Label>
+          <Label className="text-[#0d1117]">{emailInputField.label}</Label>
           <Controller
             name={emailInputField.name as 'email'}
             control={control}
@@ -98,7 +98,7 @@ const LoginWrapper = () => {
 
         {/* Password Input */}
         <div className="space-y-2">
-          <Label className="text-[#D47E30]">{passwordInputField.label}</Label>
+          <Label className="text-[#0d1117]">{passwordInputField.label}</Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -135,13 +135,13 @@ const LoginWrapper = () => {
             <TextElement as="span">Forgot password</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading} className="bg-[#6D3B07]">
+          <Button type="submit" disabled={loading} className="">
             {loading ? 'Logging in...' : 'Login'}
           </Button>
         </Row>
 
         <Row className="flex-col justify-center">
-          <TextElement as="p" className="text-[#D47E30]">
+          <TextElement as="p" className="">
             Don't have an account?
           </TextElement>
           <Link href={PAGE_ROUTES.register}>

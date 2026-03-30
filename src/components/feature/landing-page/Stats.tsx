@@ -1,6 +1,10 @@
 import { Card, CardDescription } from '@/components/ui/card';
 
-const Stats = () => {
+interface IStatsProps {
+  className?: string;
+}
+
+const Stats: React.FC<IStatsProps> = ({ className = '' }) => {
   const items = [
     {
       id: 1,
@@ -27,9 +31,12 @@ const Stats = () => {
       subTitle: 'm',
     },
   ];
+
   return (
-    <div className="items- mb-4 flex w-full flex-col justify-center bg-[#f7f8fa] p-4">
-      <div className="mt-3 grid grid-cols-2 gap-1 md:grid-cols-4 md:gap-2">
+    <div
+      className={` flex w-full flex-col justify-center bg-[#f7f8fa] p-4 ${className}`}
+    >
+      <div className=" grid grid-cols-2 gap-1 md:grid-cols-4 md:gap-2">
         {items.map((item, index) => (
           <Card
             key={item.id}

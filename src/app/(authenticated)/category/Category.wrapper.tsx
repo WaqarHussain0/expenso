@@ -123,7 +123,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             {' '}
             All Categories
           </TextElement>
-          <TextElement as="p" className="text-[#D47E30]">
+          <TextElement as="p" className="text-[#5a6070]">
             Manage your categories here
           </TextElement>
         </Row>
@@ -170,7 +170,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="textPrimary flex items-center gap-1">
+          <CardTitle className="text-[#0d1117] flex items-center gap-1">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>

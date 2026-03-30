@@ -124,7 +124,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             {' '}
             All Transactions
           </TextElement>
-          <TextElement as="p" className="text-[#D47E30]">
+          <TextElement as="p" className="text-[#5a6070]">
             Manage your transactions here
           </TextElement>
         </Row>
@@ -179,7 +179,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="textPrimary flex items-center gap-1">
+          <CardTitle className="text-[#0d1117] flex items-center gap-1">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>

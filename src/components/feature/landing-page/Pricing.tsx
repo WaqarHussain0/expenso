@@ -1,11 +1,14 @@
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
-import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
-const Pricing = () => {
+interface IPricingProps {
+  className?: string; 
+}
+
+const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
   const options = [
     'Unlimited categories — create as many as you need',
     'Unlimited transactions — log every rupee, always',
@@ -21,16 +24,16 @@ const Pricing = () => {
     'Secure private storage',
   ];
   return (
-    <Row className="my-3 w-full justify-center bg-[#]">
+    <Row className={` w-full justify-center bg-[#] ${className}`}>
       <Row className="w-full flex-col justify-between gap-3 p-4 md:flex-row md:gap-0 lg:p-8">
         <div className="flex w-full flex-col items-start gap-3 md:w-[55%]">
           <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
             Pricing
           </div>
 
-          <h2 className="section-title max-w-[560px] text-center text-[28px] tracking-tighter text-[#0d1117] md:text-[36px]">
+          <h2 className="max-w-[520px] text-[28px] font-bold tracking-tighter md:text-[36px]">
             Completely free.
-            <em className="ml-2 text-[#D47E30] italic">No tricks</em>
+            <em className="ml-2 text-[#1a7f5a] italic">No tricks.</em>
           </h2>
 
           <CardDescription className="max-w-[520px] text-start text-[#5a6070]">

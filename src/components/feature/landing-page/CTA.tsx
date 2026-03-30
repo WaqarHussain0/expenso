@@ -1,11 +1,15 @@
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Link from 'next/link';
 
-const CTA = () => {
+interface ICTAProps {
+  className?: string;
+}
+
+const CTA: React.FC<ICTAProps> = ({ className = '' }) => {
   return (
     <section
       id="signup"
-      className="flex w-full flex-col items-center justify-center bg-[#0d1117] px-4 py-12 md:px-8"
+      className={`flex w-full flex-col items-center justify-center bg-[#0d1117] px-4 py-12 md:px-8 ${className}`}
     >
       <p className="rounded-full bg-[#FFFFFF1A] px-4 py-1 text-xs font-medium tracking-wider text-[#FFFFFFB3] uppercase">
         Free forever · No card needed

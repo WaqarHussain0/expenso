@@ -8,21 +8,25 @@ import Footer from '@/components/feature/landing-page/Footer';
 import Row from '@/components/common/Row';
 import Pricing from '@/components/feature/landing-page/Pricing';
 import ShareableStats from '@/components/feature/landing-page/ShareableStats';
+import { getServerSideSession } from '@/lib/next-auth.util';
 
 const Page = async () => {
+  const session = await getServerSideSession();
+  const user = session?.user;
+  
   return (
     <Row className="no-scrollbar w-full flex-col">
-      <Nav />
-      <Header />
-      <Stats />
+      <Nav className="" user={user} />
+      <Header className="" />
+      <Stats className="" />
 
-      <Feature />
-      <ShareableStats />
-      <HowItWork />
+      <Feature className="" />
+      <ShareableStats className="" />
+      <HowItWork className="" />
 
-      <Pricing />
-      <CTA />
-      <Footer />
+      <Pricing className="my-3" />
+      <CTA className="" />
+      <Footer className="" />
     </Row>
   );
 };

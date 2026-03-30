@@ -26,6 +26,7 @@ import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
 } from '@/lib/rtk/services/category.rtk.service';
+import { BanknoteArrowDown, Coins, ShoppingCartIcon } from 'lucide-react';
 
 interface ICategoryDialogProps {
   open: boolean;
@@ -118,6 +119,32 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
 
   const isSubmitting = isCreating || isUpdating;
 
+  const getTypeColor = (type: CategoryTypeEnum | undefined) => {
+    switch (type) {
+      case CategoryTypeEnum.INCOME:
+        return 'bg-primary/10 text-primary';
+      case CategoryTypeEnum.EXPENSE:
+        return 'bg-destructive/10 text-destructive';
+      case CategoryTypeEnum.INVESTMENT:
+        return 'bg-yellow-500/10 text-yellow-500';
+      default:
+        return null;
+    }
+  };
+
+  const getTypeIcon = (type: CategoryTypeEnum | undefined) => {
+    switch (type) {
+      case CategoryTypeEnum.INCOME:
+        return <BanknoteArrowDown />;
+      case CategoryTypeEnum.EXPENSE:
+        return <ShoppingCartIcon />;
+      case CategoryTypeEnum.INVESTMENT:
+        return <Coins />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -159,29 +186,36 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="role">Type *</Label>
+
             <Controller
               name="type"
               control={control}
               rules={{ required: 'Type is required' }}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full capitalize">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categoryTypes?.map(type => (
-                      <SelectItem
-                        className="capitalize"
+                <div className="flex gap-2">
+                  {categoryTypes.map(type => {
+                    const isActive = field.value === type.id;
+
+                    return (
+                      <Button
+                        type="button"
                         key={type.id}
-                        value={type.id}
+                        onClick={() => field.onChange(type.id)}
+                        className={`flex items-center gap-2 border px-3 capitalize transition-all ${
+                          isActive
+                            ? `${getTypeColor(type.id)} shadow-md`
+                            : 'text-muted-foreground hover:bg-muted border-gray-300 bg-transparent'
+                        } `}
                       >
+                        {getTypeIcon(type.id)}
                         {type.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      </Button>
+                    );
+                  })}
+                </div>
               )}
             />
+
             {errors.type && (
               <p className="text-sm text-red-500">{errors.type.message}</p>
             )}

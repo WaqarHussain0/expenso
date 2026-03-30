@@ -75,7 +75,7 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
-          <Label className="text-[#D47E30]">{passwordInputField.label}</Label>
+          <Label className="text-[#0d1117]">{passwordInputField.label}</Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -116,7 +116,7 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
           />
         </div>
 
-        <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
+        <Button type="submit" disabled={loading}>
           {loading ? 'Saving...' : 'Save Password'}
         </Button>
       </form>

@@ -78,7 +78,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             {' '}
             All Users
           </TextElement>
-          <TextElement as="p" className="text-[#D47E30]">
+          <TextElement as="p" className="text-[#5a6070]">
             Manage users here
           </TextElement>
         </Row>
@@ -120,7 +120,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="textPrimary flex items-center gap-1">
+          <CardTitle className="flex items-center gap-1 text-[#0d1117]">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>

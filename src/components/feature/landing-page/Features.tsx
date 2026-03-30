@@ -10,7 +10,12 @@ import {
 } from 'lucide-react';
 
 /* eslint-disable react/no-unescaped-entities */
-const Feature = () => {
+
+interface IFeatureProps {
+  className?: string;
+}
+
+const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
   const allFeatures = [
     {
       title: 'Visual Dashboard',
@@ -52,11 +57,11 @@ const Feature = () => {
   ];
   return (
     <section
-      className="flex w-full flex-col items-center justify-between gap-3 p-4 lg:flex-row lg:p-8"
+      className={`flex w-full flex-col items-center justify-between gap-3 p-4 lg:flex-row lg:p-8 ${className}`}
       id="features"
     >
       <Row className="w-full flex-col lg:w-[30%] lg:items-start">
-        <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase md:text-[14px]">
+        <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
           Features
         </div>
 
@@ -77,15 +82,15 @@ const Feature = () => {
           const Icon = item.icon;
           return (
             <Card
-              className={`px-2 md:px-4 py-4 md:py-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
+              className={`py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md md:px-2 md:px-4 md:py-8 ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
               key={item.title}
             >
               <CardHeader>
                 <CardTitle
                   className={`flex items-center ${index === 0 ? 'text-white' : 'text-[#0d1117]'}`}
                 >
-                  <div className="mr-2 flex size-9 md:size-10 items-center justify-center rounded-md md:rounded-lg bg-white shadow">
-                    <Icon className="size-4 md:size-5 text-[#1a7f5a] shrink-no" />
+                  <div className="mr-2 flex size-9 items-center justify-center rounded-md bg-white shadow md:size-10 md:rounded-lg">
+                    <Icon className="shrink-no size-4 text-[#1a7f5a] md:size-5" />
                   </div>
                   {item.title}
                 </CardTitle>

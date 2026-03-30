@@ -70,7 +70,7 @@ const ForgotPasswordWrapper = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Email Input */}
         <div className="space-y-2">
-          <Label className="text-[#D47E30]">{emailInputField.label}</Label>
+          <Label className="text-[#0d1117]">{emailInputField.label}</Label>
           <Controller
             name={emailInputField.name as 'email'}
             control={control}
@@ -100,7 +100,7 @@ const ForgotPasswordWrapper = () => {
             <TextElement as="span">Login</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading} className='bg-[#6D3B07]'>
+          <Button type="submit" disabled={loading}>
             {loading ? 'Sending...' : 'Reset Password'}
           </Button>
         </Row>
