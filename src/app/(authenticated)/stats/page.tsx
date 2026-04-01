@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -21,23 +21,18 @@ import Row from '@/components/common/Row';
 import YearStatsWrapper from '@/components/feature/stats/YearStats.wrapper';
 import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
 import { Input } from '@/components/ui/input';
+import { useCreateStatsURLMutation } from '@/lib/rtk/services/stats.rtk.service';
+import { MONTH_NAMES } from '@/app/constants/app.constant';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Copy } from 'lucide-react';
 
 const now = new Date();
-
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 const DATE_FILTER_OPTIONS = [
   FilterOptionEnum.MONTH,
@@ -65,6 +60,11 @@ const Page = () => {
   const [filterOption, setFilterOption] = useState<FilterOptionEnum>(
     FilterOptionEnum.MONTH,
   );
+
+  // Add a state for copy confirmation
+  const [isCopied, setIsCopied] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
 
   // Month filter state
   const [month, setMonth] = useState(now.getMonth());
@@ -148,6 +148,8 @@ const Page = () => {
     investment: [],
   };
 
+  const [createStatsURL, { isLoading }] = useCreateStatsURLMutation();
+
   const renderData = (filterOption: FilterOptionEnum) => {
     switch (filterOption) {
       case FilterOptionEnum.MONTH:
@@ -185,6 +187,51 @@ const Page = () => {
     }
   };
 
+  // Open dialog and prepare to generate URL
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+    setShareUrl('');
+    setIsCopied(false);
+  };
+
+  // Generate stats URL and copy it
+  const handleCopy = async () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+    }
+
+    // Reset copied state after 2s
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  // Auto-generate URL when dialog opens
+  useEffect(() => {
+    if (isDialogOpen && !shareUrl) {
+      const generateURL = async () => {
+        try {
+          const res = await createStatsURL({
+            payload: { type: filterOption, startDate, endDate, year },
+          }).unwrap();
+          if (res?.url) {
+            setShareUrl(res.url);
+          }
+        } catch (error) {
+          console.error('Error generating share URL:', error);
+        }
+      };
+      generateURL();
+    }
+  }, [
+    isDialogOpen,
+    shareUrl,
+    createStatsURL,
+    filterOption,
+    startDate,
+    endDate,
+    year,
+  ]);
+
   return (
     <div className="w-full space-y-3">
       {/* Filter */}
@@ -209,100 +256,134 @@ const Page = () => {
             </div>
           </div>
 
-          {/* ── MONTH filter inputs ── */}
-          {filterOption === FilterOptionEnum.MONTH && (
-            <Row className="gap-2">
-              <div className="space-y-2">
-                <Label>Month</Label>
-                <Select
-                  value={String(month)}
-                  onValueChange={val => setMonth(Number(val))}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="h-40">
-                    {MONTHS.map((m, i) => (
-                      <SelectItem key={m} value={String(i)}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="flex items-end gap-2">
+            {/* ── MONTH filter inputs ── */}
+            {filterOption === FilterOptionEnum.MONTH && (
+              <Row className="gap-2">
+                <div className="space-y-2">
+                  <Label>Month</Label>
+                  <Select
+                    value={String(month)}
+                    onValueChange={val => setMonth(Number(val))}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="h-40">
+                      {MONTH_NAMES.map((m, i) => (
+                        <SelectItem key={m} value={String(i)}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label>Year</Label>
-                <Select
-                  value={String(year)}
-                  onValueChange={val => setYear(Number(val))}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {YEARS.map(y => (
-                      <SelectItem key={y} value={String(y)}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </Row>
-          )}
+                <div className="space-y-2">
+                  <Label>Year</Label>
+                  <Select
+                    value={String(year)}
+                    onValueChange={val => setYear(Number(val))}
+                  >
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => (
+                        <SelectItem key={y} value={String(y)}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </Row>
+            )}
 
-          {/* ── YEAR filter inputs ── */}
-          {filterOption === FilterOptionEnum.YEAR && (
-            <Row className="gap-2">
-              <div className="space-y-2">
-                <Label>Year</Label>
-                <Select
-                  value={String(year)}
-                  onValueChange={val => setYear(Number(val))}
-                >
-                  <SelectTrigger className="w-28">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {YEARS.map(y => (
-                      <SelectItem key={y} value={String(y)}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </Row>
-          )}
+            {/* ── YEAR filter inputs ── */}
+            {filterOption === FilterOptionEnum.YEAR && (
+              <Row className="gap-2">
+                <div className="space-y-2">
+                  <Label>Year</Label>
+                  <Select
+                    value={String(year)}
+                    onValueChange={val => setYear(Number(val))}
+                  >
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => (
+                        <SelectItem key={y} value={String(y)}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </Row>
+            )}
 
-          {/* ── CUSTOM filter inputs ── */}
-          {filterOption === FilterOptionEnum.CUSTOM && (
-            <Row className="gap-2">
-              <div className="space-y-2">
-                <Label>From</Label>
-                <Input
-                  type="date"
-                  value={fromDate}
-                  onChange={e => setFromDate(e.target.value)}
-                />
-              </div>
+            {/* ── CUSTOM filter inputs ── */}
+            {filterOption === FilterOptionEnum.CUSTOM && (
+              <Row className="gap-2">
+                <div className="space-y-2">
+                  <Label>From</Label>
+                  <Input
+                    type="date"
+                    value={fromDate}
+                    onChange={e => setFromDate(e.target.value)}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label>To</Label>
-                <Input
-                  type="date"
-                  value={toDate}
-                  min={fromDate} // prevent selecting before 'fromDate'
-                  onChange={e => setToDate(e.target.value)}
-                />
-              </div>
-            </Row>
-          )}
+                <div className="space-y-2">
+                  <Label>To</Label>
+                  <Input
+                    type="date"
+                    value={toDate}
+                    min={fromDate} // prevent selecting before 'fromDate'
+                    onChange={e => setToDate(e.target.value)}
+                  />
+                </div>
+              </Row>
+            )}
+
+            <Button onClick={handleOpenDialog}>Share</Button>
+          </div>
         </CardContent>
       </Card>
 
       {renderData(filterOption)}
+
+      {/* Share URL Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share your stats</DialogTitle>
+
+            <DialogDescription>
+              A unique URL for your current stats view. You can share this with
+              others.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="flex-1"
+                placeholder="Generating URL..."
+              />
+              <Button onClick={handleCopy} disabled={isLoading || !shareUrl}>
+                <Copy />{' '}
+                {isLoading ? 'Generating...' : isCopied ? 'Copied!' : 'Copy'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

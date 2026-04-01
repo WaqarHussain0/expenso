@@ -21,8 +21,6 @@ const Page = async () => {
     redirect(PAGE_ROUTES.dashboard);
   }
 
-  console.log(isFirstLogin, '!!!!!!!!!!!!!!!!!!!');
-
   return <PreferenceWrapper userId={session.user.id} />;
 };
 

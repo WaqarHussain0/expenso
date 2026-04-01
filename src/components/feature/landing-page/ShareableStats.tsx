@@ -45,7 +45,7 @@ const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
 
           <div className="flex w-full items-center justify-between rounded-md bg-slate-100 px-2 py-1">
             <p className="text-sm text-[#1a7f5a]">
-              expenso.app/stats/share?m=03&y=2026&toke!2…
+              expenso-pi.vercel.app/share?m=032026&toke!2…
             </p>
 
             <Badge className="rounded-sm bg-white">Copy</Badge>

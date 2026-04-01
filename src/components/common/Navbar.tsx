@@ -61,7 +61,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
     {
       title: 'Stats',
-      linkTo: PAGE_ROUTES.monthStats,
+      linkTo: PAGE_ROUTES.stats,
       icon: ChartPie,
       show: true,
     },

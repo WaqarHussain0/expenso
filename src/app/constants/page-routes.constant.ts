@@ -10,7 +10,7 @@ const PAGE_ROUTES = {
   // Authenticated Routes
   dashboard: '/dashboard',
 
-  monthStats: '/stats',
+  stats: '/stats',
   category: '/category',
   transaction: '/transaction',
 

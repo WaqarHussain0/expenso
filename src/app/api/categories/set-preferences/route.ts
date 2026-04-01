@@ -14,8 +14,6 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     // Parse JSON body
     const body = await req.json();
 
-    console.log(body, '!!!!!!!!!!!!');
-
     // Create transaction using the service
     await categoryService.setPreferences(userMonogoObjectId, body);
 

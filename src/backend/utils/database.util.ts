@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import CategoryEntity from '../modules/category/entities/category.entity';
 import TransactionEntity from '../modules/transaction/entities/transaction.entity';
 import UserEntity from '../modules/user/entities/user.entity';
+import StatEntity from '../modules/stats/entities/stats.entity';
 
 /**
  * Global is used to maintain a cached connection across hot reloads in development
@@ -18,6 +19,7 @@ const models = {
   Category: CategoryEntity,
   Transaction: TransactionEntity,
   User: UserEntity,
+  Stat: StatEntity,
 };
 
 async function connectToDB() {

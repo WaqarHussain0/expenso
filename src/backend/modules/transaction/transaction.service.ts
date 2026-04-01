@@ -132,7 +132,7 @@ export class TransactionService {
       .find(query)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate({
         path: 'categoryId',
         select: '_id name type', // populate only relevant fields

@@ -45,8 +45,6 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   transactions,
   className,
 }) => {
-
-  console.log(transactions)
   const router = useRouter();
   const [deleteTransaction] = useDeleteTransactionMutation();
 

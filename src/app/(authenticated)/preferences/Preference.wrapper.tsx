@@ -40,6 +40,7 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
       { name: 'Part Time Work', type: CategoryTypeEnum.INCOME },
       { name: 'Dividends', type: CategoryTypeEnum.INCOME },
       { name: 'Rental Income', type: CategoryTypeEnum.INCOME },
+      { name: 'Miscellaneous Income', type: CategoryTypeEnum.INCOME },
     ],
     expense: [
       { name: 'Fuel', type: CategoryTypeEnum.EXPENSE },
@@ -53,6 +54,8 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
       { name: 'Travel', type: CategoryTypeEnum.EXPENSE },
       { name: 'Entertainment', type: CategoryTypeEnum.EXPENSE },
       { name: 'Shopping', type: CategoryTypeEnum.EXPENSE },
+      { name: 'Miscellaneous Expense', type: CategoryTypeEnum.EXPENSE },
+
     ],
     investment: [
       { name: 'Stock Exchange', type: CategoryTypeEnum.INVESTMENT },
@@ -61,6 +64,8 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
       { name: 'Property', type: CategoryTypeEnum.INVESTMENT },
       { name: 'Mutual Funds', type: CategoryTypeEnum.INVESTMENT },
       { name: 'Savings Bonds', type: CategoryTypeEnum.INVESTMENT },
+      { name: 'Miscellaneous Investment', type: CategoryTypeEnum.INVESTMENT },
+
     ],
   };
 
