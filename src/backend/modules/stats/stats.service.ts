@@ -44,14 +44,14 @@ export class StatsService {
       token,
     });
 
-    return `${process.env.NEXTAUTH_URL}/share?m=${token}`;
+    return `${process.env.NEXTAUTH_URL}share?m=${token}`;
   }
 
   async getStatsByToken(token: string) {
     await initDB();
 
     return await this.statEntity.findOne({ token })
-    .populate('userId', 'name email')
+    .populate('userId', '_id name email')
     .lean();
   }
 }

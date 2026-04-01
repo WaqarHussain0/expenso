@@ -50,7 +50,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const userObjectId =
     typeof userId === 'string'
       ? new mongoose.Types.ObjectId(userId)
-      : new mongoose.Types.ObjectId(userId._id); // wrap string _id as ObjectId
+      : new mongoose.Types.ObjectId(userId?._id); // wrap string _id as ObjectId
 
   let response;
   switch (type) {
