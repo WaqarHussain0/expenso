@@ -31,6 +31,7 @@ import {
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 
 import StatWrapper from '@/components/common/Stat.wrapper';
+import { COLOR_CODES } from '@/app/constants/app.constant';
 
 export interface ICategoryStats {
   income: number;
@@ -148,21 +149,21 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             label: `Income`,
             value: categoryStats.income,
             icon: BanknoteArrowDown,
-            iconClassName: 'text-green-400',
+            iconClassName: `text-[#4CAF50]`,
           },
 
           {
             label: `Expense`,
             value: categoryStats.expense,
             icon: ShoppingCartIcon,
-            iconClassName: 'text-red-400',
+            iconClassName: 'text-[#F44336]',
           },
 
           {
             label: `Investment`,
             value: categoryStats.investment,
             icon: Coins,
-            iconClassName: 'text-yellow-400',
+            iconClassName: 'text-[#FF9800]',
           },
         ]}
         className="grid-cols-2 gap-2 lg:grid-cols-3"
@@ -170,7 +171,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="text-[#0d1117] flex items-center gap-1">
+          <CardTitle className="flex items-center gap-1 text-[#0d1117]">
             <Filter className="size-4" />
             Filter Options
           </CardTitle>

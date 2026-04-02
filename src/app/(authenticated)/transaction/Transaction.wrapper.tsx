@@ -149,21 +149,21 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             label: `Income`,
             value: monthStats.income,
             icon: BanknoteArrowDown,
-            iconClassName: 'text-green-400',
+            iconClassName: 'text-[#4CAF50]',
           },
 
           {
             label: `Expense`,
             value: monthStats.expense,
             icon: ShoppingCartIcon,
-            iconClassName: 'text-red-400',
+            iconClassName: 'text-[#F44336]',
           },
 
           {
             label: `Investment`,
             value: monthStats.investment,
             icon: Coins,
-            iconClassName: 'text-yellow-500',
+            iconClassName: 'text-[#FF9800]',
           },
 
           {
@@ -171,7 +171,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             value:
               monthStats.income - (monthStats.expense + monthStats.investment),
             icon: Banknote,
-            iconClassName: 'text-blue-400',
+            iconClassName: 'text-[#2196F3]',
           },
         ]}
         className="grid-cols-2 gap-2 lg:grid-cols-4"

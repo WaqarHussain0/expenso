@@ -15,3 +15,10 @@ export const MONTH_NAMES = [
   'November',
   'December',
 ];
+
+export const COLOR_CODES = {
+  income: '#4CAF50', // Green for income
+  expense: '#F44336', // Red for expense
+  investment: '#FF9800', // Blue for investment
+  freeCash: '#2196F3', // Orange for free cash
+};

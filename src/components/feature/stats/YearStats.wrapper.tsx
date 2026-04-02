@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
 import StatCard from '@/components/common/StatCard';
+import { COLOR_CODES } from '@/app/constants/app.constant';
 
 interface IYearStatsWrapperProps {
   isLoading: boolean;
@@ -70,25 +71,25 @@ const YearStatsWrapper: React.FC<IYearStatsWrapperProps> = ({
       label: 'Income',
       value: income,
       percent: 100,
-      color: '#22c55e',
+      color: COLOR_CODES.income,
     },
     {
       label: 'Expense',
       value: expense,
       percent: (expense / total) * 100,
-      color: '#ef4444',
+      color: COLOR_CODES.expense,
     },
     {
       label: 'Investment',
       value: investment,
       percent: (investment / total) * 100,
-      color: '#3b82f6',
+      color: COLOR_CODES.investment,
     },
     {
       label: 'Free Cash',
       value: freeCash,
       percent: (freeCash / total) * 100,
-      color: '#a855f7',
+      color: COLOR_CODES.freeCash,
     },
   ];
 
@@ -124,10 +125,11 @@ const YearStatsWrapper: React.FC<IYearStatsWrapperProps> = ({
             </div>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={280} className={''}>
             <LineChart
               data={monthlySeries}
               margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+              className="inter p-1"
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -223,6 +225,7 @@ const YearStatsWrapper: React.FC<IYearStatsWrapperProps> = ({
             <BarChart
               data={expenseBreakdown}
               margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+              className="inter p-1"
             >
               <CartesianGrid
                 strokeDasharray="3 3"

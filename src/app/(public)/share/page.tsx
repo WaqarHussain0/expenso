@@ -86,6 +86,11 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       filterType={type}
       response={response}
       userName={userName}
+      dateRange={{
+        startDate: stat.filter.startDate?.toISOString(),
+        endDate: stat.filter.endDate?.toISOString(),
+        year: stat.filter.year,
+      }}
     />
   );
 };

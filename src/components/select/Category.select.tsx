@@ -77,7 +77,10 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('w-full justify-between capitalize font-normal', className)}
+          className={cn(
+            'w-full justify-between font-normal capitalize',
+            className,
+          )}
         >
           {selectedLabel ?? (
             <span className="text-muted-foreground">{placeholder}</span>
@@ -105,8 +108,9 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             placeholder="Search categories..."
             value={search}
             onValueChange={setSearch}
+            className="inter text-xs"
           />
-          <CommandList>
+          <CommandList className="inter">
             {isFetching ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="size-4 animate-spin" />
@@ -124,11 +128,11 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                         setOpen(false);
                         setSearch('');
                       }}
-                      className="capitalize"
+                      className="capitalize text-xs"
                     >
                       <Check
                         className={cn(
-                          'mr-2 h-4 w-4',
+                          'size-4',
                           value === category._id ? 'opacity-100' : 'opacity-0',
                         )}
                       />

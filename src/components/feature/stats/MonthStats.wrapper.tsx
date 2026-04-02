@@ -6,6 +6,7 @@ import { Card, CardTitle } from '@/components/ui/card';
 import TextElement from '@/components/common/TextElement';
 import Row from '@/components/common/Row';
 import StatCard from '@/components/common/StatCard';
+import { COLOR_CODES } from '@/app/constants/app.constant';
 
 interface IMonthStatsWrapperProps {
   isLoading: boolean;
@@ -65,25 +66,25 @@ const MonthStatsWrapper: React.FC<IMonthStatsWrapperProps> = ({
       label: 'Income',
       value: income,
       percent: 100,
-      color: '#22c55e',
+      color: COLOR_CODES.income,
     },
     {
       label: 'Expense',
       value: expense,
       percent: (expense / total) * 100,
-      color: '#ef4444',
+      color: COLOR_CODES.expense,
     },
     {
       label: 'Investment',
       value: investment,
       percent: (investment / total) * 100,
-      color: '#3b82f6',
+      color: COLOR_CODES.investment,
     },
     {
       label: 'Free Cash',
       value: freeCash,
       percent: (freeCash / total) * 100,
-      color: '#a855f7',
+      color: COLOR_CODES.freeCash,
     },
   ];
 
