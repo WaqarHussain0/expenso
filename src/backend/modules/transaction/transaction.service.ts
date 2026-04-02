@@ -169,10 +169,27 @@ export class TransactionService {
 
     await initDB();
 
+    // 📅 Current month range
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+
     const stats = await this.transactionEntity.aggregate([
       {
         $match: {
           userId: userMongoObjectId,
+          date: {
+            $gte: startOfMonth,
+            $lte: endOfMonth,
+          },
         },
       },
       {
@@ -201,17 +218,10 @@ export class TransactionService {
     };
 
     stats.forEach(item => {
-      if (item._id === CategoryTypeEnum.INCOME) {
-        result.income = item.total;
-      }
-
-      if (item._id === CategoryTypeEnum.EXPENSE) {
-        result.expense = item.total;
-      }
-
-      if (item._id === CategoryTypeEnum.INVESTMENT) {
+      if (item._id === CategoryTypeEnum.INCOME) result.income = item.total;
+      if (item._id === CategoryTypeEnum.EXPENSE) result.expense = item.total;
+      if (item._id === CategoryTypeEnum.INVESTMENT)
         result.investment = item.total;
-      }
     });
 
     return result;

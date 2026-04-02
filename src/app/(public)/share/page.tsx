@@ -45,8 +45,6 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     redirect(PAGE_ROUTES.stats);
   }
 
-  // Determine userId string
-
   const userObjectId =
     typeof userId === 'string'
       ? new mongoose.Types.ObjectId(userId)

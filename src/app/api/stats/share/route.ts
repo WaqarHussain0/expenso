@@ -22,7 +22,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
 
     const payload: any = {
       userId: userMonogoObjectId,
-      filter: { type, startDate, endDate },
+      filter: { type, startDate, endDate, year },
     };
 
     switch (type) {

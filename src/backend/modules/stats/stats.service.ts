@@ -42,7 +42,7 @@ export class StatsService {
     const existing = await this.statEntity.findOne(filterQuery);
 
     if (existing) {
-      return `${process.env.NEXTAUTH_URL}/stats/share?m=${existing.token}`;
+      return `${process.env.NEXTAUTH_URL}share?m=${existing.token}`;
     }
 
     // 🆕 Create new token
@@ -54,7 +54,7 @@ export class StatsService {
       token,
     });
 
-    return `${process.env.NEXTAUTH_URL}/stats/share?m=${token}`;
+    return `${process.env.NEXTAUTH_URL}share?m=${token}`;
   }
 
   async getStatsByToken(token: string) {
