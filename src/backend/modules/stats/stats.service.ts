@@ -22,14 +22,24 @@ export class StatsService {
 
     const normalizedFilter = normalizeFilter(filter);
 
-    // 🔍 Check if already exists
-    const existing = await this.statEntity.findOne({
+    // 🔍 Build explicit query for nested filter fields
+    const filterQuery: Record<string, any> = {
       userId,
       'filter.type': normalizedFilter.type,
-      'filter.startDate': normalizedFilter.startDate,
-      'filter.endDate': normalizedFilter.endDate,
-      'filter.year': normalizedFilter.year,
-    });
+    };
+
+    if (normalizedFilter.startDate) {
+      filterQuery['filter.startDate'] = new Date(normalizedFilter.startDate);
+    }
+    if (normalizedFilter.endDate) {
+      filterQuery['filter.endDate'] = new Date(normalizedFilter.endDate);
+    }
+    if (normalizedFilter.year !== undefined) {
+      filterQuery['filter.year'] = normalizedFilter.year;
+    }
+
+    // 🔍 Check if already exists
+    const existing = await this.statEntity.findOne(filterQuery);
 
     if (existing) {
       return `${process.env.NEXTAUTH_URL}/stats/share?m=${existing.token}`;
@@ -44,14 +54,18 @@ export class StatsService {
       token,
     });
 
-    return `${process.env.NEXTAUTH_URL}share?m=${token}`;
+    return `${process.env.NEXTAUTH_URL}/stats/share?m=${token}`;
   }
 
   async getStatsByToken(token: string) {
     await initDB();
 
-    return await this.statEntity.findOne({ token })
-    .populate('userId', '_id name email')
-    .lean();
+    return await this.statEntity
+      .findOne({ token })
+      .populate({
+        path: 'userId',
+        select: '_id name email', // populate only relevant fields
+      })
+      .lean();
   }
 }

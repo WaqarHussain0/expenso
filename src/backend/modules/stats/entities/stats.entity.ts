@@ -22,8 +22,9 @@ const StatsSchema = new Schema<IStat>(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true, // ✅ must have owner
+      required: false,
       index: true,
+      autopopulate: true,
     },
 
     token: {

@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { StatsService } from '@/backend/modules/stats/stats.service';
+import { withAuth } from '@/backend/utils/guard/withAuth';
 
 enum FilterOptionEnum {
   MONTH = 'month',
@@ -12,13 +13,15 @@ enum FilterOptionEnum {
 }
 
 const statsService = new StatsService();
-export const POST = async (req: NextRequest) => {
+export const POST = withAuth(async (req: NextRequest, user) => {
   try {
     const body = await req.json();
-    const { startDate, endDate, year, type, userId } = body;
+    const userMonogoObjectId = new mongoose.Types.ObjectId(user.id);
+
+    const { startDate, endDate, year, type } = body;
 
     const payload: any = {
-      userId: new mongoose.Types.ObjectId(userId),
+      userId: userMonogoObjectId,
       filter: { type, startDate, endDate },
     };
 
@@ -71,4 +74,4 @@ export const POST = async (req: NextRequest) => {
       { status: 400 },
     );
   }
-};
+});
