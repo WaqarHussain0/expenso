@@ -5,6 +5,7 @@ import { CreateCategoryDto } from '@/backend/modules/category/dto/create-categor
 import { validateDto } from '@/backend/utils/input-validator.util';
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/backend/utils/guard/withAuth';
 
 const categoryService = new CategoryService();
 
@@ -30,40 +31,44 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  const monogoObjectId = new mongoose.Types.ObjectId(id);
+export const PUT = withAuth(
+  async (
+    req: NextRequest,
+    user,
+    { params }: { params: Promise<{ id: string }> },
+  ) => {
+    const { id } = await params;
+    const mongoObjectId = new mongoose.Types.ObjectId(id);
+    const userMonogoObjectId = new mongoose.Types.ObjectId(user.id);
 
-  try {
-    // Parse JSON body
-    const body = await req.json();
+    try {
+      // Parse JSON body
+      const body = await req.json();
 
-    // Transform to DTO and validate
-    const dto = await validateDto(CreateCategoryDto, body);
+      // Transform to DTO and validate
+      const dto = await validateDto(CreateCategoryDto, body);
 
-    // Update user using the service
-    await categoryService.update(monogoObjectId, dto);
+      // Update category using the service
+      await categoryService.update(mongoObjectId, dto, userMonogoObjectId);
 
-    // Return success response
-    return NextResponse.json(
-      {
-        message: 'Category updated!',
-        success: true,
-      },
-      { status: 201 },
-    );
-  } catch (err: any) {
-    // Handle validation errors or service errors
-    console.error('Error updating category:', err);
-    return NextResponse.json(
-      { error: err.message || 'Something went wrong' },
-      { status: 400 },
-    );
-  }
-}
+      // Return success response
+      return NextResponse.json(
+        {
+          message: 'Category updated!',
+          success: true,
+        },
+        { status: 201 },
+      );
+    } catch (err: any) {
+      // Handle validation errors or service errors
+      console.error('Error updating category:', err);
+      return NextResponse.json(
+        { error: err.message || 'Something went wrong' },
+        { status: 400 },
+      );
+    }
+  },
+);
 
 export async function DELETE(
   req: NextRequest,

@@ -135,7 +135,7 @@ export class TransactionService {
       .sort({ date: -1 })
       .populate({
         path: 'categoryId',
-        select: '_id name type', // populate only relevant fields
+        select: '_id name type color icon', // populate only relevant fields
       })
       .lean();
 
@@ -148,6 +148,8 @@ export class TransactionService {
           _id: category?._id?.toString(),
           name: category?.name,
           type: category?.type,
+          color: category?.color,
+          icon: category?.icon,
         },
         categoryId: category?._id?.toString(),
         amount: item.amount,

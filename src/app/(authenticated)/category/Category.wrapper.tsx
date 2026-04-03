@@ -225,7 +225,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           </div>
 
           <CategoryTable
-            className="h-[40vh] overflow-y-auto"
+            className="h-[40vh] no-scrollbar overflow-y-auto"
             categories={categories || []}
           />
 

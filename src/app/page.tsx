@@ -15,7 +15,7 @@ const Page = async () => {
   const user = session?.user;
   
   return (
-    <Row className="no-scrollbar w-full flex-col">
+    <Row className="overflow-y-auto no-scrollbar w-full flex-col">
       <Nav className="" user={user} />
       <Header className="" />
       <Stats className="" />

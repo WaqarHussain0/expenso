@@ -14,19 +14,84 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
 } from '@/lib/rtk/services/category.rtk.service';
-import { BanknoteArrowDown, Coins, ShoppingCartIcon } from 'lucide-react';
+
+import {
+  BanknoteArrowDown,
+  Coins,
+  Wallet,
+  ShoppingCartIcon,
+  Fuel,
+  Car,
+  Home,
+  ShoppingCart,
+  Heart,
+  Plane,
+  Gamepad2,
+  Coffee,
+  Gift,
+  Film,
+  Book,
+  Music,
+  Dumbbell,
+  Smartphone,
+  Shirt,
+  Bike,
+  Briefcase,
+  TrendingUp,
+  Utensils,
+  Laptop,
+  CardSim,
+  Barcode,
+} from 'lucide-react';
+
+export const CATEGORY_ICONS = [
+  { name: 'Wallet', icon: Wallet },
+  { name: 'Barcode', icon: Barcode },
+  { name: 'Laptop', icon: Laptop },
+  { name: 'CardSim', icon: CardSim },
+  { name: 'Fuel', icon: Fuel },
+  { name: 'Car', icon: Car },
+  { name: 'Home', icon: Home },
+  { name: 'ShoppingCart', icon: ShoppingCart },
+  { name: 'Heart', icon: Heart },
+  { name: 'Plane', icon: Plane },
+  { name: 'Gamepad2', icon: Gamepad2 },
+  { name: 'Coffee', icon: Coffee },
+  { name: 'Gift', icon: Gift },
+  { name: 'Book', icon: Book },
+  { name: 'Music', icon: Music },
+  { name: 'Dumbbell', icon: Dumbbell },
+  { name: 'Smartphone', icon: Smartphone },
+  { name: 'Shirt', icon: Shirt },
+  { name: 'Bike', icon: Bike },
+  { name: 'Briefcase', icon: Briefcase },
+  { name: 'TrendingUp', icon: TrendingUp },
+  { name: 'Utensils', icon: Utensils },
+];
+
+const COLORS = [
+  '#FF6B35',
+  '#3B82F6',
+  '#8B5CF6',
+  '#F59E0B',
+  '#EF4444',
+  '#22C55E',
+  '#14B8A6',
+  '#84CC16',
+  '#6366F1',
+  '#06B6D4',
+  '#EAB308',
+  '#EC4899',
+  '#795548',
+  '#10B981',
+  '#F97316',
+];
 
 interface ICategoryDialogProps {
   open: boolean;
@@ -37,6 +102,8 @@ interface ICategoryDialogProps {
 type FormValues = {
   name: string;
   type: CategoryTypeEnum;
+  icon: string;
+  color: string;
 };
 
 const categoryTypes = [
@@ -62,6 +129,8 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
     defaultValues: {
       name: '',
       type: CategoryTypeEnum.INCOME,
+      icon: '',
+      color: '',
     },
   });
 
@@ -108,6 +177,8 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
       reset({
         name: category.name,
         type: category.type,
+        icon: category.icon,
+        color: category.color,
       });
     } else {
       reset({
@@ -122,11 +193,11 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
   const getTypeColor = (type: CategoryTypeEnum | undefined) => {
     switch (type) {
       case CategoryTypeEnum.INCOME:
-        return 'bg-primary/10 text-primary';
+        return 'bg-primary/20 text-primary border-primary';
       case CategoryTypeEnum.EXPENSE:
-        return 'bg-destructive/10 text-destructive';
+        return 'bg-destructive/20 text-destructive border-destructive';
       case CategoryTypeEnum.INVESTMENT:
-        return 'bg-yellow-500/10 text-yellow-500';
+        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500';
       default:
         return null;
     }
@@ -155,7 +226,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
         }
       }}
     >
-      <DialogContent className="">
+      <DialogContent className="max-h-[80vh] overflow-y-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle>{category ? 'Edit' : 'Add New'} Category</DialogTitle>
           <DialogDescription>
@@ -192,7 +263,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               control={control}
               rules={{ required: 'Type is required' }}
               render={({ field }) => (
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   {categoryTypes.map(type => {
                     const isActive = field.value === type.id;
 
@@ -203,7 +274,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                         onClick={() => field.onChange(type.id)}
                         className={`flex items-center gap-2 border px-3 capitalize transition-all ${
                           isActive
-                            ? `${getTypeColor(type.id)} shadow-md`
+                            ? `${getTypeColor(type.id)} `
                             : 'text-muted-foreground hover:bg-muted border-gray-300 bg-transparent'
                         } `}
                       >
@@ -219,6 +290,64 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
             {errors.type && (
               <p className="text-sm text-red-500">{errors.type.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Icon</Label>
+
+            <Controller
+              name="icon"
+              control={control}
+              render={({ field }) => (
+                <div className="grid max-h-40 grid-cols-6 gap-2 overflow-y-auto rounded-md border p-3">
+                  {CATEGORY_ICONS.map(item => {
+                    const Icon = item.icon;
+                    const isActive = field.value === item.name;
+
+                    return (
+                      <Button
+                        type="button"
+                        key={item.name}
+                        variant={isActive ? 'default' : 'outline'}
+                        onClick={() => field.onChange(item.name)}
+                      >
+                        <Icon className="size-4" />
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Color</Label>
+
+            <Controller
+              name="color"
+              control={control}
+              render={({ field }) => (
+                <div className="grid grid-cols-5 md:grid-cols-7 gap-2 rounded-md border p-3">
+                  {COLORS.map(color => {
+                    const isActive = field.value === color;
+
+                    return (
+                      <div
+                        key={color}
+                        className={`flex size-9 items-center justify-center rounded-md ${isActive ? 'ring-primary ring-2 ring-offset-2' : ''}}`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(color)}
+                          className={`size-8 cursor-pointer rounded-sm border-2`}
+                          style={{ backgroundColor: color }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            />
           </div>
 
           {/* Actions */}

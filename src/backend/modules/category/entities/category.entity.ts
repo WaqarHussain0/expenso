@@ -14,6 +14,8 @@ export interface ICategory extends Document {
   createdAt: Date;
   updatedAt: Date;
   isActive?: boolean;
+  icon?: string;
+  color?: string;
 
   userId: mongoose.Types.ObjectId | IUser;
 }
@@ -25,6 +27,18 @@ const CategorySchema = new Schema<ICategory>(
       required: true,
       trim: true,
       index: true,
+    },
+
+    icon: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+
+    color: {
+      type: String,
+      required: false,
+      trim: true,
     },
 
     type: {

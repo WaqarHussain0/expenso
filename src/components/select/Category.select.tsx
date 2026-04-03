@@ -22,6 +22,7 @@ import {
   useGetCategoryByIdQuery,
 } from '@/lib/rtk/services/category.rtk.service';
 import { ICategory } from '@/types/category.type';
+import { CATEGORY_ICONS } from '../feature/category/Category.dialog';
 
 interface ICategorySelectProps {
   value?: string;
@@ -128,7 +129,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                         setOpen(false);
                         setSearch('');
                       }}
-                      className="capitalize text-xs"
+                      className="md:text-md text-xs capitalize"
                     >
                       <Check
                         className={cn(
@@ -136,6 +137,21 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                           value === category._id ? 'opacity-100' : 'opacity-0',
                         )}
                       />
+
+                      {category.icon &&
+                        (() => {
+                          const iconObj = CATEGORY_ICONS.find(
+                            item => item.name === category.icon,
+                          );
+                          if (!iconObj) return null;
+                          const IconComponent = iconObj.icon;
+                          return (
+                            <IconComponent
+                              className="size-3"
+                              style={{ color: category.color }}
+                            />
+                          );
+                        })()}
                       {category.name}
                     </CommandItem>
                   ))}

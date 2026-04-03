@@ -23,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import CategoryDialog from './Category.dialog';
+import CategoryDialog, { CATEGORY_ICONS } from './Category.dialog';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -128,8 +128,31 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
         <TableBody>
           {categories.length > 0 ? (
             categories.map(category => (
-              <TableRow key={category.name}>
-                <TableCell className="capitalize">{category?.name}</TableCell>
+              <TableRow key={category.name} className="">
+                <TableCell className="flex items-center gap-1 capitalize">
+                  <div
+                    className="flex size-8 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: category.color + '1A', // 1A is ~10% opacity in hex
+                    }}
+                  >
+                    {category.icon &&
+                      (() => {
+                        const iconObj = CATEGORY_ICONS.find(
+                          item => item.name === category.icon,
+                        );
+                        if (!iconObj) return null;
+                        const IconComponent = iconObj.icon;
+                        return (
+                          <IconComponent
+                            className="size-4"
+                            style={{ color: category.color }}
+                          />
+                        );
+                      })()}
+                  </div>
+                  {category?.name}
+                </TableCell>
                 <TableCell className="capitalize">
                   <Badge
                     variant={

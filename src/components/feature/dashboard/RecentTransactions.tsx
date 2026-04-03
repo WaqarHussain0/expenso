@@ -17,6 +17,7 @@ import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
+import { CATEGORY_ICONS } from '../category/Category.dialog';
 
 interface IRecentTransactionsProps {
   className?: string;
@@ -43,8 +44,8 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
   );
 
   return (
-    <Card className={`px-4 gap-0 ${className}`}>
-      <CardHeader className="flex justify-between p-0 items-center">
+    <Card className={`gap-0 px-4 ${className}`}>
+      <CardHeader className="flex items-center justify-between p-0">
         <CardTitle>Recent Transactions</CardTitle>
 
         <Button
@@ -70,17 +71,25 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
               <TableRow key={trx._id}>
                 <TableCell className="capitalize">
                   <Badge
-                    variant={
-                      trx?.category.type === CategoryTypeEnum.INCOME
-                        ? 'default'
-                        : 'destructive'
-                    }
-                    className={
-                      trx.category.type === CategoryTypeEnum.INVESTMENT
-                        ? 'bg-yellow-100 text-yellow-500'
-                        : ''
-                    }
+                    style={{
+                      color: trx.category.color,
+                      backgroundColor: trx.category.color + '1A', // 1A is ~10% opacity in hex
+                    }}
                   >
+                    {trx.category.icon &&
+                      (() => {
+                        const iconObj = CATEGORY_ICONS.find(
+                          item => item.name === trx.category.icon,
+                        );
+                        if (!iconObj) return null;
+                        const IconComponent = iconObj.icon;
+                        return (
+                          <IconComponent
+                            className="size-4"
+                            style={{ color: trx.category.color }}
+                          />
+                        );
+                      })()}
                     {trx?.category.name}
                   </Badge>
                 </TableCell>

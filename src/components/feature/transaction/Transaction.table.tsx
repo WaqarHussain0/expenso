@@ -36,6 +36,8 @@ import { useDeleteTransactionMutation } from '@/lib/rtk/services/transaction.rtk
 import TransactionDialog from './Transaction.dialog';
 import { CategoryTypeEnum } from '@/types/category.type';
 import { Badge } from '@/components/ui/badge';
+import { CATEGORY_ICONS } from '../category/Category.dialog';
+import Row from '@/components/common/Row';
 
 interface ITransactionTableProps {
   transactions: ITransaction[];
@@ -142,17 +144,25 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
                 </TableCell>
                 <TableCell className="capitalize">
                   <Badge
-                    variant={
-                      trx?.category.type === CategoryTypeEnum.INCOME
-                        ? 'default'
-                        : 'destructive'
-                    }
-                    className={
-                      trx.category.type === CategoryTypeEnum.INVESTMENT
-                        ? 'bg-yellow-100 text-yellow-500'
-                        : ''
-                    }
+                    style={{
+                      color: trx.category.color,
+                      backgroundColor: trx.category.color + '1A', // 1A is ~10% opacity in hex
+                    }}
                   >
+                    {trx.category.icon &&
+                      (() => {
+                        const iconObj = CATEGORY_ICONS.find(
+                          item => item.name === trx.category.icon,
+                        );
+                        if (!iconObj) return null;
+                        const IconComponent = iconObj.icon;
+                        return (
+                          <IconComponent
+                            className="size-4"
+                            style={{ color: trx.category.color }}
+                          />
+                        );
+                      })()}
                     {trx?.category.name}
                   </Badge>
                 </TableCell>

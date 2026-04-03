@@ -23,31 +23,33 @@ export class CategoryService {
     return data;
   }
 
-  async findByName(name: string) {
+  async findByNameUserAndType(
+    name: string,
+    userId: mongoose.Types.ObjectId,
+    type: CategoryTypeEnum,
+  ) {
     await initDB();
 
     return await this.categoryEntity.findOne({
-      name: name?.trim()?.toLowerCase(),
+      name: name.trim().toLowerCase(),
+      userId,
+      type,
     });
   }
 
   async create(payload: CreateCategoryDto, userId: mongoose.Types.ObjectId) {
-    const { name, type } = payload;
+    const { name, type, color, icon } = payload;
 
     await initDB();
 
-    const existingData = await this.findByName(name);
+    const existingData = await this.findByNameUserAndType(name, userId, type);
 
-    if (
-      existingData &&
-      existingData.userId._id.toString() === userId.toString() &&
-      existingData.type === type
-    ) {
+    if (existingData) {
       // If it exists but is inactive, reactivate it
       if (!existingData.isActive) {
         return await this.categoryEntity.findByIdAndUpdate(
           existingData._id,
-          { $set: { isActive: true } },
+          { $set: { isActive: true, color, icon } },
           { new: true },
         );
       }
@@ -58,11 +60,15 @@ export class CategoryService {
       );
     }
 
-    return await this.categoryEntity.create({
+    const saved = await this.categoryEntity.create({
       name,
       type,
       userId,
+      color,
+      icon,
     });
+
+    return saved;
   }
 
   async findAll({
@@ -108,6 +114,8 @@ export class CategoryService {
       return {
         name: item.name,
         type: item.type,
+        icon: item.icon,
+        color: item.color,
         _id: item._id?.toString(),
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
@@ -139,10 +147,16 @@ export class CategoryService {
     };
   }
 
-  async update(id: mongoose.Types.ObjectId, payload: CreateCategoryDto) {
+  async update(
+    id: mongoose.Types.ObjectId,
+    payload: CreateCategoryDto,
+    userId: mongoose.Types.ObjectId,
+  ) {
+    const { name, type, color, icon } = payload;
+
     const [data, existingName] = await Promise.all([
       this.findById(id),
-      this.findByName(payload.name),
+      this.findByNameUserAndType(name, userId, type),
     ]);
 
     if (!data) {
@@ -157,7 +171,7 @@ export class CategoryService {
 
     return await this.categoryEntity.findByIdAndUpdate(
       id,
-      payload,
+      { name, type, color, icon },
       { new: true }, // return updated document
     );
   }
