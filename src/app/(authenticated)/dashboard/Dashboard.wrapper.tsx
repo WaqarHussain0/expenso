@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/card';
 import { ITransaction } from '@/types/transaction.type';
 import { IUser } from '@/types/user.type';
-import { HandCoins, LayoutDashboard, ListPlus } from 'lucide-react';
+import { List, ListPlus, Tags } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
@@ -96,7 +96,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
     },
     {
       title: 'New Category',
-      icon: LayoutDashboard,
+      icon: Tags,
       show: true,
       className: 'text-green-600',
       onClick: handleCloseCategoryDialog,
@@ -105,7 +105,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
     },
     {
       title: 'Record Transaction',
-      icon: HandCoins,
+      icon: List,
       show: true,
       className: 'text-blue-600',
       onClick: handleCloseTransactionDialog,

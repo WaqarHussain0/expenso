@@ -6,11 +6,12 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import {
   ChartPie,
   Coins,
-  HandCoins,
   House,
-  LayoutDashboard,
+  List,
   LogOut,
   Menu,
+  Settings,
+  Tags,
   Users,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -67,13 +68,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
     },
     {
       title: 'Category',
-      icon: LayoutDashboard,
+      icon: Tags,
       linkTo: PAGE_ROUTES.category,
       show: true,
     },
     {
       title: 'Transaction',
-      icon: HandCoins,
+      icon: List,
       linkTo: PAGE_ROUTES.transaction,
       show: true,
     },
@@ -82,6 +83,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       title: 'Users',
       linkTo: PAGE_ROUTES.user,
       icon: Users,
+      show: isAdminUser,
+    },
+
+    {
+      title: 'Profile',
+      linkTo: PAGE_ROUTES.profile,
+      icon: Settings,
       show: isAdminUser,
     },
   ];
@@ -123,8 +131,8 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
 
       {!toggleMenu && (
-        <div className="text-primary-foreground bg-[#1a7f5a] cursor-pointerss fixed top-2 left-2 z-50 w-[20%] flex justify-center items-center rounded-sm p-2 lg:hidden">
-          <Menu onClick={handleToggleMenu} className="size-4 textPrimary" />
+        <div className="text-primary-foreground cursor-pointerss fixed top-2 left-2 z-50 flex w-[20%] items-center justify-center rounded-sm bg-[#1a7f5a] p-2 lg:hidden">
+          <Menu onClick={handleToggleMenu} className="textPrimary size-4" />
         </div>
       )}
 
@@ -189,7 +197,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="hover:bg-[#FFFFFF1A] flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:text-[#F5F5DC]"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-[#FFFFFF1A] hover:text-[#F5F5DC]"
           >
             <LogOut className="h-5 w-5" />
             <span className="poppins">Logout</span>

@@ -4,6 +4,7 @@ import CategoryEntity from '../modules/category/entities/category.entity';
 import TransactionEntity from '../modules/transaction/entities/transaction.entity';
 import UserEntity from '../modules/user/entities/user.entity';
 import StatEntity from '../modules/stats/entities/stats.entity';
+import UserProfileEntity from '../modules/user/entities/user-profile.entity';
 
 /**
  * Global is used to maintain a cached connection across hot reloads in development
@@ -20,6 +21,7 @@ const models = {
   Transaction: TransactionEntity,
   User: UserEntity,
   Stat: StatEntity,
+  UserProfile: UserProfileEntity,
 };
 
 async function connectToDB() {

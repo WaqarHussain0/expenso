@@ -38,7 +38,6 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
   userName,
   dateRange,
 }) => {
-  console.log('dateRange : ', dateRange);
   const totals = response?.totals ?? {};
 
   const { label, Icon } = filterMeta[filterType] ?? filterMeta.custom;

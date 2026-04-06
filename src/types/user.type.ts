@@ -1,3 +1,5 @@
+import { IUserProfile } from "./user-profile.type";
+
 export enum UserRoleEnum {
   USER = 'user',
   ADMIN = 'admin',
@@ -7,6 +9,7 @@ export interface IUser {
   name: string;
   role: UserRoleEnum;
   email: string;
+  profile?: IUserProfile;
 }
 
 export interface ILoginResponse {

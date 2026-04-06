@@ -35,7 +35,6 @@ import {
   Gamepad2,
   Coffee,
   Gift,
-  Film,
   Book,
   Music,
   Dumbbell,

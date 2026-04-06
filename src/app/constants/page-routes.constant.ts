@@ -9,12 +9,13 @@ const PAGE_ROUTES = {
 
   // Authenticated Routes
   dashboard: '/dashboard',
+  profile: '/profile',
 
   stats: '/stats',
   category: '/category',
   transaction: '/transaction',
 
-  preferences:"/preferences",
+  preferences: '/preferences',
 
   // Admin Routes
   user: '/user',

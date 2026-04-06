@@ -1,13 +1,6 @@
 import Row from '@/components/common/Row';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  CalendarDays,
-  ChartArea,
-  LayoutDashboard,
-  Lock,
-  Target,
-  Zap,
-} from 'lucide-react';
+import { CalendarDays, ChartArea, Lock, Tags, Target, Zap } from 'lucide-react';
 
 /* eslint-disable react/no-unescaped-entities */
 
@@ -25,7 +18,7 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
     },
     {
       title: 'Smart Categories',
-      icon: LayoutDashboard,
+      icon: Tags,
       description:
         'Create your own income, expense, and investment categories that match your real life — not generic templates.',
     },
