@@ -3,6 +3,7 @@
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
+import { CATEGORY_ICONS } from '@/components/feature/category/Category.dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/card';
 import { useSetPreferencesMutation } from '@/lib/rtk/services/category.rtk.service';
 import { CategoryTypeEnum } from '@/types/category.type';
-import { Check, Plus } from 'lucide-react';
+import { Check, Fuel, Laptop, Plus, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
@@ -25,61 +26,191 @@ interface IPreferenceWrapper {
 
 const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
   const router = useRouter();
+
   const [selectedCategories, setSelectedCategories] = useState<
     {
       name: string;
       type: CategoryTypeEnum;
+      icon: string;
+      color: string;
     }[]
   >([]);
+
   const [setPreferences, { isLoading }] = useSetPreferencesMutation();
 
   const categories = {
     income: [
-      { name: 'Salary', type: CategoryTypeEnum.INCOME },
-      { name: 'Freelance', type: CategoryTypeEnum.INCOME },
-      { name: 'Part Time Work', type: CategoryTypeEnum.INCOME },
-      { name: 'Dividends', type: CategoryTypeEnum.INCOME },
-      { name: 'Rental Income', type: CategoryTypeEnum.INCOME },
-      { name: 'Miscellaneous Income', type: CategoryTypeEnum.INCOME },
+      {
+        name: 'Salary',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'Wallet',
+        color: '#FF6B35',
+      },
+      {
+        name: 'Freelance',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'Laptop',
+        color: '#3B82F6',
+      },
+      {
+        name: 'Part Time Work',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'Briefcase',
+        color: '#8B5CF6',
+      },
+      {
+        name: 'Dividends',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'TrendingUp',
+        color: '#F59E0B',
+      },
+      {
+        name: 'Rental Income',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'Home',
+        color: '#22C55E',
+      },
+      {
+        name: 'Miscellaneous Income',
+        type: CategoryTypeEnum.INCOME,
+        icon: 'Wallet',
+        color: '#14B8A6',
+      },
     ],
+
     expense: [
-      { name: 'Fuel', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Home Rent', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Food/Groceries', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Utilities', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Dining Out', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Healthcare', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Insurance', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Education', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Travel', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Entertainment', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Shopping', type: CategoryTypeEnum.EXPENSE },
-      { name: 'Miscellaneous Expense', type: CategoryTypeEnum.EXPENSE },
-
+      {
+        name: 'Fuel',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Fuel',
+        color: '#EF4444',
+      },
+      {
+        name: 'Home Rent',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Home',
+        color: '#F97316',
+      },
+      {
+        name: 'Food/Groceries',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Utensils',
+        color: '#84CC16',
+      },
+      {
+        name: 'Utilities',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Smartphone',
+        color: '#06B6D4',
+      },
+      {
+        name: 'Dining Out',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Coffee',
+        color: '#EAB308',
+      },
+      {
+        name: 'Healthcare',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Heart',
+        color: '#EC4899',
+      },
+      {
+        name: 'Insurance',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Briefcase',
+        color: '#795548',
+      },
+      {
+        name: 'Education',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Book',
+        color: '#6366F1',
+      },
+      {
+        name: 'Travel',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Plane',
+        color: '#0EA5E9',
+      },
+      {
+        name: 'Entertainment',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Gamepad2',
+        color: '#A855F7',
+      },
+      {
+        name: 'Shopping',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'ShoppingCart',
+        color: '#10B981',
+      },
+      {
+        name: 'Miscellaneous Expense',
+        type: CategoryTypeEnum.EXPENSE,
+        icon: 'Wallet',
+        color: '#64748B',
+      },
     ],
-    investment: [
-      { name: 'Stock Exchange', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Crypto', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Gold', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Property', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Mutual Funds', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Savings Bonds', type: CategoryTypeEnum.INVESTMENT },
-      { name: 'Miscellaneous Investment', type: CategoryTypeEnum.INVESTMENT },
 
+    investment: [
+      {
+        name: 'Stock Exchange',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'TrendingUp',
+        color: '#22C55E',
+      },
+      {
+        name: 'Crypto',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'TrendingUp',
+        color: '#F59E0B',
+      },
+      {
+        name: 'Gold',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'Wallet',
+        color: '#EAB308',
+      },
+      {
+        name: 'Property',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'Home',
+        color: '#3B82F6',
+      },
+      {
+        name: 'Mutual Funds',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'Briefcase',
+        color: '#8B5CF6',
+      },
+      {
+        name: 'Savings Bonds',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'Briefcase',
+        color: '#14B8A6',
+      },
+      {
+        name: 'Miscellaneous Investment',
+        type: CategoryTypeEnum.INVESTMENT,
+        icon: 'Wallet',
+        color: '#94A3B8',
+      },
     ],
   };
 
   const toggleCategory = (category: {
     name: string;
     type: CategoryTypeEnum;
+    icon: string;
+    color: string;
   }) => {
     const isSelected = selectedCategories.find(c => c.name === category.name);
+
     if (isSelected) {
-      setSelectedCategories(
-        selectedCategories.filter(c => c.name !== category.name),
-      );
+      setSelectedCategories(prev => prev.filter(c => c.name !== category.name));
     } else {
-      setSelectedCategories([...selectedCategories, category]);
+      setSelectedCategories(prev => [...prev, category]);
     }
   };
 
@@ -111,7 +242,8 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
           {' '}
           Financial Preferences
         </TextElement>
-        <TextElement as="p" className="text-[#D47E30]">
+
+        <TextElement as="p" className="text-[#5a6070]">
           Select the categories you want to track in your budget.
         </TextElement>
       </Row>
@@ -146,6 +278,20 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
                     }`}
                     onClick={() => toggleCategory(cat)}
                   >
+                    {cat.icon &&
+                      (() => {
+                        const iconObj = CATEGORY_ICONS.find(
+                          item => item.name === cat.icon,
+                        );
+                        if (!iconObj) return null;
+                        const IconComponent = iconObj.icon;
+                        return (
+                          <IconComponent
+                            className="size-4"
+                            style={{ color: cat.color }}
+                          />
+                        );
+                      })()}
                     {cat.name}
                     {isSelected ? (
                       <Check className="ml-2 h-3 w-3" />

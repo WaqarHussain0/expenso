@@ -9,12 +9,13 @@ type SearchParams = Promise<{
   page?: string;
   search?: string;
   type?: CategoryTypeEnum;
+  categoryId?: string;
 }>;
 
 const transactionService = new TransactionService();
 
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const { page = 1, search = '', type } = await searchParams;
+  const { page = 1, search = '', type, categoryId } = await searchParams;
 
   const session = await getServerSideSession();
   const user = session?.user;
@@ -32,10 +33,11 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const transactionPayload = {
     page: Number(page),
-    limit: 5,
+    limit: 6,
     search: search,
     categoryType: normalizedType,
     userId: user.id,
+    categoryId,
   };
 
   const [data, stats] = await Promise.all([

@@ -91,12 +91,14 @@ export class TransactionService {
     limit = 10,
     categoryType,
     userId,
+    categoryId,
   }: {
     search?: string;
     page?: number;
     limit?: number;
     categoryType?: CategoryTypeEnum;
     userId: string;
+    categoryId?: string;
   }) {
     await initDB();
 
@@ -109,19 +111,27 @@ export class TransactionService {
       query['$or'] = [{ note: { $regex: search, $options: 'i' } }];
     }
 
-    // If filtering by categoryType (income/expense/investment)
+    // Category filtering logic
     if (categoryType) {
-      // 1️⃣ Find category IDs with that type
       const categories = await mongoose
         .model('Category')
-        .find({ type: categoryType, userId: userId })
+        .find({ type: categoryType, userId })
         .select('_id')
         .lean();
 
       const categoryIds = categories.map(c => c._id);
 
-      // 2️⃣ Filter transactions by these category IDs
-      query['categoryId'] = { $in: categoryIds };
+      if (categoryId) {
+        // ✅ BOTH filters applied
+        query['categoryId'] = {
+          $in: categoryIds.filter(id => id.toString() === categoryId),
+        };
+      } else {
+        query['categoryId'] = { $in: categoryIds };
+      }
+    } else if (categoryId) {
+      // only categoryId filter
+      query['categoryId'] = new mongoose.Types.ObjectId(categoryId);
     }
 
     const skip = (page - 1) * limit;

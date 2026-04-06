@@ -5,6 +5,8 @@ import { CategoryTypeEnum } from '@/types/category.type';
 interface ICreateOrUpdatePayload {
   name: string;
   type: CategoryTypeEnum;
+  icon: string;
+  color: string;
 }
 
 export const categoryApi = api.injectEndpoints({

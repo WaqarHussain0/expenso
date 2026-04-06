@@ -6,6 +6,7 @@ import { FilterOptionEnum } from '@/lib/rtk/services/dashboard.rtk.service';
 import { TransactionService } from '@/backend/modules/transaction/transaction.service';
 import SharedStatsWrapper from './SharedStats.wrapper';
 import mongoose from 'mongoose';
+import type { Metadata } from 'next';
 
 type IUser = {
   _id: string;
@@ -25,6 +26,64 @@ const isUser = (user: any): user is IUser => {
   return user && typeof user === 'object' && 'name' in user;
 };
 
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { m } = await searchParams;
+
+  if (!m) {
+    return {
+      title: 'Shared Stats',
+      description: 'View shared financial statistics.',
+    };
+  }
+
+  const stat = await statsService.getStatsByToken(m);
+
+  if (!stat || !stat.filter) {
+    return {
+      title: 'Shared Stats',
+      description: 'Invalid or expired shared stats link.',
+    };
+  }
+
+  const { filter, userId } = stat;
+  const { type, startDate, endDate, year } = filter;
+
+  const userName = isUser(userId) ? userId.name : 'User';
+
+  // Format date text
+  let dateText = '';
+  if (type === FilterOptionEnum.MONTH && startDate && endDate) {
+    dateText = `${startDate.toDateString()} - ${endDate.toDateString()}`;
+  } else if (type === FilterOptionEnum.YEAR && year) {
+    dateText = `Year ${year}`;
+  } else if (type === FilterOptionEnum.CUSTOM && startDate && endDate) {
+    dateText = `${startDate.toDateString()} - ${endDate.toDateString()}`;
+  }
+
+  const title = `${userName}'s Financial Stats (${type})`;
+  const description = `View ${userName}'s ${type.toLowerCase()} financial stats for ${dateText}. Includes income, expenses, investments, and visual insights.`;
+
+  return {
+    title,
+    description,
+
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { m } = await searchParams;
 
