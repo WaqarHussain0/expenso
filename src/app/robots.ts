@@ -8,7 +8,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/month-stats', '/transactions', '/categories'],
+        disallow: [
+          '/dashboard',
+          '/stats',
+          '/transaction',
+          '/category',
+          '/profile',
+          '/user',
+        ],
       },
     ],
     sitemap: `${appURL}/sitemap.xml`,

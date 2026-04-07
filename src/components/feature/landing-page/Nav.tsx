@@ -2,6 +2,7 @@
 
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { IUser } from '@/types/user.type';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface INavProps {
@@ -18,9 +19,16 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
     <nav
       className={`border-border z-50 flex h-14 w-full items-center justify-between border-b px-4 md:h-16 md:px-12 ${className}`}
     >
-      <p className="text-[18px] tracking-tighter md:text-[22px]">
-        expen<em className="text-[#1a7f5a]">so</em>
-      </p>
+      <div className="relative h-[50px] w-[100px]">
+        <Image
+          src={'/dark-logo.png'}
+          alt={`Logo`}
+          fill
+          className="object-contain"
+          priority
+          fetchPriority="high"
+        />
+      </div>
 
       <div className="flex items-center gap-2 md:gap-4">
         {naviagtions.map(item => (

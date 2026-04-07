@@ -30,6 +30,7 @@ import {
 } from '../ui/alert-dialog';
 import { UserRoleEnum } from '@/types/user.type';
 import { Avatar, AvatarFallback } from '../ui/avatar';
+import Image from 'next/image';
 
 interface INavbar {
   className?: string;
@@ -131,8 +132,19 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
 
       {!toggleMenu && (
-        <div className="text-primary-foreground cursor-pointerss fixed top-2 left-2 z-50 flex w-[20%] items-center justify-center rounded-sm bg-[#1a7f5a] p-2 lg:hidden">
-          <Menu onClick={handleToggleMenu} className="textPrimary size-4" />
+        <div className="text-primary-foreground cursor-pointerss fixed top-2 left-4 z-50 flex w-[8%] items-center justify-center rounded-sm border border-[#1a7f5a] bg-white shadow-sm lg:hidden">
+          {/* <Menu  className="textPrimary size-4" /> */}
+
+          <div onClick={handleToggleMenu} className="relative size-8">
+            <Image
+              src={'/icon.png'}
+              alt={`Logo`}
+              fill
+              className="object-contain"
+              priority
+              fetchPriority="high"
+            />
+          </div>
         </div>
       )}
 
@@ -141,18 +153,17 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
         className={`bg-[#0d1117] text-white ${className} fixed top-0 left-0 z-40 flex h-full flex-col justify-between transition-transform duration-300 lg:static ${toggleMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         <Row className="w-full flex-col items-start gap-4">
-          <div className="flex w-full items-center gap-3 border-b border-[#e6f5ef] px-2 py-3">
-            {/* Logo */}
-            <div className="relative flex size-10 items-center justify-center rounded-md border border-[#1a7f5a]/30 bg-[#1a7f5a] backdrop-blur-md">
-              <Coins className="size-6 text-[#F5F5DC]" />
+          <div className="flex w-full items-center gap-3 border-b border-[#e6f5ef] p-2">
+            <div className="relative h-[50px] w-[120px]">
+              <Image
+                src={'/light-logo.png'}
+                alt={`Logo`}
+                fill
+                className="object-contain"
+                priority
+                fetchPriority="high"
+              />
             </div>
-
-            <TextElement
-              as="h1"
-              className="text-xl font-semibold !text-[#F5F5DC]"
-            >
-              Expenso
-            </TextElement>
           </div>
 
           <Row className={`gap- w-full flex-col`}>

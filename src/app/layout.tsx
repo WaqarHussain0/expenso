@@ -31,13 +31,33 @@ export const metadata: Metadata = {
   metadataBase: new URL(appURL), // change later if needed
 
   title: {
-    default: 'Expenso — Smart Expense & Income Tracker',
+    default: 'Expenso — Smart Expense, Income & Investment Tracker',
     template: '%s | Expenso',
   },
 
   description:
     'Expenso helps you track expenses, income, and investments in one place. Visual dashboards, category-based tracking, and financial insights to manage your money smarter.',
 
+  icons: {
+    icon: [
+      { url: '/favicon.ico' }, // fallback
+      { url: '/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'android-chrome',
+        url: '/android-chrome-192x192.png',
+      },
+      {
+        rel: 'android-chrome',
+        url: '/android-chrome-512x512.png',
+      },
+    ],
+  },
   keywords: [
     'expense tracker',
     'budget app',
