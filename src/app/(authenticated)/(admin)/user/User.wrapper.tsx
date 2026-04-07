@@ -7,13 +7,22 @@ import TextElement from '@/components/common/TextElement';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { IUser } from '@/types/user.type';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCallback, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Filter, Search, UserRound, UserRoundKey, Users } from 'lucide-react';
+import { Search, UserRound, UserRoundKey, Users } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
 import UserTable from '@/components/feature/user/User.table';
 import StatWrapper from '@/components/common/Stat.wrapper';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserGenderEnum } from '@/types/user-profile.type';
 
 export interface IUserStats {
   totalAdmin: number;
@@ -42,12 +51,15 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
   const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
     useDebouncedSearch();
 
+  const [selectedGender, setSelectedGender] = useState<string>('all');
+
   // Function to update URL query params
   const updateQueryParams = useCallback(
-    (page: number, search?: string) => {
+    (page: number, search?: string, gender?: UserGenderEnum) => {
       const params = new URLSearchParams();
       if (page) params.set('page', page.toString());
       if (search) params.set('search', search);
+      if (gender) params.set('gender', gender);
       router.replace(`${PAGE_ROUTES.user}?${params.toString()}`);
     },
     [router],
@@ -67,8 +79,27 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
 
   const handleClearFilter = () => {
     clearSearch();
+    setSelectedGender('all');
     router.push(PAGE_ROUTES.user);
   };
+
+  const handleGenderChange = useCallback(
+    (value: string) => {
+      setSelectedGender(value);
+      const gender = value === 'all' ? undefined : (value as UserGenderEnum);
+      updateQueryParams(1, debouncedSearch, gender);
+    },
+    [debouncedSearch, updateQueryParams],
+  );
+
+  const categoryTypes = [
+    { id: 'all', name: 'all' },
+    { id: UserGenderEnum.MALE, name: UserGenderEnum.MALE },
+    { id: UserGenderEnum.FEMALE, name: UserGenderEnum.FEMALE },
+    { id: UserGenderEnum.OTHER, name: UserGenderEnum.OTHER },
+  ];
+
+  console.log('selectedGender : ', selectedGender);
 
   return (
     <div className="w-full space-y-3">
@@ -96,21 +127,21 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         stats={[
           {
             label: `Admin Users`,
-            value: userStats.normalUsers,
+            value: userStats.totalAdmin,
             icon: UserRoundKey,
             iconClassName: 'text-green-400',
           },
 
           {
             label: `Regular Users`,
-            value: userStats.totalAdmin,
+            value: userStats.normalUsers,
             icon: UserRound,
             iconClassName: 'text-red-400',
           },
 
           {
             label: `Total Users`,
-            value: userStats.totalAdmin,
+            value: userStats.totalAdmin + userStats.normalUsers,
             icon: Users,
             iconClassName: 'text-blue-400',
           },
@@ -119,34 +150,54 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
       />
 
       <Card className="gap-3">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-1 text-[#0d1117]">
-            <Filter className="size-4" />
-            Filter Options
-          </CardTitle>
-        </CardHeader>
-
         <CardContent className="space-y-3">
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
-              <form
-                onSubmit={e => {
-                  e.preventDefault(); // prevent page reload
-                }}
-              >
-                <Input
-                  placeholder="Search by note"
-                  className="w-44 pl-10 md:w-80"
-                  value={searchInput}
-                  onChange={e => handleSearch(e.target.value)}
-                />
-              </form>
+          <div className="flex items-end gap-2">
+            <div className="min-w-56 space-y-2">
+              <Label>Search</Label>
+              <div className="relative">
+                <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
+                <form
+                  onSubmit={e => {
+                    e.preventDefault(); // prevent page reload
+                  }}
+                >
+                  <Input
+                    placeholder="By name or email"
+                    className="w-44 pl-10 md:w-80"
+                    value={searchInput}
+                    onChange={e => handleSearch(e.target.value)}
+                  />
+                </form>
+              </div>
+            </div>
+
+            <div className="w-28 space-y-2">
+              <Label>Select Gender</Label>
+              <Select value={selectedGender} onValueChange={handleGenderChange}>
+                <SelectTrigger className="w-full capitalize">
+                  <SelectValue placeholder="Filter by gender" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {categoryTypes.map(type => (
+                    <SelectItem
+                      className="capitalize"
+                      key={type.id}
+                      value={type.id}
+                    >
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <TextElement
               className={`flex cursor-pointer items-center gap-1 text-blue-600 transition hover:underline ${
-                !searchInput ? 'hidden' : ''
+                !searchInput &&
+                (selectedGender === 'all' || selectedGender === '')
+                  ? 'hidden'
+                  : ''
               }`}
               as="span"
               onClick={handleClearFilter}
@@ -154,7 +205,8 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
               Clear All
             </TextElement>
           </div>
-          <UserTable className="h-[40vh] overflow-y-auto" users={users || []} />
+
+          <UserTable className="h-[45vh] overflow-y-auto" users={users || []} />
 
           {users && users?.length !== 0 && (
             <Pagination

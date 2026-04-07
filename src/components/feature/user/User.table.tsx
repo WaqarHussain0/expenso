@@ -24,6 +24,14 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
       {
         label: 'Name',
       },
+
+      {
+        label: 'Gender',
+      },
+
+      {
+        label: 'Contact ',
+      },
       {
         label: 'Email',
       },
@@ -37,7 +45,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
   return (
     <div className={className}>
       <Table>
-        <TableHeader className="">
+        <TableHeader className="bg-slate-100">
           <TableRow>
             {columns.map(column => (
               <TableHead key={column.label}>{column.label}</TableHead>
@@ -50,7 +58,11 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
             users.map(user => (
               <TableRow key={user.id}>
                 <TableCell className="capitalize">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+                <TableCell className="capitalize">
+                  {user.profile?.gender || '-'}
+                </TableCell>
+                <TableCell>{user.profile?.contact || '-'}</TableCell>
+                <TableCell>{user.email || '-'}</TableCell>
                 <TableCell className="capitalize">
                   <Badge
                     variant={

@@ -28,7 +28,6 @@ import {
   Banknote,
   BanknoteArrowDown,
   Coins,
-  Filter,
   PlusIcon,
   Search,
   ShoppingCartIcon,
@@ -148,7 +147,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
   };
 
   return (
-    <div className="no-scrollbar h-screen w-full space-y-3 ">
+    <div className="no-scrollbar h-screen w-full space-y-3">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
@@ -275,7 +274,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
           </div>
 
           <TransactionTable
-            className="no-scrollbar h-[43vh] overflow-y-auto"
+            className="no-scrollbar h-[45vh] overflow-y-auto"
             transactions={transactions || []}
           />
 

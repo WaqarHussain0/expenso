@@ -9,6 +9,7 @@ import { after } from 'next/server';
 import { sendEmail } from '@/lib/email.util';
 import { forgotPasswordEmailTemplate } from '@/app/constants/email-templates/forgot-password.email-template';
 import { welcomeEmailTemplate } from '@/app/constants/email-templates/welcome.email-template';
+import { UserGenderEnum } from './entities/user-profile.entity';
 
 export class UserService {
   private readonly userEntity = UserEntity;
@@ -183,48 +184,92 @@ export class UserService {
     search,
     page = 1,
     limit = 10,
+    gender,
   }: {
     search?: string;
     page?: number;
     limit?: number;
+    gender?: UserGenderEnum;
   }) {
     await initDB();
+
+    const matchQuery: Record<string, any> = {
+      role: UserRoleEnum.USER,
+    };
+
+    if (search) {
+      matchQuery['$or'] = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
 
     const query: Record<string, any> = {
       // _id: { $ne: new mongoose.Types.ObjectId(userId) }, // exclude logged-in user
     };
 
     if (search) {
-      query['$or'] = [{ name: { $regex: search, $options: 'i' } }];
-      query['$or'] = [{ email: { $regex: search, $options: 'i' } }];
+      query['$or'] = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
     }
 
     const skip = (page - 1) * limit;
+    const limitRecords = limit;
 
-    let totalRecords = 0;
+    const aggregationPipeline: any[] = [
+      { $match: matchQuery },
+
+      // join with profile
+      {
+        $lookup: {
+          from: 'userprofiles', // collection name in MongoDB
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'profile',
+        },
+      },
+      { $unwind: { path: '$profile', preserveNullAndEmptyArrays: true } },
+    ];
+
+    // Apply gender filter if provided
+    if (gender) {
+      aggregationPipeline.push({
+        $match: { 'profile.gender': gender },
+      });
+    }
+
+    // Count total after filters
+    const totalRecordsAgg = await this.userEntity.aggregate([
+      ...aggregationPipeline,
+      { $count: 'total' },
+    ]);
+    const totalRecords = totalRecordsAgg[0]?.total || 0;
+
+    // Pagination
+    aggregationPipeline.push({ $sort: { createdAt: -1 } });
+    aggregationPipeline.push({ $skip: skip });
+    aggregationPipeline.push({ $limit: limitRecords });
 
     // ✅ FIX COUNT
+    // Fetch data
+    const users = await this.userEntity.aggregate(aggregationPipeline);
 
-    totalRecords = await this.userEntity.countDocuments(query);
-
-    const users = await this.userEntity
-      .find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-
-      .lean();
-
-    const data = users.map(item => {
-      return {
-        id: item._id?.toString(),
-        name: item.name,
-        email: item.email,
-        role: item.role,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
-      };
-    });
+    // Map data
+    const data = users.map(item => ({
+      id: item._id.toString(),
+      name: item.name,
+      email: item.email,
+      role: item.role,
+      profile: {
+        _id: item.profile?._id?.toString() || '',
+        gender: item.profile?.gender || null,
+        contact: item.profile?.contact || '',
+      },
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    }));
 
     const totalPages = Math.ceil(totalRecords / limit);
 

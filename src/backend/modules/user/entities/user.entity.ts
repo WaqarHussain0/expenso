@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { IUserProfile } from './user-profile.entity';
 
 export enum UserRoleEnum {
   USER = 'user',
@@ -14,6 +15,8 @@ export interface IUser extends Document {
   isFirstLogin?: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  profile?: IUserProfile;
 
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
@@ -54,7 +57,18 @@ const UserSchema = new Schema<IUser>(
   },
 );
 
-const UserEntity: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+UserSchema.virtual('profile', {
+  ref: 'UserProfile',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: true, // because 1 user → 1 profile
+});
+
+UserSchema.set('toObject', { virtuals: true });
+UserSchema.set('toJSON', { virtuals: true });
+
+const UserEntity: Model<IUser> = mongoose.models.User
+  ? mongoose.model<IUser>('User')
+  : mongoose.model<IUser>('User', UserSchema);
 
 export default UserEntity;

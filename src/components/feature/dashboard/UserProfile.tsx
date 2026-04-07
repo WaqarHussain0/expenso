@@ -18,7 +18,7 @@ const UserProfile: React.FC<IUserProfileProps> = ({ className, user }) => {
 
   return (
     <Card className={`w-full ${className}`}>
-      <CardHeader className="flex items-center justify-between gap-2">
+      <CardHeader className="flex items-start md:items-center flex-col md:flex-row justify-between gap-2">
         <CardTitle className="text-primary">Welcome back!</CardTitle>
 
         <Row className="gap-2">

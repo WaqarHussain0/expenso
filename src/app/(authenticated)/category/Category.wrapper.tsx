@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import {
   BanknoteArrowDown,
   Coins,
-  Filter,
   PlusIcon,
   Search,
   ShoppingCartIcon,
@@ -18,7 +17,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import Pagination from '@/components/common/Pagination';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import CategoryDialog from '@/components/feature/category/Category.dialog';
 import {
@@ -31,7 +30,7 @@ import {
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 
 import StatWrapper from '@/components/common/Stat.wrapper';
-import { COLOR_CODES } from '@/app/constants/app.constant';
+import { Label } from '@/components/ui/label';
 
 export interface ICategoryStats {
   income: number;
@@ -170,48 +169,48 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       />
 
       <Card className="gap-3">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-1 text-[#0d1117]">
-            <Filter className="size-4" />
-            Filter Options
-          </CardTitle>
-        </CardHeader>
-
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-end gap-2">
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
-              <form
-                onSubmit={e => {
-                  e.preventDefault(); // prevent page reload
-                }}
-              >
-                <Input
-                  placeholder="Search by name"
-                  className="w-44 pl-10 md:w-80"
-                  value={searchInput}
-                  onChange={e => handleSearch(e.target.value)}
-                />
-              </form>
+            <div className="space-y-2">
+              <Label>Name</Label>
+
+              <div className="relative">
+                <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
+                <form
+                  onSubmit={e => {
+                    e.preventDefault(); // prevent page reload
+                  }}
+                >
+                  <Input
+                    placeholder="Search by name"
+                    className="w-44 pl-10 md:w-80"
+                    value={searchInput}
+                    onChange={e => handleSearch(e.target.value)}
+                  />
+                </form>
+              </div>
             </div>
 
-            <Select value={selectedType} onValueChange={handleTypeChange}>
-              <SelectTrigger className="w-24 capitalize">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
+            <div className="w-32 space-y-2">
+              <Label>Select Type</Label>
+              <Select value={selectedType} onValueChange={handleTypeChange}>
+                <SelectTrigger className="w-full capitalize">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
 
-              <SelectContent>
-                {categoryTypes.map(type => (
-                  <SelectItem
-                    className="capitalize"
-                    key={type.id}
-                    value={type.id}
-                  >
-                    {type.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectContent>
+                  {categoryTypes.map(type => (
+                    <SelectItem
+                      className="capitalize"
+                      key={type.id}
+                      value={type.id}
+                    >
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <TextElement
               className={` ${
@@ -225,7 +224,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           </div>
 
           <CategoryTable
-            className="h-[40vh] no-scrollbar overflow-y-auto"
+            className="no-scrollbar h-[45vh] overflow-y-auto"
             categories={categories || []}
           />
 
