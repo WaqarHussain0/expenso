@@ -91,7 +91,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       title: 'Profile',
       linkTo: PAGE_ROUTES.profile,
       icon: Settings,
-      show: isAdminUser,
+      show: true,
     },
   ];
 
