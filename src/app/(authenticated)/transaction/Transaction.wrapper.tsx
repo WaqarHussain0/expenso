@@ -274,7 +274,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
           </div>
 
           <TransactionTable
-            className="no-scrollbar h-[45vh] overflow-y-auto"
+            className="no-scrollbar h-[42vh] overflow-y-auto"
             transactions={transactions || []}
           />
 

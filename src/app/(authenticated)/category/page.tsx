@@ -32,7 +32,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const catPayload = {
     page: Number(page),
-    limit: 6,
+    limit: 5,
     search: search || '',
     type: normalizedType,
     userId: user.id,

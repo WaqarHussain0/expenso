@@ -99,8 +99,6 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
     { id: UserGenderEnum.OTHER, name: UserGenderEnum.OTHER },
   ];
 
-  console.log('selectedGender : ', selectedGender);
-
   return (
     <div className="w-full space-y-3">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
@@ -206,7 +204,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             </TextElement>
           </div>
 
-          <UserTable className="h-[45vh] overflow-y-auto" users={users || []} />
+          <UserTable className="h-[42vh] overflow-y-auto" users={users || []} />
 
           {users && users?.length !== 0 && (
             <Pagination

@@ -5,6 +5,7 @@ import { ILoginResponse, IUser } from '@/types/user.type';
 import jwt from 'jsonwebtoken';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -53,11 +54,47 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
 
   callbacks: {
-    async signIn({ user }) {
-      console.log('Callback user : ', user);
+    async signIn({ user, account }) {
+      // Only handle Google login here
+      if (account?.provider === 'google') {
+        try {
+          const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+
+          const res = await fetch(`${baseUrl}/api/auth/google`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              googleToken: account.id_token,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (data.error) throw new Error(data.error);
+
+
+          // Attach backend response to user
+          user.id = data.data.id;
+          (user as any).accessToken = data.accessToken;
+          (user as any).role = data.data.role;
+
+          return true;
+        } catch (error) {
+          console.error('Google signIn error:', error);
+          return false;
+        }
+      }
+
       return true;
     },
 

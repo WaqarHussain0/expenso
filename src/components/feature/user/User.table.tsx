@@ -11,8 +11,7 @@ import { useMemo } from 'react';
 
 import TextElement from '@/components/common/TextElement';
 
-import { Badge } from '@/components/ui/badge';
-import { IUser, UserRoleEnum } from '@/types/user.type';
+import { IUser } from '@/types/user.type';
 
 interface IUserTableProps {
   users: IUser[];
@@ -34,9 +33,6 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
       },
       {
         label: 'Email',
-      },
-      {
-        label: 'Role',
       },
     ],
     [],
@@ -63,15 +59,6 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
                 </TableCell>
                 <TableCell>{user.profile?.contact || '-'}</TableCell>
                 <TableCell>{user.email || '-'}</TableCell>
-                <TableCell className="capitalize">
-                  <Badge
-                    variant={
-                      user.role === UserRoleEnum.ADMIN ? 'default' : 'outline'
-                    }
-                  >
-                    {user.role}
-                  </Badge>
-                </TableCell>
               </TableRow>
             ))
           ) : (

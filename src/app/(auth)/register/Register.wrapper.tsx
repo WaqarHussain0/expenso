@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { baseUrl } from '@/app/constants/app.constant';
+import GoogleButton from '@/components/common/GoogleButton';
 
 interface IFormValues {
   name: string;
@@ -174,6 +175,7 @@ const RegisterWrapper = () => {
             {loading ? 'Registering...' : 'Register'}
           </Button>
         </Row>
+        <GoogleButton forLogin={false} />
 
         <Row className="flex-col justify-center">
           <TextElement as="p" className="">

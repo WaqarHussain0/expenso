@@ -1,18 +1,23 @@
-import { unstable_noStore as noStore } from 'next/cache';
-
 import { getServerSideSession } from '@/lib/next-auth.util';
 import ProfileWrapper from './Profile.wrapper';
 import { UserProfileService } from '@/backend/modules/user/services/user-profile.service';
+import { redirect } from 'next/navigation';
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import mongoose from 'mongoose';
 
 const userProfileService = new UserProfileService();
 const Page = async () => {
-
-  noStore(); // 🚀 disables caching for this render
-  
   const session = await getServerSideSession();
   const user = session?.user;
 
-  const userData = await userProfileService.getProfileByUserId(user?.id || '');
+  if (!user) {
+    redirect(PAGE_ROUTES.login);
+  }
+
+  const userMonogoObjectId = new mongoose.Types.ObjectId(user?.id);
+
+  const userData =
+    await userProfileService.getProfileByUserId(userMonogoObjectId);
 
   return <ProfileWrapper user={userData} />;
 };

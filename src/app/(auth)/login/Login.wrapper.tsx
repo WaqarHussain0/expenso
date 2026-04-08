@@ -19,6 +19,7 @@ import {
 } from '@/app/constants/input.constant';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import GoogleButton from '@/components/common/GoogleButton';
 
 interface ILoginRequest {
   email: string;
@@ -139,6 +140,8 @@ const LoginWrapper = () => {
             {loading ? 'Logging in...' : 'Login'}
           </Button>
         </Row>
+
+        <GoogleButton />
 
         <Row className="flex-col justify-center">
           <TextElement as="p" className="">

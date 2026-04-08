@@ -1,26 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from 'bcryptjs';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import jwt from 'jsonwebtoken';
 import { RegisterDto } from './dto/register.dto';
+import { UserRoleEnum } from '../user/entities/user.entity';
+import { OAuth2Client } from 'google-auth-library';
 
 const userService = new UserService();
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 export class AuthService {
-  async login(payload: LoginDto) {
-    const { email, password } = payload;
-
-    const user = await userService.findByEmail(email);
-
-    if (!user || !user.password) {
-      throw new Error('Invalid email or password');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
-    }
-
+  generateToken(user: any) {
     // Prepare payload for JWT
     const jwtPayload = {
       id: user._id || '',
@@ -38,9 +30,27 @@ export class AuthService {
     // Convert hours to seconds
     const expiresInSeconds = JWT_EXPIRY_HOURS * 60 * 60;
 
-    const token = jwt.sign(jwtPayload, JWT_SECRET, {
+    return jwt.sign(jwtPayload, JWT_SECRET, {
       expiresIn: expiresInSeconds,
     });
+  }
+
+  async login(payload: LoginDto) {
+    const { email, password } = payload;
+
+    const user = await userService.findByEmail(email);
+
+    if (!user || !user.password) {
+      throw new Error('Invalid email or password');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new Error('Invalid email or password');
+    }
+
+    const token = await this.generateToken(user);
 
     // Return only necessary user details + token
     const userData = {
@@ -64,5 +74,46 @@ export class AuthService {
 
   async resetPasswordByToken(token: string, password: string) {
     return await userService.resetPasswordByToken(token, password);
+  }
+
+  async googleLogin(googleToken: string) {
+    // ✅ VERIFY TOKEN WITH GOOGLE
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      throw new Error('Invalid Google token');
+    }
+
+    const { email, name } = payload;
+    // const { email, name, picture } = payload;
+
+    let user = await userService.findByEmail(email!);
+
+    if (!user) {
+      user = await userService.createUser({
+        email: email || '',
+        name: name || '',
+        role: UserRoleEnum.USER,
+        password: '',
+      });
+    }
+
+    const accessToken = this.generateToken(user);
+
+    // Return only necessary user details + token
+    const userData = {
+      id: user._id || '',
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isFirstLogin: user.isFirstLogin,
+    };
+
+    return { userData, accessToken };
   }
 }

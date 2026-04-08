@@ -26,10 +26,10 @@ export class UserProfileService {
     const user = profile?.userId as IUser;
 
     const data = {
-      id: user._id?.toString() || '',
-      role: user.role,
-      name: user.name,
-      email: user.email,
+      id: user?._id?.toString() || '',
+      role: user?.role,
+      name: user?.name,
+      email: user?.email,
       profile: {
         _id: profile?._id?.toString() || '',
         contact: profile?.contact,
