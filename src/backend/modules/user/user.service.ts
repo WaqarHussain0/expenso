@@ -9,10 +9,19 @@ import { after } from 'next/server';
 import { sendEmail } from '@/lib/email.util';
 import { forgotPasswordEmailTemplate } from '@/app/constants/email-templates/forgot-password.email-template';
 import { welcomeEmailTemplate } from '@/app/constants/email-templates/welcome.email-template';
-import { UserGenderEnum } from './entities/user-profile.entity';
+import UserProfileEntity, {
+  UserGenderEnum,
+} from './entities/user-profile.entity';
+import StatEntity from '../stats/entities/stats.entity';
+import TransactionEntity from '../transaction/entities/transaction.entity';
+import CategoryEntity from '../category/entities/category.entity';
 
 export class UserService {
   private readonly userEntity = UserEntity;
+  private readonly statEntity = StatEntity;
+  private readonly transactionEntity = TransactionEntity;
+  private readonly categoryEntity = CategoryEntity;
+  private readonly userProfileEntity = UserProfileEntity;
 
   async findById(id: string | mongoose.Types.ObjectId) {
     await initDB();
@@ -322,5 +331,36 @@ export class UserService {
         new: true,
       },
     );
+  }
+
+  async delete(id: mongoose.Types.ObjectId) {
+    await initDB();
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.userEntity.findById(id).session(session);
+      if (!user) throw new Error('User not found');
+      await this.userEntity.findByIdAndDelete(user._id, { session });
+
+      await Promise.all([
+        this.categoryEntity.deleteMany({ userId: user._id }, { session }),
+        this.transactionEntity.deleteMany({ userId: user._id }, { session }),
+        this.statEntity.deleteMany({ userId: user._id }, { session }),
+        this.userProfileEntity.deleteOne({ userId: user._id }, { session }),
+      ]);
+
+      await session.commitTransaction();
+
+      return {
+        success: true,
+        message: 'User and associated data deleted successfully!',
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }

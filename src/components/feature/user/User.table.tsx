@@ -1,4 +1,5 @@
 'use client';
+
 import {
   Table,
   TableBody,
@@ -7,17 +8,48 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import TextElement from '@/components/common/TextElement';
 
 import { IUser } from '@/types/user.type';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useDeleteUserMutation } from '@/lib/rtk/services/user.rtk.service';
+import { MoreHorizontal, Trash } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface IUserTableProps {
   users: IUser[];
   className?: string;
 }
+
 const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
+  const [deleteUser] = useDeleteUserMutation();
+
+  const router = useRouter();
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+
   const columns = useMemo(
     () => [
       {
@@ -34,10 +66,41 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
       {
         label: 'Email',
       },
+      {
+        label: 'Action',
+      },
     ],
     [],
   );
 
+  const getActions = (user: IUser) => {
+    return [
+      {
+        label: 'Delete',
+        onClick: () => {
+          setIsDeleteModalOpen(true);
+          setSelectedUser(user);
+        },
+        show: true,
+        separatorAfter: false,
+        icon: Trash,
+      },
+    ];
+  };
+
+  const handleDelete = async (user: IUser | null) => {
+    if (!user || !user.id) return;
+    const res = await deleteUser(user.id).unwrap();
+
+    if (res.success) {
+      toast.success('User deleted successfully');
+      router.refresh();
+      setIsDeleteModalOpen(false);
+      setSelectedUser(null);
+    } else {
+      toast.error('Failed to delete user');
+    }
+  };
   return (
     <div className={className}>
       <Table>
@@ -59,6 +122,31 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
                 </TableCell>
                 <TableCell>{user.profile?.contact || '-'}</TableCell>
                 <TableCell>{user.email || '-'}</TableCell>
+
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {getActions(user)
+                        ?.filter(action => action.show)
+                        .map(action => (
+                          <div key={action.label}>
+                            <DropdownMenuItem onClick={action.onClick}>
+                              {action.icon && (
+                                <action.icon className="mr-2 size-4" />
+                              )}
+                              {action.label}
+                            </DropdownMenuItem>
+                            {action.separatorAfter && <DropdownMenuSeparator />}
+                          </div>
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
             ))
           ) : (
@@ -72,6 +160,29 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
           )}
         </TableBody>
       </Table>
+
+      {/* Delete Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="capitalize">
+              Delete User
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            Are you sure you want to delete this user?
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="!bg-destructive hover:bg-destructive/90"
+              onClick={() => handleDelete(selectedUser)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

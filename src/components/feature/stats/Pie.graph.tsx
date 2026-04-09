@@ -44,9 +44,7 @@ const PieGraph: React.FC<IPieGraphProps> = ({
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={250}>
-            <PieChart
-              className='inter'
-            >
+            <PieChart className="inter">
               <Pie
                 data={sortedData}
                 dataKey="total"

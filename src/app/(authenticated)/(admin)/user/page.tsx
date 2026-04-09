@@ -25,7 +25,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const userPayload = {
     page: Number(page),
-    limit: 6,
+    limit: 5,
     search: search,
     userId: user.id,
     gender,

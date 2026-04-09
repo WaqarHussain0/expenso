@@ -10,8 +10,8 @@ interface ICreateOrUpdatePayload {
 }
 
 export const UserApi = api.injectEndpoints({
-  endpoints: category => ({
-    setProfile: category.mutation<any, ICreateOrUpdatePayload>({
+  endpoints: user => ({
+    setProfile: user.mutation<any, ICreateOrUpdatePayload>({
       query: payload => ({
         url: '/users/set-profile',
         method: 'POST',
@@ -19,8 +19,15 @@ export const UserApi = api.injectEndpoints({
       }),
       invalidatesTags: ['users'],
     }),
+
+    deleteUser: user.mutation<any, string>({
+      query: id => ({
+        url: `/users/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useSetProfileMutation } = UserApi;
+export const { useSetProfileMutation, useDeleteUserMutation } = UserApi;

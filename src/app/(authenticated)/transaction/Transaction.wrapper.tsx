@@ -147,7 +147,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
   };
 
   return (
-    <div className="no-scrollbar h-screen w-full space-y-3">
+    <div className="no-scrollbar w-full space-y-2">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
@@ -207,8 +207,8 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
         className="grid-cols-2 gap-2 lg:grid-cols-4"
       />
 
-      <Card className="gap-3">
-        <CardContent className="space-y-3">
+      <Card>
+        <CardHeader>
           <div className="flex flex-wrap items-end gap-2">
             <div className="w-72 space-y-2">
               <Label>Select Category</Label>
@@ -272,9 +272,13 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
               Clear All
             </TextElement>
           </div>
+        </CardHeader>
+      </Card>
 
+      <Card className="p-0 ">
+        <CardContent className="p-0">
           <TransactionTable
-            className="no-scrollbar h-[42vh] overflow-y-auto"
+            className="no-scrollbar h-[40vh] overflow-y-auto"
             transactions={transactions || []}
           />
 

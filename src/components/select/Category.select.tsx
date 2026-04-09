@@ -51,6 +51,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
     limit: 3,
   });
 
+
   const categories = data?.data?.data ?? [];
 
   const shouldFetchSingle =
@@ -131,13 +132,6 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                       }}
                       className="md:text-md text-xs capitalize"
                     >
-                      <Check
-                        className={cn(
-                          'size-4',
-                          value === category._id ? 'opacity-100' : 'opacity-0',
-                        )}
-                      />
-
                       {category.icon &&
                         (() => {
                           const iconObj = CATEGORY_ICONS.find(
@@ -152,7 +146,14 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                             />
                           );
                         })()}
+
                       {category.name}
+                      <Check
+                        className={cn(
+                          'size-4',
+                          value === category._id ? '' : 'hidden',
+                        )}
+                      />
                     </CommandItem>
                   ))}
                 </CommandGroup>

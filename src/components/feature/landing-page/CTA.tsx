@@ -15,7 +15,7 @@ const CTA: React.FC<ICTAProps> = ({ className = '' }) => {
         Free forever · No card needed
       </p>
 
-      <h2 className="text-center text-[28px] text-[#F5F5DC] md:text-[36px]">
+      <h2 className="text-center text-[28px] text-white md:text-[36px]">
         Start tracking today.
         <br />
         <em className="text-[#2ea878]">Future you will thank you.</em>

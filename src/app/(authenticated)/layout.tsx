@@ -1,14 +1,19 @@
 import 'react-loading-skeleton/dist/skeleton.css';
 import Navbar from '@/components/common/Navbar';
 import Row from '@/components/common/Row';
+import TopBar from '@/components/common/TopBar';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Row className="h-screen w-full">
       <Navbar className="h-full w-64" />
 
-      <Row className="h-full flex-1 flex-col items-start overflow-y-auto bg-[#F5F5DC] px-4 py-12 lg:py-6">
-        {children}
+      <Row className="no-scrollbar h-full flex-1 flex-col overflow-y-auto bg-white">
+        <TopBar className="h-[50px] flex-shrink-0" />
+
+        <div className="w-full flex-1 overflow-y-auto bg-slate-50 p-4">
+          {children}
+        </div>
       </Row>
     </Row>
   );

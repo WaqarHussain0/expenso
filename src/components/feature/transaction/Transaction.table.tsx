@@ -233,7 +233,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
+              className="!bg-destructive hover:bg-destructive/90"
               onClick={() => handleDelete(selectedTransaction)}
             >
               Delete

@@ -9,7 +9,7 @@ import Image from 'next/image';
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <Row className="h-screen w-full flex-col items-center justify-between overflow-hidden md:flex-row">
-      <div className="flex h-[250px] w-full flex-col items-center justify-center gap-1 bg-[#F5F5DC] md:h-full md:flex-1">
+      <div className="flex h-[250px] w-full flex-col items-center justify-center gap-1 bg-white md:h-full md:flex-1">
         <Link href={PAGE_ROUTES.home}>
           <div className="relative h-[100px] w-[220px]">
             <Image

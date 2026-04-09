@@ -6,7 +6,6 @@ import Row from '@/components/common/Row';
 import StatCard from '@/components/common/StatCard';
 import CategoryDialog from '@/components/feature/category/Category.dialog';
 import RecentTransactions from '@/components/feature/dashboard/RecentTransactions';
-import UserProfile from '@/components/feature/dashboard/UserProfile';
 import TransactionDialog from '@/components/feature/transaction/Transaction.dialog';
 import {
   Card,
@@ -15,14 +14,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ITransaction } from '@/types/transaction.type';
-import { IUser } from '@/types/user.type';
 import { List, ListPlus, Tags } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 interface IDashboardWrapperProps {
   transactions: ITransaction[];
-  user: IUser | undefined;
   totals: {
     income: number;
     expense: number;
@@ -33,7 +30,6 @@ interface IDashboardWrapperProps {
 const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
   totals,
   transactions,
-  user,
   isFirstLogin = false,
 }) => {
   const router = useRouter();
@@ -117,8 +113,6 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
   return (
     <>
       <Row className="w-full flex-col gap-3">
-        <UserProfile user={user} />
-
         {/* Stats  */}
         <div className="grid w-full grid-cols-2 gap-2 lg:grid-cols-4">
           {stats.map(item => (

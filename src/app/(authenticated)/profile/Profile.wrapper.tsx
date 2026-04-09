@@ -20,7 +20,7 @@ interface IProfileWrapperProps {
 }
 const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user }) => {
   return (
-    <div className="no-scrollbar h-screen w-full space-y-3">
+    <div className="no-scrollbar w-full space-y-2">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
@@ -50,7 +50,7 @@ const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user }) => {
         </CardHeader>
 
         <CardContent>
-          <UserProfileForm user={user}/>
+          <UserProfileForm user={user} />
         </CardContent>
       </Card>
     </div>

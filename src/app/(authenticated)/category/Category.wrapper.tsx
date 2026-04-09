@@ -17,7 +17,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import Pagination from '@/components/common/Pagination';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import CategoryDialog from '@/components/feature/category/Category.dialog';
 import {
@@ -116,7 +116,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
   };
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-2">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
@@ -165,11 +165,11 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             iconClassName: 'text-[#FF9800]',
           },
         ]}
-        className="grid-cols-2 gap-2 lg:grid-cols-3"
+        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3"
       />
 
-      <Card className="gap-3">
-        <CardContent className="space-y-3">
+      <Card>
+        <CardHeader>
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-2">
               <Label>Name</Label>
@@ -222,9 +222,13 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
               Clear All
             </TextElement>
           </div>
+        </CardHeader>
+      </Card>
 
+      <Card className="p-0">
+        <CardContent className="p-0">
           <CategoryTable
-            className="no-scrollbar h-[42vh] overflow-y-auto"
+            className="no-scrollbar h-[40vh] overflow-y-auto"
             categories={categories || []}
           />
 

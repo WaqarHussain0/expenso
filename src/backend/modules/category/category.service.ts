@@ -183,6 +183,7 @@ export class CategoryService {
       {
         $match: {
           userId: new mongoose.Types.ObjectId(userId),
+          isActive: true,
         },
       },
       {
@@ -258,4 +259,6 @@ export class CategoryService {
       session.endSession();
     }
   }
+
+
 }

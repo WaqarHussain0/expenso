@@ -3,8 +3,9 @@ import { initDB } from '@/backend/utils/dbInit.util';
 import mongoose from 'mongoose';
 import UserProfileEntity from '../entities/user-profile.entity';
 import { CreateUserProfileDto } from '../dto/create-user-profile.dto';
-import { IUser } from '../entities/user.entity';
+import { UserService } from '../user.service';
 
+const userService = new UserService();
 export class UserProfileService {
   private readonly userProfileEntity = UserProfileEntity;
 
@@ -14,16 +15,14 @@ export class UserProfileService {
   ) {
     await initDB();
 
-    const profile = await this.userProfileEntity
-      .findOne({ userId })
-      .populate('userId')
-      .lean();
+    const [user, profile] = await Promise.all([
+      userService.findById(userId),
+      this.userProfileEntity.findOne({ userId }).lean(),
+    ]);
 
     if (!profile && throwException) {
       throw new Error(`Profile for user with id ${userId} not found`);
     }
-
-    const user = profile?.userId as IUser;
 
     const data = {
       id: user?._id?.toString() || '',

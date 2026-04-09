@@ -28,18 +28,15 @@ const Page = async () => {
   const [data, stats, isFirstLogin] = await Promise.all([
     transactionService.findAll(transactionPayload),
     transactionService.getUserStats(activeUser?.id || ''),
-    userService.isFirstLogin(session.user.id)
+    userService.isFirstLogin(session.user.id),
   ]);
 
   return (
-    <>
-      <DashboardWrapper
-        user={activeUser}
-        transactions={data.data || []}
-        totals={stats.totals}
-        isFirstLogin={isFirstLogin}
-      />
-    </>
+    <DashboardWrapper
+      transactions={data.data || []}
+      totals={stats.totals}
+      isFirstLogin={isFirstLogin}
+    />
   );
 };
 

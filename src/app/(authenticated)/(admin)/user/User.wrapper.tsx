@@ -8,7 +8,7 @@ import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { IUser } from '@/types/user.type';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search, UserRound, UserRoundKey, Users } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
@@ -100,7 +100,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
   ];
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-2">
       <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
@@ -147,8 +147,8 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         className="grid-cols-2 gap-2 lg:grid-cols-3"
       />
 
-      <Card className="gap-3">
-        <CardContent className="space-y-3">
+      <Card>
+        <CardHeader>
           <div className="flex items-end gap-2">
             <div className="min-w-56 space-y-2">
               <Label>Search</Label>
@@ -203,8 +203,12 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
               Clear All
             </TextElement>
           </div>
+        </CardHeader>
+      </Card>
 
-          <UserTable className="h-[42vh] overflow-y-auto" users={users || []} />
+      <Card className="p-0">
+        <CardContent className="p-0">
+          <UserTable className="h-[40vh] overflow-y-auto" users={users || []} />
 
           {users && users?.length !== 0 && (
             <Pagination

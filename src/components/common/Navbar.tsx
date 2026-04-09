@@ -5,11 +5,9 @@ import TextElement from './TextElement';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import {
   ChartPie,
-  Coins,
   House,
   List,
   LogOut,
-  Menu,
   Settings,
   Tags,
   Users,
@@ -132,7 +130,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
 
       {!toggleMenu && (
-        <div className="text-primary-foreground cursor-pointerss fixed top-2 left-4 z-50 flex w-[8%] items-center justify-center rounded-sm border border-[#1a7f5a] bg-white shadow-sm lg:hidden">
+        <div className="text-primary-foreground cursor-pointerss fixed top-4 left-4 z-50 flex w-[8%] items-center justify-center rounded-sm border border-[#1a7f5a] bg-white shadow-sm lg:hidden">
           {/* <Menu  className="textPrimary size-4" /> */}
 
           <div onClick={handleToggleMenu} className="relative size-8">
@@ -175,9 +173,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
                 return (
                   <Link
                     className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                      isActive
-                        ? 'bg-[#FFFFFF1A] text-[#F5F5DC]'
-                        : 'hover:bg-[#FFFFFF1A] hover:text-[#F5F5DC]'
+                      isActive ? 'bg-[#FFFFFF1A]' : 'hover:bg-[#FFFFFF1A]'
                     }`}
                     key={item.title}
                     href={item.linkTo}
@@ -208,7 +204,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-[#FFFFFF1A] hover:text-[#F5F5DC]"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-[#FFFFFF1A]"
           >
             <LogOut className="h-5 w-5" />
             <span className="poppins">Logout</span>
