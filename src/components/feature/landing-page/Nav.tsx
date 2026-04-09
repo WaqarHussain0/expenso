@@ -43,7 +43,7 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
 
         <Link
           href={user ? PAGE_ROUTES.dashboard : PAGE_ROUTES.register}
-          className="inline-flex w-fit items-center rounded-full bg-[#1a7f5a] px- py-1 font-medium text-white no-underline shadow-[0_4px_5px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[1px] md:px-8 md:py-2"
+          className="inline-flex w-fit items-center rounded-full bg-[#1a7f5a] px-4 py-1 font-medium text-white no-underline shadow-[0_4px_5px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[1px] md:px-8 md:py-2"
         >
           {user ? 'My Portfolio' : 'Get Started'}
         </Link>
