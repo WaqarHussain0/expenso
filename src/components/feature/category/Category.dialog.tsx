@@ -235,7 +235,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div className="space-y-2">
             <Label>Category Name *</Label>
 
@@ -298,7 +298,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               name="icon"
               control={control}
               render={({ field }) => (
-                <div className="grid max-h-40 grid-cols-6 gap-2 overflow-y-auto rounded-md border p-3">
+                <div className="grid max-h-40 grid-cols-8 gap-2 overflow-y-auto rounded-md border p-3">
                   {CATEGORY_ICONS.map(item => {
                     const Icon = item.icon;
                     const isActive = field.value === item.name;
@@ -326,7 +326,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               name="color"
               control={control}
               render={({ field }) => (
-                <div className="grid grid-cols-5 md:grid-cols-7 gap-2 rounded-md border p-3">
+                <div className="grid grid-cols-8 gap-2 rounded-md border p-3">
                   {COLORS.map(color => {
                     const isActive = field.value === color;
 

@@ -135,7 +135,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* Amount & Date */}
 
           <div className="grid w-full grid-cols-2 gap-2">

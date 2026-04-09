@@ -204,7 +204,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             iconClassName: 'text-[#2196F3]',
           },
         ]}
-        className="grid-cols-2 gap-2 lg:grid-cols-4"
+        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
       />
 
       <Card>
@@ -275,7 +275,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
         </CardHeader>
       </Card>
 
-      <Card className="p-0 ">
+      <Card className="p-0">
         <CardContent className="p-0">
           <TransactionTable
             className="no-scrollbar h-[40vh] overflow-y-auto"

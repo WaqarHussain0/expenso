@@ -87,7 +87,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
           {selectedLabel ?? (
             <span className="text-muted-foreground">{placeholder}</span>
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 
@@ -112,7 +112,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             onValueChange={setSearch}
             className="inter text-xs"
           />
-          <CommandList className="inter">
+          <CommandList className="inter w-full">
             {isFetching ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="size-4 animate-spin" />
@@ -120,7 +120,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             ) : (
               <>
                 <CommandEmpty>No categories found</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className='w-full'>
                   {options.map(category => (
                     <CommandItem
                       key={category._id}

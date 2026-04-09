@@ -11,7 +11,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <Row className="no-scrollbar h-full flex-1 flex-col overflow-y-auto bg-white">
         <TopBar className="h-[50px] flex-shrink-0" />
 
-        <div className="w-full flex-1 overflow-y-auto bg-slate-50 p-4">
+        <div className="w-full flex-1 overflow-y-auto bg-slate-50 px-3 pt-3">
           {children}
         </div>
       </Row>

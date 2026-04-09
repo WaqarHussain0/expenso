@@ -14,6 +14,17 @@ import { Button } from '../ui/button';
 import { LogOut, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
+import { useState } from 'react';
 
 interface ITopBarProps {
   className?: string;
@@ -24,6 +35,9 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
   const { data: session } = useSession();
   const user = session?.user;
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const initials = user?.name
     ?.split(' ')
     .map(n => n[0])
@@ -31,6 +45,7 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
     .toUpperCase();
 
   const handleLogout = async () => {
+    setIsLoading(true);
     await signOut({ redirect: false });
     router.push(PAGE_ROUTES.login);
   };
@@ -69,7 +84,7 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive focus:text-destructive flex items-center gap-2"
-              onClick={handleLogout}
+              onClick={() => setIsDeleteModalOpen(true)}
             >
               <LogOut className="mr-2 size-4" />
               Logout
@@ -77,6 +92,28 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Logout Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="capitalize">Logout</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            Are you sure you want to logout?
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="!bg-destructive"
+              onClick={handleLogout}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging out...' : 'Logout'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

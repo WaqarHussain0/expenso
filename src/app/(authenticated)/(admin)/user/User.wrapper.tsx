@@ -144,12 +144,12 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             iconClassName: 'text-blue-400',
           },
         ]}
-        className="grid-cols-2 gap-2 lg:grid-cols-3"
+        className="grid-cols-1 gap-2 lg:grid-cols-3"
       />
 
       <Card>
         <CardHeader>
-          <div className="flex items-end gap-2">
+          <div className="flex flex-wrap items-end gap-2">
             <div className="min-w-56 space-y-2">
               <Label>Search</Label>
               <div className="relative">
