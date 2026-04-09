@@ -71,7 +71,7 @@ const RegisterWrapper = () => {
   };
   return (
     <div className="page-fade bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
-      <TextElement as="h1" className="mb-8">
+      <TextElement as="h1" className="mb-4 md:mb-8">
         Register
       </TextElement>
 

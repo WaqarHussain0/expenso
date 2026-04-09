@@ -19,7 +19,7 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
     <nav
       className={`border-border z-50 flex h-14 w-full items-center justify-between border-b px-4 md:h-16 md:px-12 ${className}`}
     >
-      <div className="relative h-[50px] w-[100px]">
+      <div className="relative h-[20px] w-[40px] md:h-[50px] md:w-[100px]">
         <Image
           src={'/dark-logo.png'}
           alt={`Logo`}
@@ -35,7 +35,7 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
           <Link
             key={item.href}
             href={item.href}
-            className="text-sm font-light text-[#5a6070]"
+            className="text-xs md:text-sm font-light text-[#5a6070]"
           >
             {item.title}
           </Link>
@@ -43,7 +43,7 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
 
         <Link
           href={user ? PAGE_ROUTES.dashboard : PAGE_ROUTES.register}
-          className="inline-flex w-fit items-center rounded-full bg-[#1a7f5a] px-4 py-1 font-medium text-white no-underline shadow-[0_4px_5px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[1px] md:px-8 md:py-2"
+          className="inline-flex w-fit items-center rounded-full bg-[#1a7f5a] px- py-1 font-medium text-white no-underline shadow-[0_4px_5px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[1px] md:px-8 md:py-2"
         >
           {user ? 'My Portfolio' : 'Get Started'}
         </Link>

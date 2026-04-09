@@ -13,11 +13,15 @@ const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
       className={`w-full flex-col justify-between gap-3 bg-slate-100 p-4 md:flex-row lg:p-8 ${className}`}
     >
       <Row className="w-full flex-col items-start gap-2 md:w-[50%]">
+
+        <Row className='gap-2'>
+
         <div className="border-border flex size-10 items-center justify-center rounded-sm border-2 bg-[#e6f5ef]">
           🔗
         </div>
 
         <CardTitle className="text-[#0d1117]">Shareable Stats Links</CardTitle>
+        </ Row>
 
         <CardDescription className="max-w-[560px] text-[#5a6070]">
           Generate a public link to your stats page — filtered by month, year,
@@ -26,7 +30,7 @@ const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
           view.
         </CardDescription>
 
-        <div className="space-x-2">
+        <div className="space-x-1 md:space-x-2">
           {['By month', 'By year', 'Custom range'].map(item => (
             <Badge
               variant={'outline'}
@@ -45,7 +49,7 @@ const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
 
           <div className="flex w-full items-center justify-between rounded-md bg-slate-100 px-2 py-1">
             <p className="text-sm text-[#1a7f5a]">
-              expenso-pi.vercel.app/share?m=032026&toke!2…
+              expenso-pi.vercel.app/share?m=032026!skndkfsd!2…
             </p>
 
             <Badge className="rounded-sm bg-white">Copy</Badge>

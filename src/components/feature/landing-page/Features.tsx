@@ -70,12 +70,12 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
         </p>
       </Row>
 
-      <div className="grid w-full grid-cols-2 gap-2 md:grid-cols-3 lg:w-[60%]">
+      <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-3 lg:w-[60%]">
         {allFeatures.map((item, index) => {
           const Icon = item.icon;
           return (
             <Card
-              className={`py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md md:px-2 md:px-4 md:py-8 ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
+              className={`py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md px-2 ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
               key={item.title}
             >
               <CardHeader>

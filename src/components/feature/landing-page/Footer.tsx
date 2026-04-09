@@ -8,9 +8,9 @@ interface IFooterProps {
 const Footer: React.FC<IFooterProps> = ({ className = '' }) => {
   return (
     <footer
-      className={`border-border flex w-full flex-col items-center justify-center gap-2 border-t py-4 md:flex-row md:gap-4 ${className}`}
+      className={`border-border flex w-full items-center justify-center gap-2 border-t py-4 md:gap-4 ${className}`}
     >
-      <div className="relative h-[40px] w-[80px]">
+      <div className="relative h-[20px] w-[40px] md:h-[50px] md:w-[100px]">
         <Image
           src={'/dark-logo.png'}
           alt={`Logo`}
@@ -21,7 +21,7 @@ const Footer: React.FC<IFooterProps> = ({ className = '' }) => {
         />
       </div>
 
-      <div className="text-sm text-[#5a6070]">
+      <div className="text-xs md:text-sm text-[#5a6070]">
         © 2026 Expenso. All rights reserved.
       </div>
     </footer>

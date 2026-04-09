@@ -19,7 +19,7 @@ type TextVariants =
 
 // Default Tailwind utility classes per element
 const defaultClasses: Record<TextVariants, string> = {
-  h1: 'poppins text-3xl font-semibold text-[#0d1117]',
+  h1: 'poppins text-2xl md:text-3xl font-semibold text-[#0d1117]',
   h2: 'text-3xl font-bold',
   h3: 'poppins text-[#0d1117] text-xl font-bold',
   h4: ' text-md ',

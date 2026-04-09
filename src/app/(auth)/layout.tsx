@@ -9,9 +9,9 @@ import Image from 'next/image';
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <Row className="h-screen w-full flex-col items-center justify-between overflow-hidden md:flex-row">
-      <div className="flex h-[250px] w-full flex-col items-center justify-center gap-1 bg-white md:h-full md:flex-1">
+      <div className="flex h-[100px] w-full flex-col items-center justify-center bg-white md:h-full md:flex-1">
         <Link href={PAGE_ROUTES.home}>
-          <div className="relative h-[100px] w-[220px]">
+          <div className="mdw-[220px] relative h-[50px] w-[100px] md:h-[100px]">
             <Image
               src={'/dark-logo.png'}
               alt={`Logo`}
@@ -23,12 +23,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </Link>
 
-        <TextElement as="p" className="text-sm tracking-wide text-[#5a6070]">
+        <TextElement
+          as="p"
+          className="text-xs tracking-wide text-[#5a6070] md:text-sm"
+        >
           Expense & Income Management
         </TextElement>
       </div>
 
-      <div className="flex h-full w-full items-center justify-center bg-[#0d1117] px-4 md:w-[40%] md:p-0">
+      <div className="flex h-full w-full items-center justify-center bg-[#0d1117] px-4 md:w-[60%] lg:w-[40%] md:p-0">
         {/* Card */}
         {children}
       </div>
