@@ -10,25 +10,45 @@ interface IShareableStatsProps {
 const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
   return (
     <Row
-      className={`w-full flex-col justify-between gap-3 bg-slate-100 p-4 md:flex-row lg:p-8 ${className}`}
+      className={`relative w-full flex-col justify-between gap-3 bg-[#0d1117] p-4 md:flex-row lg:p-8 ${className}`}
     >
+      {/* Grid texture */}
+      <div className="fr-grid-bg pointer-events-none absolute inset-0" />
+
+      {/* Glow orb */}
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 h-[400px] w-[600px] -translate-x-1/2"
+        style={{
+          background:
+            'radial-gradient(ellipse, rgba(74,222,128,.07) 0%, transparent 70%)',
+        }}
+      />
+
       <Row className="w-full flex-col items-start gap-2 md:w-[50%]">
+        <Row className="gap-2">
+          <div className="border-border flex size-9 items-center justify-center rounded-sm border-2 bg-[#f4f4f4]">
+            🔗
+          </div>
 
-        <Row className='gap-2'>
+          {/* Heading */}
+          <h2
+            className="text-[clamp(22px,5vw,22px)] leading-[1.1] font-bold text-[#f4f4f4]"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            Shareable
+            <em className="ml-2 text-[#2ea878]" style={{ fontStyle: 'italic' }}>
+              Stats Links
+            </em>
+          </h2>
+        </Row>
 
-        <div className="border-border flex size-10 items-center justify-center rounded-sm border-2 bg-[#e6f5ef]">
-          🔗
-        </div>
-
-        <CardTitle className="text-[#0d1117]">Shareable Stats Links</CardTitle>
-        </ Row>
-
-        <CardDescription className="max-w-[560px] text-[#5a6070]">
+        {/* Subtext */}
+        <p className="my-2 inter max-w-[560px] text-[14px] leading-relaxed text-[#888]">
           Generate a public link to your stats page — filtered by month, year,
           or a custom date range — and share it with anyone. Your accountant,
           your partner, or just yourself on another device. No login needed to
           view.
-        </CardDescription>
+        </p>
 
         <div className="space-x-1 md:space-x-2">
           {['By month', 'By year', 'Custom range'].map(item => (

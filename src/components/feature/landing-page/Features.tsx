@@ -58,10 +58,16 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
           Features
         </div>
 
-        <h2 className="section-title max-w-[520px] text-[28px] tracking-tighter md:text-[36px]">
+        {/* Heading */}
+        <h2
+          className="mb-5 text-[clamp(28px,5vw,52px)] leading-[1.1] font-bold"
+          style={{ fontFamily: 'Georgia, serif' }}
+        >
           Everything you need to
           <br />
-          <em className="text-[#1a7f5a] italic">understand your money</em>
+          <em className="text-[#2ea878]" style={{ fontStyle: 'italic' }}>
+            understand your money
+          </em>
         </h2>
 
         <p className="text-center text-[14px] font-extralight text-[#5a6070] md:text-start md:text-[16px]">
@@ -75,7 +81,7 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
           const Icon = item.icon;
           return (
             <Card
-              className={`py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md px-2 ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
+              className={`px-2 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
               key={item.title}
             >
               <CardHeader>

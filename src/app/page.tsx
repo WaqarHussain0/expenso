@@ -9,20 +9,23 @@ import Row from '@/components/common/Row';
 import Pricing from '@/components/feature/landing-page/Pricing';
 import ShareableStats from '@/components/feature/landing-page/ShareableStats';
 import { getServerSideSession } from '@/lib/next-auth.util';
+import FeatureRequestSection from '@/components/feature/landing-page/FeatureRequest';
 
 const Page = async () => {
   const session = await getServerSideSession();
   const user = session?.user;
-  
+
   return (
-    <Row className="overflow-y-auto no-scrollbar w-full flex-col">
+    <Row className="no-scrollbar w-full flex-col overflow-y-auto overflow-x-hidden">
       <Nav className="" user={user} />
       <Header className="" />
       <Stats className="" />
 
       <Feature className="" />
       <ShareableStats className="" />
+
       <HowItWork className="" />
+      <FeatureRequestSection />
 
       <Pricing className="my-3" />
       <CTA className="" />

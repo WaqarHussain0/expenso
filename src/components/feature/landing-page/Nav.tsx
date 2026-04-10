@@ -19,7 +19,7 @@ const Nav: React.FC<INavProps> = ({ className = '', user }) => {
     <nav
       className={`border-border z-50 flex h-14 w-full items-center justify-between border-b px-4 md:h-16 md:px-12 ${className}`}
     >
-      <div className="relative h-[20px] w-[40px] md:h-[50px] md:w-[100px]">
+      <div className="relative h-[20px] w-[40px] md:h-[40px] md:w-[80px]">
         <Image
           src={'/dark-logo.png'}
           alt={`Logo`}

@@ -10,7 +10,7 @@ const Footer: React.FC<IFooterProps> = ({ className = '' }) => {
     <footer
       className={`border-border flex w-full items-center justify-center gap-2 border-t py-4 md:gap-4 ${className}`}
     >
-      <div className="relative h-[20px] w-[40px] md:h-[50px] md:w-[100px]">
+      <div className="relative h-[20px] w-[40px] md:h-[40px] md:w-[80px]">
         <Image
           src={'/dark-logo.png'}
           alt={`Logo`}
@@ -21,7 +21,7 @@ const Footer: React.FC<IFooterProps> = ({ className = '' }) => {
         />
       </div>
 
-      <div className="text-xs md:text-sm text-[#5a6070]">
+      <div className="text-xs text-[#5a6070] md:text-sm">
         © 2026 Expenso. All rights reserved.
       </div>
     </footer>

@@ -5,7 +5,7 @@ import { Check } from 'lucide-react';
 import Link from 'next/link';
 
 interface IPricingProps {
-  className?: string; 
+  className?: string;
 }
 
 const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
@@ -24,16 +24,23 @@ const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
     'Secure private storage',
   ];
   return (
-    <Row className={` w-full justify-center bg-[#] ${className}`}>
+    <Row className={`w-full justify-center bg-[#] ${className}`}>
       <Row className="w-full flex-col justify-between gap-3 p-4 md:flex-row md:gap-0 lg:p-8">
         <div className="flex w-full flex-col items-start gap-3 md:w-[55%]">
           <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
             Pricing
           </div>
 
-          <h2 className="max-w-[520px] text-[28px] font-bold tracking-tighter md:text-[36px]">
-            Completely free.
-            <em className="ml-2 text-[#1a7f5a] italic">No tricks.</em>
+          {/* Heading */}
+          <h2
+            className="mb-5 text-[clamp(32px,5vw,52px)] leading-[1.1] font-bold"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            Completely free
+            <br />
+            <em className="text-[#2ea878]" style={{ fontStyle: 'italic' }}>
+              No tricks.
+            </em>
           </h2>
 
           <CardDescription className="max-w-[520px] text-start text-[#5a6070]">

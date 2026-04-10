@@ -36,9 +36,16 @@ const HowItWork: React.FC<IHowItWorkProps> = ({ className = '' }) => {
           How it works
         </div>
 
-        <h2 className="max-w-[520px] text-[28px] font-bold tracking-tighter md:text-[36px]">
+        {/* Heading */}
+        <h2
+          className="mb-5 text-center text-[clamp(32px,5vw,52px)] leading-[1.1] font-bold"
+          style={{ fontFamily: 'Georgia, serif' }}
+        >
           Up and running in
-          <em className="ml-2 text-[#1a7f5a] italic">three steps</em>
+          <br />
+          <em className="text-[#2ea878]" style={{ fontStyle: 'italic' }}>
+            three steps
+          </em>
         </h2>
 
         <CardDescription className="text-center text-[#5a6070]">
