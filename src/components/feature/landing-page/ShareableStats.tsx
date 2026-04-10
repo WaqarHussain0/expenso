@@ -10,7 +10,7 @@ interface IShareableStatsProps {
 const ShareableStats: React.FC<IShareableStatsProps> = ({ className = '' }) => {
   return (
     <Row
-      className={`relative w-full flex-col justify-between gap-3 bg-[#0d1117] p-4 md:flex-row lg:p-8 ${className}`}
+      className={`relative w-full flex-col justify-between gap-3 bg-[#0d1117] md:flex-row   px-4 py-16 md:py-12  md:px-8 ${className}`}
     >
       {/* Grid texture */}
       <div className="fr-grid-bg pointer-events-none absolute inset-0" />

@@ -87,7 +87,7 @@ const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
 
             <Link
               href={PAGE_ROUTES.register}
-              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#0d1117] px-6 py-3 text-[15px] font-medium text-white no-underline shadow-[0_4px_20px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(13,17,23,0.3)]"
+              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#0d1117] px-8 md:px-12 py-2 md:py-3  text-[15px] font-medium text-white no-underline shadow-[0_4px_20px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(13,17,23,0.3)]"
             >
               Create Free Account →
             </Link>
