@@ -9,7 +9,7 @@ const CTA: React.FC<ICTAProps> = ({ className = '' }) => {
   return (
     <section
       id="signup"
-      className={`relative flex w-full flex-col items-center justify-center bg-[#0d1117] px-4 py-12 md:px-8 ${className} `}
+      className={`relative flex w-full flex-col items-center justify-center bg-[#0d1117] px-4 py-20 md:py-12  md:px-8 ${className} `}
     >
       {/* Grid texture */}
       <div className="fr-grid-bg pointer-events-none absolute inset-0" />

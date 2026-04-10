@@ -9,7 +9,7 @@ interface IHeaderProps {
 const Header: React.FC<IHeaderProps> = ({ className = '' }) => {
   return (
     <section
-      className={`relative flex w-full flex-col items-center justify-center gap-4 bg-[#0d1117] py-4 text-center md:py-24 ${className}`}
+      className={`relative flex w-full flex-col items-center justify-center gap-4 bg-[#0d1117] py-14 text-center md:py-24 ${className}`}
     >
       {/* Grid texture */}
       <div className="fr-grid-bg pointer-events-none absolute inset-0" />
@@ -57,7 +57,7 @@ const Header: React.FC<IHeaderProps> = ({ className = '' }) => {
           <div className="mt-3 flex flex-col items-center justify-center gap-2">
             <Link
               href={PAGE_ROUTES.register}
-              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#4ade80] px-12 py-3 text-[15px] font-medium no-underline shadow-[0_4px_10px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_10px_rgba(13,17,23,0.3)]"
+              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-green-400 px-12 py-3 text-[15px] font-medium no-underline shadow-[0_4px_10px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_10px_rgba(13,17,23,0.3)]"
             >
               Start for free →
             </Link>
