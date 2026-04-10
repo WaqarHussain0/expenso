@@ -487,6 +487,7 @@ export class TransactionService {
   }
 
   async getYearlyDashboardData(userId: mongoose.Types.ObjectId, year: number) {
+    await initDB();
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31, 23, 59, 59);
 
@@ -581,6 +582,7 @@ export class TransactionService {
     startDate: Date,
     endDate: Date,
   ) {
+    await initDB();
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
 
@@ -631,6 +633,7 @@ export class TransactionService {
 
   // Get all the income, expense and investment total for a user
   async getUserStats(userId: string) {
+    await initDB();
     const userMongoObjectId = new mongoose.Types.ObjectId(userId);
 
     const transactions = await TransactionEntity.find({
@@ -649,6 +652,4 @@ export class TransactionService {
 
     return { totals };
   }
-
-
 }
