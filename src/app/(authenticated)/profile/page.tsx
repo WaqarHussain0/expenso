@@ -16,11 +16,8 @@ const Page = async () => {
 
   const userMonogoObjectId = new mongoose.Types.ObjectId(user?.id);
 
-  console.log({userMonogoObjectId})
   const userData =
     await userProfileService.getProfileByUserId(userMonogoObjectId);
-
-    console.log('userData:',userData)
 
   return <ProfileWrapper user={userData} />;
 };

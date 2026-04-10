@@ -9,6 +9,7 @@ import { useSetProfileMutation } from '@/lib/rtk/services/user.rtk.service';
 import { UserGenderEnum } from '@/types/user-profile.type';
 
 import { IUser } from '@/types/user.type';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -27,6 +28,7 @@ interface IUserProfileFormProps {
 
 const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
   const router = useRouter();
+  const { update } = useSession();
 
   const [setProfile, { isLoading: isSubmitting }] = useSetProfileMutation();
   const {
@@ -34,7 +36,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
     handleSubmit,
     control,
     reset,
-    formState: { errors,isDirty },
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
@@ -74,6 +76,8 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
 
       if (response.success) {
         reset();
+        // ✅ Push the new name into the JWT token + session
+        await update({ name: data.name });
         toast.success('Request Successfull', {
           description: 'Profile saved successfully',
         });
@@ -103,11 +107,10 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <Row className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
           <div className="space-y-2">
-            <Label>Name</Label>
+            <Label>Full Name</Label>
 
             <Input
               type="text"
-              disabled
               placeholder="John Doe"
               {...register('name', {
                 required: 'Name is required',

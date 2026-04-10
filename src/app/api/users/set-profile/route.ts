@@ -19,6 +19,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     const profilePayload = {
       contact: body.contact,
       gender: body.gender,
+      name: body.name,
     };
 
     // Transform to DTO and validate

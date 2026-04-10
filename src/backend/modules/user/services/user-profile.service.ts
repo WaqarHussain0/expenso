@@ -43,7 +43,7 @@ export class UserProfileService {
     userId: string | mongoose.Types.ObjectId,
     payload: CreateUserProfileDto,
   ) {
-    const { contact, gender } = payload;
+    const { contact, gender, name } = payload;
     await initDB();
 
     const existingProfile = await this.userProfileEntity.findOne({ userId });
@@ -52,6 +52,10 @@ export class UserProfileService {
       existingProfile.contact = contact || existingProfile.contact;
       existingProfile.gender = gender || existingProfile.gender;
       await existingProfile.save();
+
+      if (name) {
+        await userService.updateUser(userId, { name });
+      }
     } else {
       const newProfile = new this.userProfileEntity({
         userId,
@@ -59,6 +63,10 @@ export class UserProfileService {
         gender,
       });
       await newProfile.save();
+
+      if (name) {
+        await userService.updateUser(userId, { name });
+      }
     }
 
     return await this.getProfileByUserId(userId, true);

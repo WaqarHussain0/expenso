@@ -25,7 +25,7 @@ const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user }) => {
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
             {' '}
-            All Transactions
+            Profile Settings
           </TextElement>
           <TextElement as="p" className="text-[#5a6070]">
             Manage your account information

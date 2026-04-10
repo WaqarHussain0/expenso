@@ -15,6 +15,7 @@ import UserProfileEntity, {
 import StatEntity from '../stats/entities/stats.entity';
 import TransactionEntity from '../transaction/entities/transaction.entity';
 import CategoryEntity from '../category/entities/category.entity';
+import { StringSchemaDefinition } from 'mongoose';
 
 export class UserService {
   private readonly userEntity = UserEntity;
@@ -362,5 +363,22 @@ export class UserService {
       session.endSession();
       throw error;
     }
+  }
+
+  async updateUser(
+    userId: string | mongoose.Types.ObjectId,
+    payload: {
+      name?: string;
+    },
+  ) {
+    return await this.userEntity.findByIdAndUpdate(
+      userId,
+      {
+        name: payload.name,
+      },
+      {
+        new: true,
+      },
+    );
   }
 }

@@ -82,7 +82,6 @@ export const authOptions: NextAuthOptions = {
 
           if (data.error) throw new Error(data.error);
 
-
           // Attach backend response to user
           user.id = data.data.id;
           (user as any).accessToken = data.accessToken;
@@ -98,7 +97,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       // Initial login
       if (user) {
         const customUser = user as IUser & {
@@ -123,6 +122,11 @@ export const authOptions: NextAuthOptions = {
           : Date.now() + 3600 * 1000;
 
         return token;
+      }
+
+      // ✅ Handle session update trigger
+      if (trigger === 'update' && session?.name) {
+        (token.user as IUser).name = session.name;
       }
 
       if (

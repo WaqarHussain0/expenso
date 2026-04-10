@@ -4,6 +4,10 @@ import { UserGenderEnum } from '../entities/user-profile.entity';
 export class CreateUserProfileDto {
   @IsOptional()
   @IsString()
+  name?: string | null;
+
+  @IsOptional()
+  @IsString()
   contact?: string | null;
 
   @IsOptional()
