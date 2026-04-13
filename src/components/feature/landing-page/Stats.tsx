@@ -44,13 +44,13 @@ const Stats: React.FC<IStatsProps> = ({ className = '' }) => {
               index !== items.length - 1 ? 'md:border-r-2' : 'border-r-0'
             }`}
           >
-            <div className="text-[52px] text-[#0d1117]">
+            <div className="text-[32px] md:text-[52px] text-[#0d1117]">
               {item.title}
               {item.subTitle && (
                 <span className="text-[#1a7f5a]">{item.subTitle}</span>
               )}
             </div>
-            <CardDescription className="text-center text-[14px] text-[#5a6070]">
+            <CardDescription className="text-center text-[12px] md:text-[14px] text-[#5a6070]">
               {item.description}
             </CardDescription>
           </Card>

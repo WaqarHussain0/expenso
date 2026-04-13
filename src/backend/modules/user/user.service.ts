@@ -271,6 +271,7 @@ export class UserService {
       name: item.name,
       email: item.email,
       role: item.role,
+      isActive: item.isActive,
       profile: {
         _id: item.profile?._id?.toString() || '',
         gender: item.profile?.gender || null,
@@ -401,5 +402,25 @@ export class UserService {
         contact: user?.profile?.contact || '',
       },
     };
+  }
+
+  async toggleUserStatus(id: mongoose.Types.ObjectId) {
+    await initDB();
+
+    const user = await this.userEntity.findById(id);
+
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+
+    return await this.userEntity.findByIdAndUpdate(
+      id,
+      {
+        isActive: !user?.isActive,
+      },
+      {
+        new: true,
+      },
+    );
   }
 }

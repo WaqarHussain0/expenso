@@ -57,7 +57,7 @@ const Header: React.FC<IHeaderProps> = ({ className = '' }) => {
           <div className="mt-3 flex flex-col items-center justify-center gap-2">
             <Link
               href={PAGE_ROUTES.register}
-              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-green-400 px-8 md:px-12 py-2 md:py-3 text-[15px] font-medium no-underline shadow-[0_4px_10px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_10px_rgba(13,17,23,0.3)]"
+              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#1a7f5a] px-8 py-2 text-[15px] font-medium text-[#f4f4f4] no-underline shadow-[0_4px_10px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_10px_rgba(13,17,23,0.3)] md:px-12 md:py-3"
             >
               Start for free →
             </Link>

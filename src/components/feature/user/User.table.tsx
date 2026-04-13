@@ -25,7 +25,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useDeleteUserMutation } from '@/lib/rtk/services/user.rtk.service';
+import {
+  useDeleteUserMutation,
+  useToggleUserStatusMutation,
+} from '@/lib/rtk/services/user.rtk.service';
 import { Eye, MoreHorizontal, Trash } from 'lucide-react';
 import {
   DropdownMenu,
@@ -36,6 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import { Switch } from '@/components/ui/switch';
 
 interface IUserTableProps {
   users: IUser[];
@@ -44,7 +48,7 @@ interface IUserTableProps {
 
 const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
   const [deleteUser] = useDeleteUserMutation();
-
+  const [toggleUserStatus] = useToggleUserStatusMutation();
   const router = useRouter();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -66,6 +70,10 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
       },
       {
         label: 'Email',
+      },
+
+      {
+        label: 'Is Active',
       },
       {
         label: 'Action',
@@ -112,6 +120,20 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
       toast.error('Failed to delete user');
     }
   };
+
+  const handleToggleStatus = async (user: IUser, value: boolean) => {
+    try {
+      await toggleUserStatus({
+        id: user.id,
+        isActive: value,
+      }).unwrap();
+
+      toast.success(`User ${value ? 'activated' : 'deactivated'}`);
+      router.refresh();
+    } catch (error) {
+      toast.error('Failed to update status');
+    }
+  };
   return (
     <div className={className}>
       <Table>
@@ -126,13 +148,24 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
         <TableBody>
           {users.length > 0 ? (
             users.map(user => (
-              <TableRow key={user.id} onClick={() => handleViewClick(user.id)} className='cursor-pointer'>
+              <TableRow
+                key={user.id}
+                onClick={() => handleViewClick(user.id)}
+                className="cursor-pointer"
+              >
                 <TableCell className="capitalize">{user.name}</TableCell>
                 <TableCell className="capitalize">
                   {user.profile?.gender || '-'}
                 </TableCell>
                 <TableCell>{user.profile?.contact || '-'}</TableCell>
                 <TableCell>{user.email || '-'}</TableCell>
+                <TableCell className="">
+                  <Switch
+                    checked={user.isActive}
+                    onClick={e => e.stopPropagation()} // ✅ stop row click
+                    onCheckedChange={value => handleToggleStatus(user, value)}
+                  />
+                </TableCell>
 
                 <TableCell>
                   <DropdownMenu>

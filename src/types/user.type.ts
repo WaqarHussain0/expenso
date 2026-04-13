@@ -1,4 +1,4 @@
-import { IUserProfile } from "./user-profile.type";
+import { IUserProfile } from './user-profile.type';
 
 export enum UserRoleEnum {
   USER = 'user',
@@ -9,6 +9,7 @@ export interface IUser {
   name: string;
   role: UserRoleEnum;
   email: string;
+  isActive?: boolean;
   profile?: IUserProfile;
 }
 

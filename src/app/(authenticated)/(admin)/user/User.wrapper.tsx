@@ -105,7 +105,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         <Row className="flex-col items-start">
           <TextElement as="h3" className="">
             {' '}
-            All Users
+            User Settings
           </TextElement>
           <TextElement as="p" className="text-[#5a6070]">
             Manage users here

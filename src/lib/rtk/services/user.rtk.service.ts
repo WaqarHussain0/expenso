@@ -20,6 +20,18 @@ export const UserApi = api.injectEndpoints({
       invalidatesTags: ['users'],
     }),
 
+
+    toggleUserStatus: user.mutation<
+      { success: boolean },
+      { id: string; isActive: boolean }
+    >({
+      query: ({ id, isActive }) => ({
+        url: `/users/${id}/toggle-status`,
+        method: 'PATCH',
+        body: { isActive },
+      }),
+    }),
+
     deleteUser: user.mutation<any, string>({
       query: id => ({
         url: `/users/${id}`,
@@ -30,4 +42,8 @@ export const UserApi = api.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useSetProfileMutation, useDeleteUserMutation } = UserApi;
+export const {
+  useSetProfileMutation,
+  useToggleUserStatusMutation,
+  useDeleteUserMutation,
+} = UserApi;
