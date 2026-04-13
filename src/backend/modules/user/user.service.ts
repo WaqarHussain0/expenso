@@ -15,7 +15,6 @@ import UserProfileEntity, {
 import StatEntity from '../stats/entities/stats.entity';
 import TransactionEntity from '../transaction/entities/transaction.entity';
 import CategoryEntity from '../category/entities/category.entity';
-import { StringSchemaDefinition } from 'mongoose';
 
 export class UserService {
   private readonly userEntity = UserEntity;
@@ -380,5 +379,27 @@ export class UserService {
         new: true,
       },
     );
+  }
+
+  async getUserData(id: string) {
+    await initDB();
+    const user = await this.userEntity
+      .findById(id)
+      .populate('profile')
+      .lean({ virtuals: true });
+
+    return {
+      user: {
+        id: user?._id.toString(),
+        name: user?.name || '',
+        email: user?.email || '',
+      },
+
+      profile: {
+        id: user?.profile?._id.toString(),
+        gender: user?.profile?.gender || '',
+        contact: user?.profile?.contact || '',
+      },
+    };
   }
 }

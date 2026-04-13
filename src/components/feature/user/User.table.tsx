@@ -26,7 +26,7 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useDeleteUserMutation } from '@/lib/rtk/services/user.rtk.service';
-import { MoreHorizontal, Trash } from 'lucide-react';
+import { Eye, MoreHorizontal, Trash } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 
 interface IUserTableProps {
   users: IUser[];
@@ -73,8 +74,18 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
     [],
   );
 
+  const handleViewClick = (userId: string) =>
+    router.push(`${PAGE_ROUTES.user}/${userId}`);
+
   const getActions = (user: IUser) => {
     return [
+      {
+        label: 'View',
+        onClick: () => handleViewClick(user.id),
+        show: true,
+        separatorAfter: true,
+        icon: Eye,
+      },
       {
         label: 'Delete',
         onClick: () => {
@@ -115,7 +126,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
         <TableBody>
           {users.length > 0 ? (
             users.map(user => (
-              <TableRow key={user.id}>
+              <TableRow key={user.id} onClick={() => handleViewClick(user.id)} className='cursor-pointer'>
                 <TableCell className="capitalize">{user.name}</TableCell>
                 <TableCell className="capitalize">
                   {user.profile?.gender || '-'}

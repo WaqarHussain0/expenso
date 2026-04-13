@@ -152,7 +152,7 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       >
         <Row className="w-full flex-col items-start gap-4">
           <div className="flex w-full items-center gap-3 border-b border-[#e6f5ef] p-2">
-            <div className="relative h-[50px] w-[120px]">
+            <div className="relative h-[35px] w-[80px]">
               <Image
                 src={'/light-logo.png'}
                 alt={`Logo`}

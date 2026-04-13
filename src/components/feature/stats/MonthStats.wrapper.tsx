@@ -42,17 +42,19 @@ const MonthStatsWrapper: React.FC<IMonthStatsWrapperProps> = ({
       category: CategoryTypeEnum.INCOME,
       pieFirst: false, // Transactions left, Pie right
     },
-    {
-      key: 'investment' as const,
-      label: 'Investment',
-      category: CategoryTypeEnum.INVESTMENT,
-      pieFirst: true, // Pie left, Transactions right
-    },
+
     {
       key: 'expense' as const,
       label: 'Expense',
       category: CategoryTypeEnum.EXPENSE,
       pieFirst: false,
+    },
+
+    {
+      key: 'investment' as const,
+      label: 'Investment',
+      category: CategoryTypeEnum.INVESTMENT,
+      pieFirst: true, // Pie left, Transactions right
     },
   ];
 
