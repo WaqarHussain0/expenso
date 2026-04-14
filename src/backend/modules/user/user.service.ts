@@ -389,6 +389,10 @@ export class UserService {
       .populate('profile')
       .lean({ virtuals: true });
 
+    const userCategories = await this.categoryEntity.find({
+      userId: user?._id,
+    });
+
     return {
       user: {
         id: user?._id.toString(),
@@ -401,6 +405,19 @@ export class UserService {
         gender: user?.profile?.gender || '',
         contact: user?.profile?.contact || '',
       },
+
+      categories:
+        userCategories.length > 0
+          ? userCategories?.map(item => {
+              return {
+                id: item._id.toString(),
+                name: item.name,
+                type: item.type,
+                icon: item.icon,
+                color: item.color,
+              };
+            })
+          : [],
     };
   }
 

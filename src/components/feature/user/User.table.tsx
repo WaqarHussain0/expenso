@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import {
@@ -89,14 +90,18 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
     return [
       {
         label: 'View',
-        onClick: () => handleViewClick(user.id),
+        onClick: (e: any) => {
+          e.stopPropagation();
+          handleViewClick(user.id);
+        },
         show: true,
         separatorAfter: true,
         icon: Eye,
       },
       {
         label: 'Delete',
-        onClick: () => {
+        onClick: (e: any) => {
+          e.stopPropagation();
           setIsDeleteModalOpen(true);
           setSelectedUser(user);
         },

@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, VenusAndMars } from 'lucide-react';
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
 import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import { CATEGORY_ICONS } from '@/components/feature/category/Category.dialog';
+import { Badge } from '@/components/ui/badge';
+import { CategoryTypeEnum } from '@/types/category.type';
 
 interface IUserDetailsWrapperProps {
   userData: any;
@@ -15,7 +18,7 @@ interface IUserDetailsWrapperProps {
 const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
   userData,
 }) => {
-  const { user, profile } = userData || {};
+  const { user, profile, categories } = userData || {};
 
   const stats = [
     {
@@ -44,7 +47,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
             User Details
           </TextElement>
           <TextElement as="p" className="text-[#5a6070]">
-            User details here here
+            User details here
           </TextElement>
         </Row>
       </Row>
@@ -82,6 +85,59 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      <Row className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        {categories &&
+          categories.length > 0 &&
+          categories?.map((item: any) => (
+            <Card key={item.id} className="w-full p-3">
+              <CardHeader className="flex flex-col items-center gap-2 p-0 md:flex-row">
+                <div
+                  className="flex size-8 items-center justify-center rounded-full"
+                  style={{
+                    backgroundColor: item.color + '1A', // 1A is ~10% opacity in hex
+                  }}
+                >
+                  {item.icon &&
+                    (() => {
+                      const iconObj = CATEGORY_ICONS.find(
+                        c => c.name === item.icon,
+                      );
+                      if (!iconObj) return null;
+                      const IconComponent = iconObj.icon;
+                      return (
+                        <IconComponent
+                          className="size-4"
+                          style={{ color: item.color }}
+                        />
+                      );
+                    })()}
+                </div>
+
+                <Row className="flex-col gap-1 md:items-start">
+                  <CardTitle className="text-sm capitalize">
+                    {item.name}
+                  </CardTitle>
+
+                  <Badge
+                    variant={
+                      item.type === CategoryTypeEnum.EXPENSE
+                        ? 'destructive'
+                        : 'default'
+                    }
+                    className={
+                      item.type === CategoryTypeEnum.INVESTMENT
+                        ? 'bg-yellow-100 text-yellow-500'
+                        : ''
+                    }
+                  >
+                    {item?.type}
+                  </Badge>
+                </Row>
+              </CardHeader>
+            </Card>
+          ))}
+      </Row>
     </div>
   );
 };
