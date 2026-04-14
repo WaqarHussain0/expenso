@@ -7,11 +7,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 
 import { toast } from 'sonner';
 
-import { useRouter } from 'next/navigation';
 import TextElement from '@/components/common/TextElement';
 import {
   DropdownMenu,
@@ -32,12 +31,10 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { ITransaction } from '@/types/transaction.type';
-import { useDeleteTransactionMutation } from '@/lib/rtk/services/transaction.rtk.service';
 import TransactionDialog from './Transaction.dialog';
-import { CategoryTypeEnum } from '@/types/category.type';
 import { Badge } from '@/components/ui/badge';
 import { CATEGORY_ICONS } from '../category/Category.dialog';
-import Row from '@/components/common/Row';
+import { deleteTransactionAction } from '@/lib/server-actions/transaction.server-action';
 
 interface ITransactionTableProps {
   transactions: ITransaction[];
@@ -47,8 +44,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   transactions,
   className,
 }) => {
-  const router = useRouter();
-  const [deleteTransaction] = useDeleteTransactionMutation();
+  const [isPending, startTransition] = useTransition();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
@@ -110,18 +106,22 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
     ];
   };
 
-  const handleDelete = async (transaction: ITransaction | null) => {
-    if (!transaction || !transaction._id) return;
-    const res = await deleteTransaction(transaction._id).unwrap();
+  const handleDelete = (transaction: ITransaction | null) => {
+    if (!transaction?._id) return;
 
-    if (res.success) {
-      toast.success('Transaction deleted successfully');
-      router.refresh();
-      setIsDeleteModalOpen(false);
-      setSelectedTransaction(null);
-    } else {
-      toast.error('Failed to delete transaction');
-    }
+    startTransition(async () => {
+      const result = await deleteTransactionAction(transaction._id);
+
+      if (result.success) {
+        toast.success('Transaction deleted successfully');
+        setIsDeleteModalOpen(false);
+        setSelectedTransaction(null);
+      } else {
+        toast.error('Failed to delete transaction', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
 
   return (
@@ -235,8 +235,9 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
             <AlertDialogAction
               className="!bg-destructive hover:bg-destructive/90"
               onClick={() => handleDelete(selectedTransaction)}
+              disabled={isPending}
             >
-              Delete
+              {isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

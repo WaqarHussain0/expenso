@@ -13,19 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useSetPreferencesMutation } from '@/lib/rtk/services/category.rtk.service';
+import { setPreferencesAction } from '@/lib/server-actions/category.server-action';
 import { CategoryTypeEnum } from '@/types/category.type';
-import { Check, Fuel, Laptop, Plus, Wallet } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
-interface IPreferenceWrapper {
-  userId: string;
-}
-
-const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
+const PreferenceWrapper = () => {
   const router = useRouter();
+
+  const [isPending, startTransition] = useTransition();
 
   const [selectedCategories, setSelectedCategories] = useState<
     {
@@ -35,8 +33,6 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
       color: string;
     }[]
   >([]);
-
-  const [setPreferences, { isLoading }] = useSetPreferencesMutation();
 
   const categories = {
     income: [
@@ -214,25 +210,21 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      await setPreferences({
-        payload: selectedCategories,
-      }).unwrap();
+  const handleSubmit = () => {
+    startTransition(async () => {
+      const result = await setPreferencesAction(selectedCategories);
 
-      toast.success('Request Successfull', {
-        description: 'Categories added',
-      });
-      router.push(PAGE_ROUTES.category);
-      // Add success toast here
-    } catch (err) {
-      console.log('Failed to set references', err);
-
-      toast.error('Request Failed', {
-        description: 'Failed to set references',
-      });
-      // Handle error
-    }
+      if (result.success) {
+        toast.success('Request Successful', {
+          description: 'Categories added',
+        });
+        router.push(PAGE_ROUTES.category);
+      } else {
+        toast.error('Request Failed', {
+          description: result.error ?? 'Failed to set preferences',
+        });
+      }
+    });
   };
 
   return (
@@ -310,9 +302,9 @@ const PreferenceWrapper: React.FC<IPreferenceWrapper> = ({ userId }) => {
         <Button
           size="lg"
           onClick={handleSubmit}
-          disabled={selectedCategories.length === 0 || isLoading}
+          disabled={selectedCategories.length === 0 || isPending}
         >
-          {isLoading ? 'Saving...' : 'Save Preferences'}
+          {isPending ? 'Saving...' : 'Save Preferences'}
         </Button>
       </div>
     </div>

@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 'use client';
 import Row from '@/components/common/Row';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useSetProfileMutation } from '@/lib/rtk/services/user.rtk.service';
+import { setUserProfileAction } from '@/lib/server-actions/user.server-action';
 import { UserGenderEnum } from '@/types/user-profile.type';
 
 import { IUser } from '@/types/user.type';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useTransition } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -27,10 +24,10 @@ interface IUserProfileFormProps {
 }
 
 const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
-  const router = useRouter();
   const { update } = useSession();
 
-  const [setProfile, { isLoading: isSubmitting }] = useSetProfileMutation();
+  const [isPending, startTransition] = useTransition();
+
   const {
     register,
     handleSubmit,
@@ -66,30 +63,27 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
   };
 
   const onSubmit = async (data: FormValues) => {
-    try {
-      const response = await setProfile({
+    startTransition(async () => {
+      const result = await setUserProfileAction(user?.id || '', {
         name: data.name,
         contact: data.contact,
         gender: data.gender,
         userId: user?.id || '',
-      }).unwrap();
+      });
 
-      if (response.success) {
+      if (result.success) {
         reset();
         // ✅ Push the new name into the JWT token + session
         await update({ name: data.name });
         toast.success('Request Successfull', {
           description: 'Profile saved successfully',
         });
-        router.refresh();
-        return;
+      } else {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
       }
-    } catch (error: any) {
-      console.log('err : ', error);
-      toast.error('Request failed', {
-        description: error?.data?.error || 'Something went wrong',
-      });
-    }
+    });
   };
 
   useEffect(() => {
@@ -188,9 +182,9 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
           </div>
         </Row>
 
-        <Button type="submit" disabled={isSubmitting || !isDirty}>
+        <Button type="submit" disabled={isPending || !isDirty}>
           {' '}
-          {isSubmitting ? 'Saving...' : 'Save'}
+          {isPending ? 'Saving...' : 'Save'}
         </Button>
       </form>
     </>

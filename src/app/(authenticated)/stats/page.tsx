@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -21,7 +21,6 @@ import Row from '@/components/common/Row';
 import YearStatsWrapper from '@/components/feature/stats/YearStats.wrapper';
 import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
 import { Input } from '@/components/ui/input';
-import { useCreateStatsURLMutation } from '@/lib/rtk/services/stats.rtk.service';
 import { MONTH_NAMES } from '@/app/constants/app.constant';
 import {
   Dialog,
@@ -31,6 +30,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Copy } from 'lucide-react';
+import { getStatsLinkAction } from '@/lib/server-actions/user.server-action';
 
 const now = new Date();
 
@@ -57,6 +57,8 @@ const getRangeForYear = (year: number) => ({
 });
 
 const Page = () => {
+  const [isPending, startTransition] = useTransition();
+
   const [filterOption, setFilterOption] = useState<FilterOptionEnum>(
     FilterOptionEnum.MONTH,
   );
@@ -148,8 +150,6 @@ const Page = () => {
     investment: [],
   };
 
-  const [createStatsURL, { isLoading }] = useCreateStatsURLMutation();
-
   const renderData = (filterOption: FilterOptionEnum) => {
     switch (filterOption) {
       case FilterOptionEnum.MONTH:
@@ -209,28 +209,22 @@ const Page = () => {
   useEffect(() => {
     if (isDialogOpen && !shareUrl) {
       const generateURL = async () => {
-        try {
-          const res = await createStatsURL({
-            payload: { type: filterOption, startDate, endDate, year },
-          }).unwrap();
-          if (res?.url) {
-            setShareUrl(res.url);
+        startTransition(async () => {
+          const result = await getStatsLinkAction({
+            type: filterOption,
+            startDate,
+            endDate,
+            year,
+          });
+
+          if (result.success && result.url) {
+            setShareUrl(result.url);
           }
-        } catch (error) {
-          console.error('Error generating share URL:', error);
-        }
+        });
       };
       generateURL();
     }
-  }, [
-    isDialogOpen,
-    shareUrl,
-    createStatsURL,
-    filterOption,
-    startDate,
-    endDate,
-    year,
-  ]);
+  }, [isDialogOpen, shareUrl, filterOption, startDate, endDate, year]);
 
   return (
     <div className="w-full space-y-3">
@@ -376,9 +370,9 @@ const Page = () => {
                 className="flex-1"
                 placeholder="Generating URL..."
               />
-              <Button onClick={handleCopy} disabled={isLoading || !shareUrl}>
+              <Button onClick={handleCopy} disabled={isPending || !shareUrl}>
                 <Copy />{' '}
-                {isLoading ? 'Generating...' : isCopied ? 'Copied!' : 'Copy'}
+                {isPending ? 'Generating...' : isCopied ? 'Copied!' : 'Copy'}
               </Button>
             </div>
           </div>

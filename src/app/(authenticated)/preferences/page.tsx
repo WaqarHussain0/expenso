@@ -21,7 +21,7 @@ const Page = async () => {
     redirect(PAGE_ROUTES.dashboard);
   }
 
-  return <PreferenceWrapper userId={session.user.id} />;
+  return <PreferenceWrapper />;
 };
 
 export default Page;

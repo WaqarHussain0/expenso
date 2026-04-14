@@ -17,12 +17,12 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import {
-  useGetAllCategoriesQuery,
-  useGetCategoryByIdQuery,
-} from '@/lib/rtk/services/category.rtk.service';
 import { ICategory } from '@/types/category.type';
 import { CATEGORY_ICONS } from '../feature/category/Category.dialog';
+import {
+  getAllCategoriesAction,
+  getCategoryByIdAction,
+} from '@/lib/server-actions/category.server-action';
 
 interface ICategorySelectProps {
   value?: string;
@@ -37,6 +37,10 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
   placeholder = 'Select category',
   className = '',
 }) => {
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [singleCategory, setSingleCategory] = useState<ICategory | null>(null);
+
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -46,23 +50,6 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data, isFetching } = useGetAllCategoriesQuery({
-    name: debouncedSearch || undefined,
-    limit: 3,
-  });
-
-
-  const categories = data?.data?.data ?? [];
-
-  const shouldFetchSingle =
-    !!value && !categories.some((c: ICategory) => c._id === value);
-
-  const { data: singleCategoryResponse } = useGetCategoryByIdQuery(value!, {
-    skip: !shouldFetchSingle,
-  });
-
-  const singleCategory = singleCategoryResponse?.data;
-
   const options = useMemo(() => {
     const merged = [...(singleCategory ? [singleCategory] : []), ...categories];
     const map = new Map();
@@ -71,6 +58,38 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
   }, [categories, singleCategory]);
 
   const selectedLabel = options.find(c => c._id === value)?.name;
+
+  // Replaces useGetAllCategoriesQuery
+  useEffect(() => {
+    const fetch = async () => {
+      setIsFetching(true);
+      const result = await getAllCategoriesAction({
+        name: debouncedSearch || undefined,
+        limit: 3,
+      });
+      if (result.success) setCategories(result.data?.data ?? []);
+      setIsFetching(false);
+    };
+    fetch();
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (!value) return;
+
+    const fetch = async () => {
+      // Already in the list — clear stale single and bail
+      if (categories.some((c: ICategory) => c._id === value)) {
+        setSingleCategory(null);
+        return;
+      }
+
+      const result = await getCategoryByIdAction(value);
+      if (result.success)
+        setSingleCategory((result.data as unknown as ICategory) ?? null);
+    };
+
+    fetch();
+  }, [value, categories]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -120,7 +139,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             ) : (
               <>
                 <CommandEmpty>No categories found</CommandEmpty>
-                <CommandGroup className='w-full'>
+                <CommandGroup className="w-full">
                   {options.map(category => (
                     <CommandItem
                       key={category._id}

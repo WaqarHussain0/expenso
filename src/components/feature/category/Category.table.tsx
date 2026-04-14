@@ -7,11 +7,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 
 import { toast } from 'sonner';
 
-import { useRouter } from 'next/navigation';
 import TextElement from '@/components/common/TextElement';
 import {
   DropdownMenu,
@@ -34,7 +33,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { useDeleteCategoryMutation } from '@/lib/rtk/services/category.rtk.service';
+import { deleteCategoryAction } from '@/lib/server-actions/category.server-action';
 
 interface ICategoryTableProps {
   categories: ICategory[];
@@ -44,9 +43,7 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
   categories,
   className,
 }) => {
-  const router = useRouter();
-
-  const [deleteCategory] = useDeleteCategoryMutation();
+  const [isPending, startTransition] = useTransition();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
@@ -101,18 +98,23 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
       },
     ];
   };
-  const handleDelete = async (category: ICategory | null) => {
-    if (!category || !category._id) return;
-    const res = await deleteCategory(category._id).unwrap();
 
-    if (res.success) {
-      toast.success('Category deleted successfully');
-      router.refresh();
-      setIsDeleteModalOpen(false);
-      setSelectedCategory(null);
-    } else {
-      toast.error('Failed to delete category');
-    }
+  const handleDelete = (category: ICategory | null) => {
+    if (!category?._id) return;
+
+    startTransition(async () => {
+      const result = await deleteCategoryAction(category._id);
+
+      if (result.success) {
+        toast.success('Category deleted successfully');
+        setIsDeleteModalOpen(false);
+        setSelectedCategory(null);
+      } else {
+        toast.error('Failed to delete category', {
+          description: result.error,
+        });
+      }
+    });
   };
   return (
     <div className={className}>
@@ -232,8 +234,9 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
             <AlertDialogAction
               className="!bg-destructive hover:bg-destructive/90"
               onClick={() => handleDelete(selectedCategory)}
+              disabled={isPending}
             >
-              Delete
+              {isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

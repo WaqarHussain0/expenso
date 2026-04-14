@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -12,15 +10,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
-import { useEffect } from 'react';
+import { useEffect, useTransition } from 'react';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
 import { ITransaction } from '@/types/transaction.type';
-import {
-  useCreateTransactionMutation,
-  useUpdateTransactionMutation,
-} from '@/lib/rtk/services/transaction.rtk.service';
+
 import { CategorySelect } from '@/components/select/Category.select';
+import {
+  createTransactionAction,
+  updateTransactionAction,
+} from '@/lib/server-actions/transaction.server-action';
 
 interface ITransactionDialogProps {
   open: boolean;
@@ -44,13 +43,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
   const formatDateForInput = (date: string | Date) =>
     new Date(date).toISOString().split('T')[0];
 
-  const router = useRouter();
-
-  const [createTransaction, { isLoading: isCreating }] =
-    useCreateTransactionMutation();
-
-  const [updateTransaction, { isLoading: isUpdating }] =
-    useUpdateTransactionMutation();
+  const [isPending, startTransition] = useTransition();
 
   const {
     register,
@@ -66,30 +59,22 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    let response: any;
+  const onSubmit = (data: FormValues) => {
+    startTransition(async () => {
+      const result = transaction?._id
+        ? await updateTransactionAction(transaction._id, data)
+        : await createTransactionAction(data);
 
-    if (transaction && transaction?._id) {
-      response = await updateTransaction({
-        id: transaction?._id,
-        payload: data,
-      }).unwrap();
-    } else {
-      // For creation, include password if it's in the data
-      response = await createTransaction(data).unwrap();
-    }
-
-    if (response.success) {
-      onClose();
-      reset();
-      toast.success('Transaction saved successfully');
-      router.refresh();
-    } else {
-      const error = await response.json();
-      toast.error('Request failed', {
-        description: error?.error || 'Something went wrong',
-      });
-    }
+      if (result.success) {
+        onClose();
+        reset();
+        toast.success('Transaction saved successfully');
+      } else {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
 
   // Reset when editing
@@ -111,7 +96,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
     }
   }, [transaction, reset, open]);
 
-  const isSubmitting = isCreating || isUpdating;
+  const isSubmitting = isPending;
 
   return (
     <Dialog

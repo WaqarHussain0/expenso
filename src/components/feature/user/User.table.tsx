@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import TextElement from '@/components/common/TextElement';
 
@@ -25,10 +25,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import {
-  useDeleteUserMutation,
-  useToggleUserStatusMutation,
-} from '@/lib/rtk/services/user.rtk.service';
 import { Eye, MoreHorizontal, Trash } from 'lucide-react';
 import {
   DropdownMenu,
@@ -40,6 +36,10 @@ import {
 import { Button } from '@/components/ui/button';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { Switch } from '@/components/ui/switch';
+import {
+  deleteUserAction,
+  toggleUserStatusAction,
+} from '@/lib/server-actions/user.server-action';
 
 interface IUserTableProps {
   users: IUser[];
@@ -47,8 +47,8 @@ interface IUserTableProps {
 }
 
 const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
-  const [deleteUser] = useDeleteUserMutation();
-  const [toggleUserStatus] = useToggleUserStatusMutation();
+  const [isPending, startTransition] = useTransition();
+
   const router = useRouter();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -109,30 +109,35 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
 
   const handleDelete = async (user: IUser | null) => {
     if (!user || !user.id) return;
-    const res = await deleteUser(user.id).unwrap();
 
-    if (res.success) {
-      toast.success('User deleted successfully');
-      router.refresh();
-      setIsDeleteModalOpen(false);
-      setSelectedUser(null);
-    } else {
-      toast.error('Failed to delete user');
-    }
+    startTransition(async () => {
+      const result = await deleteUserAction(user.id);
+
+      if (result.success) {
+        toast.success('User deleted successfully');
+
+        setIsDeleteModalOpen(false);
+        setSelectedUser(null);
+      } else {
+        toast.error('Failed to delete user', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
 
   const handleToggleStatus = async (user: IUser, value: boolean) => {
-    try {
-      await toggleUserStatus({
-        id: user.id,
-        isActive: value,
-      }).unwrap();
+    startTransition(async () => {
+      const result = await toggleUserStatusAction(user.id);
 
-      toast.success(`User ${value ? 'activated' : 'deactivated'}`);
-      router.refresh();
-    } catch (error) {
-      toast.error('Failed to update status');
-    }
+      if (result.success) {
+        toast.success(`User ${value ? 'activated' : 'deactivated'}`);
+      } else {
+        toast.error('Failed to update status', {
+          description: result.error,
+        });
+      }
+    });
   };
   return (
     <div className={className}>
@@ -164,6 +169,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
                     checked={user.isActive}
                     onClick={e => e.stopPropagation()} // ✅ stop row click
                     onCheckedChange={value => handleToggleStatus(user, value)}
+                    disabled={isPending}
                   />
                 </TableCell>
 

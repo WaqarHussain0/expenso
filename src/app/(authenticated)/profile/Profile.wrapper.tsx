@@ -18,6 +18,7 @@ import { IUser } from '@/types/user.type';
 interface IProfileWrapperProps {
   user?: IUser;
 }
+
 const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user }) => {
   return (
     <div className="no-scrollbar w-full space-y-2">

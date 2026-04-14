@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect } from 'react';
+import { useEffect, useTransition } from 'react';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -16,10 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import {
-  useCreateCategoryMutation,
-  useUpdateCategoryMutation,
-} from '@/lib/rtk/services/category.rtk.service';
 
 import {
   BanknoteArrowDown,
@@ -48,6 +42,10 @@ import {
   CardSim,
   Barcode,
 } from 'lucide-react';
+import {
+  createCategoryAction,
+  updateCategoryAction,
+} from '@/lib/server-actions/category.server-action';
 
 export const CATEGORY_ICONS = [
   { name: 'Wallet', icon: Wallet },
@@ -116,8 +114,6 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
   onClose,
   category,
 }) => {
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -128,44 +124,29 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
     defaultValues: {
       name: '',
       type: CategoryTypeEnum.INCOME,
-      icon: '',
-      color: '',
+      icon: 'Wallet',
+      color: '#22C55E',
     },
   });
 
-  const [createCategory, { isLoading: isCreating }] =
-    useCreateCategoryMutation();
+  const [isPending, startTransition] = useTransition();
 
-  const [updateCategory, { isLoading: isUpdating }] =
-    useUpdateCategoryMutation();
+  const onSubmit = (data: FormValues) => {
+    startTransition(async () => {
+      const result = category?._id
+        ? await updateCategoryAction(category._id, data)
+        : await createCategoryAction(data);
 
-  const onSubmit = async (data: FormValues) => {
-    let response: any;
-
-    try {
-      if (category && category?._id) {
-        response = await updateCategory({
-          id: category?._id,
-          payload: data,
-        }).unwrap();
-      } else {
-        // For creation, include password if it's in the data
-        response = await createCategory(data).unwrap();
-      }
-
-      if (response.success) {
+      if (result.success) {
         onClose();
         reset();
         toast.success('Category saved successfully');
-        router.refresh();
-        return;
+      } else {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
       }
-    } catch (err: any) {
-      console.log('err : ', err);
-      toast.error('Request failed', {
-        description: err?.data?.error || 'Something went wrong',
-      });
-    }
+    });
   };
 
   // Reset when editing
@@ -183,11 +164,13 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
       reset({
         name: '',
         type: CategoryTypeEnum.EXPENSE,
+        icon: 'Wallet',
+        color: '#22C55E',
       });
     }
   }, [category, reset, open]);
 
-  const isSubmitting = isCreating || isUpdating;
+  const isSubmitting = isPending;
 
   const getTypeColor = (type: CategoryTypeEnum | undefined) => {
     switch (type) {
@@ -225,7 +208,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
         }
       }}
     >
-      <DialogContent className="max-h-[80vh] overflow-y-auto no-scrollbar">
+      <DialogContent className="no-scrollbar max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{category ? 'Edit' : 'Add New'} Category</DialogTitle>
           <DialogDescription>
@@ -262,7 +245,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               control={control}
               rules={{ required: 'Type is required' }}
               render={({ field }) => (
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex flex-wrap gap-2">
                   {categoryTypes.map(type => {
                     const isActive = field.value === type.id;
 
@@ -297,6 +280,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
             <Controller
               name="icon"
               control={control}
+              rules={{ required: 'Icon is required' }}
               render={({ field }) => (
                 <div className="grid max-h-40 grid-cols-8 gap-2 overflow-y-auto rounded-md border p-3">
                   {CATEGORY_ICONS.map(item => {
@@ -317,6 +301,10 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                 </div>
               )}
             />
+
+            {errors.icon && (
+              <p className="text-sm text-red-500">{errors.icon.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -325,6 +313,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
             <Controller
               name="color"
               control={control}
+              rules={{ required: 'Color is required' }}
               render={({ field }) => (
                 <div className="grid grid-cols-8 gap-2 rounded-md border p-3">
                   {COLORS.map(color => {
@@ -347,6 +336,10 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                 </div>
               )}
             />
+
+            {errors.color && (
+              <p className="text-sm text-red-500">{errors.color.message}</p>
+            )}
           </div>
 
           {/* Actions */}
