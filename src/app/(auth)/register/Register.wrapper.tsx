@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
 /* eslint-disable react/no-unescaped-entities */
+'use client';
 import {
   emailInputField,
   nameInputField,
@@ -12,14 +11,14 @@ import TextElement from '@/components/common/TextElement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
-import { baseUrl } from '@/app/constants/app.constant';
 import GoogleButton from '@/components/common/GoogleButton';
+import { registerAction } from '@/lib/server-actions/auth.server-action';
 
 interface IFormValues {
   name: string;
@@ -30,7 +29,7 @@ interface IFormValues {
 const RegisterWrapper = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const {
     control,
@@ -40,34 +39,28 @@ const RegisterWrapper = () => {
   } = useForm<IFormValues>();
 
   const onSubmit = async (data: IFormValues) => {
-    try {
-      setLoading(true);
-
-      const res = await fetch(`${baseUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+    startTransition(async () => {
+      const result = await registerAction({
+        email: data.email,
+        name: data.name,
+        password: data.password,
       });
 
-      const result = await res.json();
+      if (result.success) {
+        toast.success('Request Successful', {
+          description: 'Your account has been created.',
+        });
+        reset();
 
-      if (!res.ok) {
-        throw new Error(result?.error || 'Something went wrong');
+        router.push(PAGE_ROUTES.login);
       }
 
-      toast.success('Request Successful', {
-        description: result?.message || 'Your account has been created.',
-      });
-
-      reset();
-      router.push(PAGE_ROUTES.login);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
-    } finally {
-      setLoading(false);
-    }
+      if (!result.success) {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
   return (
     <div className="page-fade bg-opacity-90 w-full max-w-md rounded-lg bg-white p-5 shadow-lg backdrop-blur-sm md:p-8">
@@ -171,8 +164,8 @@ const RegisterWrapper = () => {
             <TextElement as="span">Forgot password</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Registering...' : 'Register'}
           </Button>
         </Row>
         <GoogleButton forLogin={false} />

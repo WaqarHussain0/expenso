@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import TextElement from '@/components/common/TextElement';
@@ -7,11 +6,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { passwordInputField } from '@/app/constants/input.constant';
 import { Label } from '@/components/ui/label';
+import { resetPasswordAction } from '@/lib/server-actions/auth.server-action';
 
 interface IResetPasswordRequest {
   password: string;
@@ -19,7 +19,9 @@ interface IResetPasswordRequest {
 
 const ResetPasswordWrapper = ({ token }: { token: string }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
+  const [isPending, startTransition] = useTransition();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -30,41 +32,24 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
   } = useForm<IResetPasswordRequest>();
 
   const onSubmit = async (data: IResetPasswordRequest) => {
-    try {
-      setLoading(true);
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    startTransition(async () => {
+      const result = await resetPasswordAction(token, data.password);
 
-      const res = await fetch(`${baseUrl}/api/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          password: data.password,
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
+      if (result.success) {
+        toast.success('Request Successful', {
+          description: 'Password reset successfully',
+        });
         reset();
-        throw new Error(result?.error || 'Failed to reset password');
+
+        router.push(PAGE_ROUTES.login);
       }
 
-      toast.success('Password reset successfully');
-
-      reset();
-
-      setTimeout(() => {
-        router.push(PAGE_ROUTES.login);
-      }, 1000);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to reset password');
-    } finally {
-      setLoading(false);
-    }
+      if (!result.success) {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
 
   return (
@@ -116,8 +101,8 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
           />
         </div>
 
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Password'}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Saving...' : 'Save Password'}
         </Button>
       </form>
     </div>

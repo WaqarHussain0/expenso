@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import TextElement from '@/components/common/TextElement';
@@ -8,12 +7,12 @@ import { useRouter } from 'next/navigation';
 import Row from '@/components/common/Row';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useTransition } from 'react';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { emailInputField } from '@/app/constants/input.constant';
 import { Label } from '@/components/ui/label';
-import { baseUrl } from '@/app/constants/app.constant';
 import Link from 'next/link';
+import { forgotPasswordAction } from '@/lib/server-actions/auth.server-action';
 
 interface IForgotPasswordRequest {
   email: string;
@@ -21,7 +20,8 @@ interface IForgotPasswordRequest {
 
 const ForgotPasswordWrapper = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
+  const [isPending, startTransition] = useTransition();
 
   const {
     control,
@@ -31,34 +31,24 @@ const ForgotPasswordWrapper = () => {
   } = useForm<IForgotPasswordRequest>();
 
   const onSubmit = async (data: IForgotPasswordRequest) => {
-    try {
-      setLoading(true);
+    startTransition(async () => {
+      const result = await forgotPasswordAction(data.email);
 
-      const res = await fetch(`${baseUrl}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      if (result.success) {
+        toast.success('Request Successful', {
+          description: 'Check your email for further actions',
+        });
+        reset();
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result?.error || 'Something went wrong');
+        router.push(PAGE_ROUTES.login);
       }
 
-      toast.success('Request Successful', {
-        description: result?.message || 'Check your email for further actions',
-      });
-
-      reset();
-      router.push(PAGE_ROUTES.login);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset link');
-    } finally {
-      setLoading(false);
-    }
+      if (!result.success) {
+        toast.error('Request failed', {
+          description: result.error || 'Something went wrong',
+        });
+      }
+    });
   };
 
   return (
@@ -100,8 +90,8 @@ const ForgotPasswordWrapper = () => {
             <TextElement as="span">Login</TextElement>
           </Link>
 
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Sending...' : 'Reset Password'}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Sending...' : 'Reset Password'}
           </Button>
         </Row>
       </form>
