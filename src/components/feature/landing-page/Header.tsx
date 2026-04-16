@@ -1,12 +1,14 @@
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
+import { IUser } from '@/types/user.type';
 import Link from 'next/link';
 
 interface IHeaderProps {
   className?: string;
+  user?: IUser;
 }
 
-const Header: React.FC<IHeaderProps> = ({ className = '' }) => {
+const Header: React.FC<IHeaderProps> = ({ className = '', user }) => {
   return (
     <section
       className={`relative flex w-full flex-col items-center justify-center gap-4 bg-[#0d1117] py-16 text-center md:py-24 ${className}`}
@@ -56,10 +58,10 @@ const Header: React.FC<IHeaderProps> = ({ className = '' }) => {
 
           <div className="mt-3 flex flex-col items-center justify-center gap-2">
             <Link
-              href={PAGE_ROUTES.register}
+              href={user ? PAGE_ROUTES.dashboard : PAGE_ROUTES.register}
               className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#1a7f5a] px-8 py-2 text-[15px] font-medium text-[#f4f4f4] no-underline shadow-[0_4px_10px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_10px_rgba(13,17,23,0.3)] md:px-12 md:py-3"
             >
-              Start for free →
+              {user ? 'My Portfolio' : 'Start for free'} →
             </Link>
           </div>
         </Row>

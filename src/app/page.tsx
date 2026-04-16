@@ -10,15 +10,16 @@ import Pricing from '@/components/feature/landing-page/Pricing';
 import ShareableStats from '@/components/feature/landing-page/ShareableStats';
 import { getServerSideSession } from '@/lib/next-auth.util';
 import FeatureRequestSection from '@/components/feature/landing-page/FeatureRequest';
+import Testimonials from '@/components/feature/landing-page/Testimonials';
 
 const Page = async () => {
   const session = await getServerSideSession();
   const user = session?.user;
 
   return (
-    <Row className="no-scrollbar w-full flex-col overflow-y-auto overflow-x-hidden">
-      <Nav className="" user={user} />
-      <Header className="" />
+    <Row className="no-scrollbar w-full flex-col overflow-x-hidden overflow-y-auto">
+      <Nav className="" />
+      <Header className="" user={user} />
       <Stats className="" />
 
       <Feature className="" />
@@ -28,6 +29,8 @@ const Page = async () => {
       <FeatureRequestSection />
 
       <Pricing className="my-3" />
+
+      <Testimonials />
       <CTA className="" />
       <Footer className="" />
     </Row>

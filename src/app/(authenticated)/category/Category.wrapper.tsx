@@ -165,7 +165,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             iconClassName: 'text-[#FF9800]',
           },
         ]}
-        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3"
+        className="grid-cols-2 gap-2 lg:grid-cols-3"
       />
 
       <Card>
