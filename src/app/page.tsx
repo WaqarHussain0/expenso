@@ -18,8 +18,8 @@ const Page = async () => {
 
   return (
     <Row className="no-scrollbar w-full flex-col overflow-x-hidden overflow-y-auto">
-      <Nav className="" />
-      <Header className="" user={user} />
+      <Nav className=""  />
+      <Header className=""  user={user}/>
       <Stats className="" />
 
       <Feature className="" />

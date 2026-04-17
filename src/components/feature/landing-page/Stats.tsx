@@ -34,9 +34,9 @@ const Stats: React.FC<IStatsProps> = ({ className = '' }) => {
 
   return (
     <div
-      className={`border-border mt-4 flex w-[92%] flex-col justify-center rounded-full border bg-[#f7f8fa] p-4 lg:w-[70%] ${className}`}
+      className={`border-border mt-4 flex w-[92%] flex-col justify-center rounded-2xl border bg-[#f7f8fa] p-4 lg:w-[70%] ${className}`}
     >
-      <div className="grid grid-cols-2 md:grid-cols-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-0">
         {items.map((item, index) => (
           <Card
             key={item.id}
