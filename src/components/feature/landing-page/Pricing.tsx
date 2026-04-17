@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
 import { Card, CardDescription, CardHeader } from '@/components/ui/card';
@@ -44,9 +45,8 @@ const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
           </h2>
 
           <CardDescription className="max-w-[520px] text-start text-[#5a6070]">
-            No freemium walls. No premium tiers. No credit card required.
-            Expenso is free because everyone deserves to understand their
-            finances.
+            It's free because I use it myself and didn't want to charge people
+            for something I built on weekends. Simple as that.
           </CardDescription>
 
           <div className="mt-4 flex flex-col gap-2">
@@ -87,7 +87,7 @@ const Pricing: React.FC<IPricingProps> = ({ className = '' }) => {
 
             <Link
               href={PAGE_ROUTES.register}
-              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#0d1117] px-8 md:px-12 py-2 md:py-3  text-[15px] font-medium text-white no-underline shadow-[0_4px_20px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(13,17,23,0.3)]"
+              className="inline-flex w-fit items-center gap-[8px] rounded-full bg-[#0d1117] px-8 py-2 text-[15px] font-medium text-white no-underline shadow-[0_4px_20px_rgba(13,17,23,0.25)] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_8px_30px_rgba(13,17,23,0.3)] md:px-12 md:py-3"
             >
               Create Free Account →
             </Link>

@@ -26,7 +26,7 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
       title: 'Quick Transactions',
       icon: Zap,
       description:
-        'Log any transaction in seconds. Add amount, pick a category, set the date, and optionally add a note.',
+        'Bought chai from a cart? It takes longer to unlock your phone than to log it. Amount, category, date — done.',
     },
 
     {
@@ -71,8 +71,8 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
         </h2>
 
         <p className="text-center text-[14px] font-extralight text-[#5a6070] md:text-start md:text-[16px]">
-          Built around how people actually think about their finances — not how
-          accountants do.
+          No double-entry bookkeeping. No "debits and credits." Just: money came
+          in, money went out, here's what's left.
         </p>
       </Row>
 

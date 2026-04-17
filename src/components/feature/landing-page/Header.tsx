@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import Row from '@/components/common/Row';
 import { IUser } from '@/types/user.type';
@@ -52,8 +53,8 @@ const Header: React.FC<IHeaderProps> = ({ className = '', user }) => {
 
           {/* Subtext */}
           <p className="inter max-w-[560px] text-[14px] text-[#888]">
-            Expenso turns your daily transactions into clear insights — so you
-            can spend smarter, save more, and stress less.
+            I built Expenso because I kept wondering where my salary went by the
+            20th of every month. Now I don't have to wonder. You won't either.
           </p>
 
           <div className="mt-3 flex flex-col items-center justify-center gap-2">

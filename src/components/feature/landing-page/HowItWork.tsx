@@ -16,7 +16,7 @@ const HowItWork: React.FC<IHowItWorkProps> = ({ className = '' }) => {
       number: '02',
       label: 'Log your transactions',
       description:
-        'Every time money moves, add a transaction. Pick the category, enter the amount, set the date. Takes five seconds.',
+        'Got paid? Log it. Paid rent? Log it. The habit takes a week to build. After that, it\'s automatic.',
     },
     {
       number: '03',

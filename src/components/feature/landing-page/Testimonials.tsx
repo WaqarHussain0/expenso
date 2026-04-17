@@ -302,7 +302,7 @@ export default function Testimonials() {
 
         {/* Bottom trust line */}
         <div
-        className="mt-10"
+          className="mt-10"
           style={{
             textAlign: 'center',
             display: 'flex',
@@ -322,9 +322,6 @@ export default function Testimonials() {
             Trusted by users across Pakistan
           </span>
           <span style={{ color: 'rgba(0,0,0,0.15)', fontSize: '13px' }}>·</span>
-          <span style={{ fontSize: '13px', color: '#5a6070' }}>
-            Free forever · No credit card
-          </span>
         </div>
       </div>
     </section>
