@@ -113,7 +113,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
   return (
     <>
       <Row className="w-full flex-col gap-3">
-        <div className="grid w-full grid-cols-2 gap-3">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
           {/* Quick Actions */}
           <Card className="w-full gap-2 px-4">
             <CardHeader className="p-0">
