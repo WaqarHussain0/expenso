@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
@@ -225,13 +226,12 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
         </CardHeader>
       </Card>
 
-      <Card className="p-0">
+      <Card className="w-full p-0">
         <CardContent className="p-0">
           <CategoryTable
             className="no-scrollbar h-[40vh] overflow-y-auto"
             categories={categories || []}
           />
-
           {categories && categories.length !== 0 && (
             <Pagination
               page={currentPage}

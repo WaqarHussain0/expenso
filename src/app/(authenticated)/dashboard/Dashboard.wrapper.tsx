@@ -113,14 +113,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
   return (
     <>
       <Row className="w-full flex-col gap-3">
-        {/* Stats  */}
-        <div className="grid w-full grid-cols-2 gap-2 lg:grid-cols-4">
-          {stats.map(item => (
-            <StatCard key={item.label} stat={item} />
-          ))}
-        </div>
-
-        <div className="grid w-full grid-cols-1 gap-2 lg:grid-cols-2">
+        <div className="grid w-full grid-cols-2 gap-3">
           {/* Quick Actions */}
           <Card className="w-full gap-2 px-4">
             <CardHeader className="p-0">
@@ -153,9 +146,16 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
                 })}
             </div>
           </Card>
+          {/* Stats  */}
 
-          <RecentTransactions transactions={transactions} className="w-full" />
+          <div className="grid w-full grid-cols-2 gap-2">
+            {stats.map(item => (
+              <StatCard key={item.label} stat={item} />
+            ))}
+          </div>
         </div>
+
+        <RecentTransactions transactions={transactions} className="w-full" />
 
         <CategoryDialog
           onClose={handleCloseCategoryDialog}

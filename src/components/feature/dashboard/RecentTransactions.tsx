@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
@@ -35,6 +34,9 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
       },
       {
         label: 'Amount',
+      },
+       {
+        label: 'Date',
       },
       {
         label: 'Notes',
@@ -98,7 +100,9 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
                   {trx?.amount?.toLocaleString()}
                 </TableCell>
 
-                <TableCell className="capitalize">{trx?.note}</TableCell>
+                <TableCell className="capitalize">
+                  {trx?.note || '-'}{' '}
+                </TableCell>
               </TableRow>
             ))
           ) : (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Table,
   TableBody,
@@ -63,12 +64,11 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
         label: 'Amount',
       },
       {
-        label: 'Source',
+        label: 'Category',
       },
       {
         label: 'Date',
       },
-
       {
         label: 'Note',
       },

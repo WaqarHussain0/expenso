@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Table,
   TableBody,
@@ -117,8 +118,8 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
     });
   };
   return (
-    <div className={className}>
-      <Table>
+    <div className={`${className}`}>
+      <Table className="">
         <TableHeader className="bg-slate-100">
           <TableRow>
             {columns.map(column => (
@@ -127,6 +128,7 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
           </TableRow>
         </TableHeader>
 
+      
         <TableBody>
           {categories.length > 0 ? (
             categories.map(category => (
