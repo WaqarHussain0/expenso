@@ -100,6 +100,10 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
                   {trx?.amount?.toLocaleString()}
                 </TableCell>
 
+                  <TableCell className="capitalize">
+                  {trx?.date.toDateString()}
+                </TableCell>
+
                 <TableCell className="capitalize">
                   {trx?.note || '-'}{' '}
                 </TableCell>
