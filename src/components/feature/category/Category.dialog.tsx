@@ -41,6 +41,9 @@ import {
   Laptop,
   CardSim,
   Barcode,
+  Scissors,
+  HandHeart,
+  BriefcaseMedical,
 } from 'lucide-react';
 import {
   createCategoryAction,
@@ -70,6 +73,11 @@ export const CATEGORY_ICONS = [
   { name: 'Briefcase', icon: Briefcase },
   { name: 'TrendingUp', icon: TrendingUp },
   { name: 'Utensils', icon: Utensils },
+  { name: 'Scissors', icon: Scissors },
+  { name: 'HandHeart', icon: HandHeart },
+  { name: 'BriefcaseMedical', icon: BriefcaseMedical },
+
+  
 ];
 
 const COLORS = [

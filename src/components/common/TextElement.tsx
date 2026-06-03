@@ -22,7 +22,7 @@ const defaultClasses: Record<TextVariants, string> = {
   h1: 'poppins text-2xl md:text-3xl font-semibold text-[#0d1117]',
   h2: 'text-3xl font-bold',
   h3: 'poppins text-[#0d1117] text-xl font-bold',
-  h4: ' text-md ',
+  h4: ' inter text-md font-medium ',
   h5: ' text-sm',
   h6: '',
   p: 'text-sm inter text-[#5a6070]',

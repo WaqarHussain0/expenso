@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
         try {
-          const res = await fetch(`${baseUrl}/api/auth/login`, {
+          const res = await fetch(`${baseUrl}api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
-          const res = await fetch(`${baseUrl}/api/auth/google`, {
+          const res = await fetch(`${baseUrl}api/auth/google`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

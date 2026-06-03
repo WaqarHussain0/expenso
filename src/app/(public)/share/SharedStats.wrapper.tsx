@@ -106,7 +106,7 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
   };
 
   return (
-    <Row className="no-scrollbar bg-background w-full flex-col items-start gap-0">
+    <Row className="no-scrollbar bg-background w-full flex-col items-center gap-0">
       {/* ── Hero ── */}
       <div className="border-border flex w-full flex-col items-center border-b bg-[#0d1117] p-4 md:px-6">
         {/* User row */}

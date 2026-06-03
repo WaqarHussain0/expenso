@@ -65,7 +65,7 @@ export class UserService {
       isFirstLogin: true,
     });
 
-    const loginPageLink = `${process.env.NEXTAUTH_URL}/login}`;
+    const loginPageLink = `${process.env.NEXTAUTH_URL}login}`;
 
     // prepare email template
     const html = welcomeEmailTemplate({
@@ -131,7 +131,7 @@ export class UserService {
     // Save new token + expiry (15 minutes)
     await this.saveUserResetToken(user._id, resetToken);
 
-    const resetLink = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.NEXTAUTH_URL}reset-password?token=${resetToken}`;
 
     // prepare email template
     const html = forgotPasswordEmailTemplate({

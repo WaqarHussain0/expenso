@@ -42,7 +42,15 @@ const DATE_FILTER_OPTIONS = [
 
 const YEARS = Array.from({ length: 6 }, (_, i) => now.getFullYear() - i);
 
-const toInputDate = (d: Date) => d.toISOString().split('T')[0];
+// const toInputDate = (d: Date) => d.toISOString().split('T')[0];
+
+const toInputDate = (d: Date) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
 
 // Month filter: first → last day of the selected month
 const getRangeForMonth = (month: number, year: number) => ({
@@ -226,6 +234,7 @@ const Page = () => {
     }
   }, [isDialogOpen, shareUrl, filterOption, startDate, endDate, year]);
 
+
   return (
     <div className="w-full space-y-3">
       {/* Filter */}
@@ -263,7 +272,13 @@ const Page = () => {
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="h-40">
+                    <SelectContent
+                      position="popper"
+                      side="bottom"
+                      align="start"
+                      sideOffset={4}
+                      className='max-h-40'
+                    >
                       {MONTH_NAMES.map((m, i) => (
                         <SelectItem key={m} value={String(i)}>
                           {m}

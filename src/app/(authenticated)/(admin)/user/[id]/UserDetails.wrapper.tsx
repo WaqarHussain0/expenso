@@ -9,8 +9,6 @@ import {
   Banknote,
   BanknoteArrowDown,
   Coins,
-  PlusIcon,
-  Search,
   ShoppingCartIcon,
 } from 'lucide-react';
 import Row from '@/components/common/Row';
@@ -87,14 +85,19 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                 <div key={item.title} className="flex items-center gap-3">
                   <Icon className="text-muted-foreground h-5 w-5" />
                   <div className="flex flex-col">
-                    <p className="text-muted-foreground text-sm">
+                    <TextElement as="p" className="text-[#5a6070]">
                       {item.title}
-                    </p>
-                    <p
+                    </TextElement>
+
+                    <TextElement as="h4"
                       className={`font-medium ${item.title === 'Gender' ? 'capitalize' : ''}`}
                     >
                       {item.value}
-                    </p>
+
+                    </TextElement>
+
+
+                   
                   </div>
                 </div>
               );
@@ -192,11 +195,10 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                             ? 'destructive'
                             : 'default'
                         }
-                        className={`capitalize ${
-                          item.type === CategoryTypeEnum.INVESTMENT
-                            ? 'bg-yellow-100 text-yellow-500'
-                            : ''
-                        }`}
+                        className={`capitalize ${item.type === CategoryTypeEnum.INVESTMENT
+                          ? 'bg-yellow-100 text-yellow-500'
+                          : ''
+                          }`}
                       >
                         {item?.type}
                       </Badge>
