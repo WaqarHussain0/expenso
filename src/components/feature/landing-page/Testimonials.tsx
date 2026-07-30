@@ -1,4 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
+import Reveal from '@/components/common/Reveal';
+
 const testimonials = [
   {
     name: 'Bilal Chaudhry',
@@ -129,7 +131,7 @@ export default function Testimonials() {
 
       <div className="testi-section">
         {/* Section header */}
-        <div className="mb-8 text-center">
+        <Reveal className="mb-8 text-center">
           <div
             className="gap-2 rounded-full uppercase"
             style={{
@@ -184,119 +186,120 @@ export default function Testimonials() {
             From engineers to executives — here's what real users say about
             finally feeling in control of their money.
           </p>
-        </div>
+        </Reveal>
 
         {/* Cards */}
         <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-3">
           {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className={`testi-card flex flex-col gap-0 rounded-2xl bg-white p-4 md:p-7 testi-card-${i === 0 ? 'green' : i === 1 ? 'amber' : 'purple'}`}
-            >
-              {/* Quote icon */}
-              <div className="mb-4">
-                <QuoteIcon color={t.accentText} />
-              </div>
-
-              {/* Tag */}
+            <Reveal key={i} delay={i * 100}>
               <div
-                className=""
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  background: t.tagBg,
-                  border: `1px solid ${t.tagBorder}`,
-                  color: t.accentText,
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  padding: '3px 10px',
-                  borderRadius: '100px',
-                  marginBottom: '14px',
-                  width: 'fit-content',
-                }}
+                className={`testi-card flex flex-col gap-0 rounded-2xl bg-white p-4 md:p-7 testi-card-${i === 0 ? 'green' : i === 1 ? 'amber' : 'purple'}`}
               >
-                {t.tag}
-              </div>
+                {/* Quote icon */}
+                <div className="mb-4">
+                  <QuoteIcon color={t.accentText} />
+                </div>
 
-              {/* Stars */}
-              <div className="mb-2 flex items-center gap-1">
-                {Array.from({ length: t.stars }).map((_, s) => (
-                  <StarIcon key={s} />
-                ))}
-              </div>
-
-              {/* Feedback */}
-              <p
-                style={{
-                  fontSize: '14px',
-                  color: '#374151',
-                  lineHeight: 1.7,
-                  fontWeight: 300,
-                  flex: 1,
-                  margin: 0,
-                }}
-              >
-                "{t.feedback}"
-              </p>
-
-              {/* Highlight */}
-              <div
-                className="highlight-pill"
-                style={{
-                  background: t.accentBg,
-                  color: t.accentText,
-                  borderColor: t.tagBorder,
-                }}
-              >
-                {t.highlight}
-              </div>
-
-              {/* Divider */}
-              <div
-                className="my-4 h-px"
-                style={{
-                  background: 'rgba(0,0,0,0.06)',
-                }}
-              />
-
-              {/* Author */}
-              <div className="flex items-center gap-2">
+                {/* Tag */}
                 <div
-                  className="flex size-10 items-center justify-center rounded-full"
+                  className=""
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    background: t.tagBg,
+                    border: `1px solid ${t.tagBorder}`,
+                    color: t.accentText,
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    padding: '3px 10px',
+                    borderRadius: '100px',
+                    marginBottom: '14px',
+                    width: 'fit-content',
+                  }}
+                >
+                  {t.tag}
+                </div>
+
+                {/* Stars */}
+                <div className="mb-2 flex items-center gap-1">
+                  {Array.from({ length: t.stars }).map((_, s) => (
+                    <StarIcon key={s} />
+                  ))}
+                </div>
+
+                {/* Feedback */}
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: '#374151',
+                    lineHeight: 1.7,
+                    fontWeight: 300,
+                    flex: 1,
+                    margin: 0,
+                  }}
+                >
+                  "{t.feedback}"
+                </p>
+
+                {/* Highlight */}
+                <div
+                  className="highlight-pill"
                   style={{
                     background: t.accentBg,
                     color: t.accentText,
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    flexShrink: 0,
-                    border: `1.5px solid ${t.tagBorder}`,
+                    borderColor: t.tagBorder,
                   }}
                 >
-                  {t.initials}
+                  {t.highlight}
                 </div>
-                <div>
+
+                {/* Divider */}
+                <div
+                  className="my-4 h-px"
+                  style={{
+                    background: 'rgba(0,0,0,0.06)',
+                  }}
+                />
+
+                {/* Author */}
+                <div className="flex items-center gap-2">
                   <div
+                    className="flex size-10 items-center justify-center rounded-full"
                     style={{
-                      fontSize: '14px',
-                      fontWeight: 500,
-                      color: '#0d1117',
-                      lineHeight: 1.3,
+                      background: t.accentBg,
+                      color: t.accentText,
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      flexShrink: 0,
+                      border: `1.5px solid ${t.tagBorder}`,
                     }}
                   >
-                    {t.name}
+                    {t.initials}
                   </div>
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      color: '#9ba3af',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {t.profession}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        color: '#0d1117',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {t.name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#9ba3af',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {t.profession}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
 

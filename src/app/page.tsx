@@ -1,4 +1,3 @@
-import Nav from '@/components/feature/landing-page/Nav';
 import Header from '@/components/feature/landing-page/Header';
 import Feature from '@/components/feature/landing-page/Features';
 import HowItWork from '@/components/feature/landing-page/HowItWork';
@@ -8,6 +7,7 @@ import Footer from '@/components/feature/landing-page/Footer';
 import Row from '@/components/common/Row';
 import Pricing from '@/components/feature/landing-page/Pricing';
 import ShareableStats from '@/components/feature/landing-page/ShareableStats';
+import AssistantShowcase from '@/components/feature/landing-page/AssistantShowcase';
 import { getServerSideSession } from '@/lib/next-auth.util';
 import FeatureRequestSection from '@/components/feature/landing-page/FeatureRequest';
 import Testimonials from '@/components/feature/landing-page/Testimonials';
@@ -18,12 +18,12 @@ const Page = async () => {
 
   return (
     <Row className="no-scrollbar w-full flex-col overflow-x-hidden overflow-y-auto">
-      <Nav className=""  />
-      <Header className=""  user={user}/>
+      <Header className="" user={user} />
       <Stats className="" />
 
       <Feature className="" />
       <ShareableStats className="" />
+      <AssistantShowcase className="" />
 
       <HowItWork className="" />
       <FeatureRequestSection />

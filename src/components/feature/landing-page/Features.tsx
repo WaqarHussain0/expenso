@@ -1,4 +1,5 @@
 import Row from '@/components/common/Row';
+import Reveal from '@/components/common/Reveal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, ChartArea, Lock, Tags, Target, Zap } from 'lucide-react';
 
@@ -53,54 +54,57 @@ const Feature: React.FC<IFeatureProps> = ({ className = '' }) => {
       className={`flex w-full flex-col items-center justify-between gap-3 p-4 lg:flex-row lg:p-8 ${className}`}
       id="features"
     >
-      <Row className="w-full flex-col lg:w-[30%] lg:items-start">
-        <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
-          Features
-        </div>
+      <Reveal className="w-full lg:w-[30%]">
+        <Row className="w-full flex-col lg:items-start">
+          <div className="text-[12px] font-medium tracking-widest text-[#1a7f5a] uppercase">
+            Features
+          </div>
 
-        {/* Heading */}
-        <h2
-          className="mb-5 text-[clamp(28px,5vw,52px)] leading-[1.1] font-bold"
-          style={{ fontFamily: 'Georgia, serif' }}
-        >
-          Everything you need to
-          <br />
-          <em className="text-[#2ea878]" style={{ fontStyle: 'italic' }}>
-            understand your money
-          </em>
-        </h2>
+          {/* Heading */}
+          <h2
+            className="mb-5 text-[clamp(28px,5vw,52px)] leading-[1.1] font-bold"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            Everything you need to
+            <br />
+            <em className="text-gradient-green" style={{ fontStyle: 'italic' }}>
+              understand your money
+            </em>
+          </h2>
 
-        <p className="text-center text-[14px] font-extralight text-[#5a6070] md:text-start md:text-[16px]">
-          No double-entry bookkeeping. No "debits and credits." Just: money came
-          in, money went out, here's what's left.
-        </p>
-      </Row>
+          <p className="text-center text-[14px] font-extralight text-[#5a6070] md:text-start md:text-[16px]">
+            No double-entry bookkeeping. No "debits and credits." Just: money
+            came in, money went out, here's what's left.
+          </p>
+        </Row>
+      </Reveal>
 
       <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-3 lg:w-[60%]">
         {allFeatures.map((item, index) => {
           const Icon = item.icon;
           return (
-            <Card
-              className={`px-2 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
-              key={item.title}
-            >
-              <CardHeader>
-                <CardTitle
-                  className={`flex items-center ${index === 0 ? 'text-white' : 'text-[#0d1117]'}`}
-                >
-                  <div className="mr-2 flex size-9 items-center justify-center rounded-md bg-white shadow md:size-10 md:rounded-lg">
-                    <Icon className="shrink-no size-4 text-[#1a7f5a] md:size-5" />
-                  </div>
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent
-                className={` ${index === 0 ? 'text-[#dededf]' : 'text-[#5a6070]'}`}
+            <Reveal key={item.title} delay={index * 60}>
+              <Card
+                className={`px-2 py-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${index === 0 ? 'bg-[#0d1117]' : 'bg-[#f7f8fa]'}`}
               >
-                {item.description}
-              </CardContent>
-            </Card>
+                <CardHeader>
+                  <CardTitle
+                    className={`flex items-center ${index === 0 ? 'text-white' : 'text-[#0d1117]'}`}
+                  >
+                    <div className="mr-2 flex size-9 items-center justify-center rounded-md bg-white shadow md:size-10 md:rounded-lg">
+                      <Icon className="shrink-no size-4 text-[#1a7f5a] md:size-5" />
+                    </div>
+                    {item.title}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent
+                  className={` ${index === 0 ? 'text-[#dededf]' : 'text-[#5a6070]'}`}
+                >
+                  {item.description}
+                </CardContent>
+              </Card>
+            </Reveal>
           );
         })}
       </div>

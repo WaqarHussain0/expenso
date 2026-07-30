@@ -2,6 +2,8 @@
 'use client';
 
 import Row from '@/components/common/Row';
+import Reveal from '@/components/common/Reveal';
+import AuroraGlow from '@/components/feature/landing-page/AuroraGlow';
 import { Lightbulb } from 'lucide-react';
 
 const MailIcon = () => (
@@ -94,49 +96,48 @@ export default function FeatureRequestSection() {
         {/* Grid texture */}
         <div className="fr-grid-bg pointer-events-none absolute inset-0" />
 
-        {/* Glow orb */}
-        <div
-          className="pointer-events-none absolute -top-40 left-1/2 h-[400px] w-[600px] -translate-x-1/2"
-          style={{
-            background:
-              'radial-gradient(ellipse, rgba(74,222,128,.07) 0%, transparent 70%)',
-          }}
-        />
+        {/* Glow orbs */}
+        <AuroraGlow />
 
         {/* Inner container — full width up to max-w-5xl */}
         <div className="relative z-10 w-full">
-          <Row className="mb-4 w-full flex-col">
-            {/* Label */}
-            <div className="mb-5 inline-flex items-center gap-2">
-              <span
-                className="animate-pulse-dot h-1.5 w-1.5 rounded-full bg-green-400"
-                style={{ boxShadow: '0 0 8px #4ade80' }}
-              />
-              <span className="text-xs font-semibold tracking-widest text-green-400 uppercase">
-                Feature Requests
-              </span>
-            </div>
+          <Reveal>
+            <Row className="mb-4 w-full flex-col">
+              {/* Label */}
+              <div className="mb-5 inline-flex items-center gap-2">
+                <span
+                  className="animate-pulse-dot h-1.5 w-1.5 rounded-full bg-green-400"
+                  style={{ boxShadow: '0 0 8px #4ade80' }}
+                />
+                <span className="text-xs font-semibold tracking-widest text-green-400 uppercase">
+                  Feature Requests
+                </span>
+              </div>
 
-            {/* Heading */}
-            <h2
-              className="mb-5 text-center text-[clamp(32px,5vw,52px)] leading-[1.1] font-bold text-[#f4f4f4]"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
-              Have an idea that could make
-              <br />
-              Expenso{' '}
-              <em className="text-[#2ea878]" style={{ fontStyle: 'italic' }}>
-                even better?
-              </em>
-            </h2>
+              {/* Heading */}
+              <h2
+                className="mb-5 text-center text-[clamp(32px,5vw,52px)] leading-[1.1] font-bold text-[#f4f4f4]"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                Have an idea that could make
+                <br />
+                Expenso{' '}
+                <em
+                  className="text-gradient-green"
+                  style={{ fontStyle: 'italic' }}
+                >
+                  even better?
+                </em>
+              </h2>
 
-            {/* Subtext */}
-            <p className="inter max-w-[660px] text-center text-[14px] leading-relaxed text-[#888]">
-              Expenso is built around real user needs. If a feature you want
-              could benefit everyone, there&apos;s a good chance it&apos;ll make
-              it into the app. Reach out — good ideas are always welcome.
-            </p>
-          </Row>
+              {/* Subtext */}
+              <p className="inter max-w-[660px] text-center text-[14px] leading-relaxed text-[#888]">
+                Expenso is built around real user needs. If a feature you want
+                could benefit everyone, there&apos;s a good chance it&apos;ll
+                make it into the app. Reach out — good ideas are always welcome.
+              </p>
+            </Row>
+          </Reveal>
 
           {/* Cards grid */}
           <div className="grid w-full grid-cols-1 items-start gap-6">
