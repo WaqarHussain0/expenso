@@ -14,6 +14,7 @@ const PAGE_ROUTES = {
   stats: '/stats',
   category: '/category',
   transaction: '/transaction',
+  assistant: '/assistant',
 
   preferences: '/preferences',
 

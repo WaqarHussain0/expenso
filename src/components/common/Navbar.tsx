@@ -9,6 +9,7 @@ import {
   List,
   LogOut,
   Settings,
+  Sparkles,
   Tags,
   Users,
 } from 'lucide-react';
@@ -75,6 +76,13 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
       title: 'Transaction',
       icon: List,
       linkTo: PAGE_ROUTES.transaction,
+      show: true,
+    },
+
+    {
+      title: 'Assistant',
+      icon: Sparkles,
+      linkTo: PAGE_ROUTES.assistant,
       show: true,
     },
 
