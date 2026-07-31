@@ -33,7 +33,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const transactionPayload = {
     page: Number(page),
-    limit: 5,
+    limit: 6,
     search: search,
     categoryType: normalizedType,
     userId: user.id,

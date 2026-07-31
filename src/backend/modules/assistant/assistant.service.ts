@@ -9,7 +9,7 @@ const REFUSAL_MESSAGE =
   "I can only answer questions about your existing financial data. I can't make changes, additions, or deletions.";
 
 const RATE_LIMIT_MESSAGE =
-  "The assistant is getting a lot of requests right now. Please try again in a minute.";
+  'The assistant is getting a lot of requests right now. Please try again in a minute.';
 
 export class AssistantService {
   async ask(userId: string, question: string): Promise<string> {

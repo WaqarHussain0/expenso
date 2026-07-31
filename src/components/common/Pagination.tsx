@@ -31,7 +31,7 @@ const Pagination = ({
 
   return (
     <Row
-      className={`w-full flex-col justify-between gap-2 bg-slate-200 px-[20px] py-[6px] md:flex-row md:gap-0 ${className}`}
+      className={`w-full flex-col justify-between gap-1 bg-slate-200 px-[20px] py-[6px] md:flex-row md:gap-0 ${className}`}
     >
       <Row className="gap-2">
         <TextElement as="p" className="">

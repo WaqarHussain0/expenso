@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { CategoryTypeEnum } from '@/types/category.type';
 import Skeleton from 'react-loading-skeleton';
+import { formatCompactAmount } from '@/lib/utils';
 
 interface ITransactionsProps {
   transactions: any[];
@@ -75,7 +76,7 @@ const Transactions: React.FC<ITransactionsProps> = ({
                           : 'text-red-500'
                     }`}
                   >
-                    {item?.amount?.toLocaleString()}
+                    {item?.amount != null ? formatCompactAmount(item.amount) : ''}
                   </TextElement>
                 </CardTitle>
                 <CardDescription>

@@ -144,7 +144,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
             iconClassName: 'text-blue-400',
           },
         ]}
-        className="grid-cols-1 gap-2 lg:grid-cols-3"
+        className="grid-cols-2 gap-2 lg:grid-cols-3"
       />
 
       <Card>
@@ -208,7 +208,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
 
       <Card className="p-0">
         <CardContent className="p-0">
-          <UserTable className="h-[40vh] overflow-y-auto" users={users || []} />
+          <UserTable className="h-[43vh] overflow-y-auto" users={users || []} />
 
           {users && users?.length !== 0 && (
             <Pagination

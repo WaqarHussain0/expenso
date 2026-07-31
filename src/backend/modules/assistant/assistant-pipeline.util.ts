@@ -38,6 +38,80 @@ const DANGEROUS_KEYS = new Set([
 const MAX_STAGES = 10;
 const MAX_LIMIT = 200;
 
+// The model can only express date bounds as JSON — either a bare ISO string
+// (e.g. "2026-06-01") or, more often in practice, MongoDB Extended JSON's
+// canonical form (e.g. {"$date": "2026-06-01T00:00:00.000Z"}). `.aggregate()`
+// never auto-casts either of these against the BSON `Date` fields in the
+// "transactions" collection the way Mongoose's `find()` does — and since this
+// pipeline came from `JSON.parse`, not an EJSON parser, the `{"$date": ...}`
+// form isn't understood by the driver either; it's just a plain subdocument
+// that can never match a real Date. Left alone, every date-range question
+// would silently match zero documents. This walks the sanitized pipeline and
+// turns both forms into real `Date` instances before it reaches
+// `TransactionEntity.aggregate()`.
+const ISO_DATE_PATTERN =
+  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+function extendedJsonToDate(value: Record<string, unknown>): Date | null {
+  const raw = value.$date;
+
+  if (typeof raw === 'string') {
+    const date = new Date(raw);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  if (typeof raw === 'number') {
+    return new Date(raw);
+  }
+
+  if (raw && typeof raw === 'object' && '$numberLong' in raw) {
+    const ms = Number((raw as Record<string, unknown>).$numberLong);
+    return Number.isNaN(ms) ? null : new Date(ms);
+  }
+
+  return null;
+}
+
+// Only plain object/array literals — the shapes `JSON.parse` can actually
+// produce — get walked and rebuilt. Anything else (the `ObjectId` this
+// module injects for `userId`, or any other class instance) is returned
+// untouched, so rebuilding a plain-object clone of it doesn't strip its BSON
+// type and silently break the match.
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+function coerceDateStrings(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(coerceDateStrings);
+
+  if (value instanceof Date) return value;
+
+  if (isPlainObject(value)) {
+    const keys = Object.keys(value);
+
+    if (keys.length === 1 && keys[0] === '$date') {
+      const date = extendedJsonToDate(value);
+      if (date) return date;
+    }
+
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nested]) => [
+        key,
+        coerceDateStrings(nested),
+      ]),
+    );
+  }
+
+  if (typeof value === 'string' && ISO_DATE_PATTERN.test(value)) {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+
+  return value;
+}
+
 /**
  * Validates and sanitizes a MongoDB aggregation pipeline produced by the model
  * before it is allowed anywhere near `TransactionEntity.aggregate()`. Throws on
@@ -76,7 +150,7 @@ export function sanitizePipeline(
     firstStage.$match = { ...firstStage.$match, userId: userObjectId };
   }
 
-  return sanitized as unknown as mongoose.PipelineStage[];
+  return sanitized.map(coerceDateStrings) as unknown as mongoose.PipelineStage[];
 }
 
 function sanitizeStage(stage: unknown): Record<string, any> {

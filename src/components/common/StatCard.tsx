@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardTitle } from '../ui/card';
 import Skeleton from 'react-loading-skeleton';
+import { formatCompactAmount } from '@/lib/utils';
 
 interface IStatCardProps {
   isLoading?: boolean;
@@ -44,7 +45,7 @@ const StatCard: React.FC<IStatCardProps> = ({ isLoading = false, stat }) => {
                 {safePercent.toFixed(0)}%
               </span>
               <span className="manropeBold text-sm font-semibold">
-                {stat.value.toLocaleString()}
+                {formatCompactAmount(stat.value)}
               </span>
             </div>
           </div>

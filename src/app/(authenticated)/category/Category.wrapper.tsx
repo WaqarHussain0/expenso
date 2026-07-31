@@ -166,7 +166,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
             iconClassName: 'text-[#FF9800]',
           },
         ]}
-        className="grid-cols-2 gap-2 lg:grid-cols-3"
+        className="grid grid-cols-2 gap-2 lg:grid-cols-3"
       />
 
       <Card>
@@ -229,7 +229,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       <Card className="w-full p-0">
         <CardContent className="p-0">
           <CategoryTable
-            className="no-scrollbar h-[40vh] overflow-y-auto"
+            className="no-scrollbar h-[43vh] overflow-y-auto flex flex-column items-center"
             categories={categories || []}
           />
           {categories && categories.length !== 0 && (

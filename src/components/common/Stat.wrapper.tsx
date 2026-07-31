@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import Row from './Row';
 import Skeleton from 'react-loading-skeleton';
+import { formatCompactAmount } from '@/lib/utils';
 
 interface IStatWrapperProps {
   stats: {
@@ -56,7 +57,7 @@ const StatWrapper: React.FC<IStatWrapperProps> = ({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="manropeBold text-lg text-gray-900 capitalize md:text-2xl">
-                        {item.value?.toLocaleString()}
+                        {item.value != null ? formatCompactAmount(item.value) : ''}
                       </span>
                     </div>
                   </div>

@@ -11,7 +11,7 @@ import TransactionDialog from '@/components/feature/transaction/Transaction.dial
 import TransactionTable from '@/components/feature/transaction/Transaction.table';
 import { CategorySelect } from '@/components/select/Category.select';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -204,7 +204,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
             iconClassName: 'text-[#2196F3]',
           },
         ]}
-        className="grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4"
+        className="lg:grid-cols-4 grid grid-cols-2 gap-2"
       />
 
       <Card>
@@ -278,7 +278,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
       <Card className="p-0">
         <CardContent className="p-0">
           <TransactionTable
-            className="no-scrollbar h-[40vh] overflow-y-auto"
+            className="no-scrollbar h-[43vh] overflow-y-auto"
             transactions={transactions || []}
           />
 

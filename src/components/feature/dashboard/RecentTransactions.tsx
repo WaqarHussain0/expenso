@@ -17,6 +17,7 @@ import { ITransaction } from '@/types/transaction.type';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { CATEGORY_ICONS } from '../category/Category.dialog';
+import { formatCompactAmount } from '@/lib/utils';
 
 interface IRecentTransactionsProps {
   className?: string;
@@ -97,7 +98,7 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
                 </TableCell>
 
                 <TableCell className="capitalize">
-                  {trx?.amount?.toLocaleString()}
+                  {trx?.amount != null ? formatCompactAmount(trx.amount) : '-'}
                 </TableCell>
 
                   <TableCell className="capitalize">

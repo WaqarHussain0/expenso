@@ -16,7 +16,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -41,11 +41,6 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [toggleMenu, setToggleMenu] = useState(false);
-  const navbarRef = useRef<HTMLDivElement>(null);
-
-  const handleToggleMenu = () => setToggleMenu(prev => !prev);
 
   const { data: session } = useSession();
   const user = session?.user;
@@ -107,56 +102,19 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
     router.push(PAGE_ROUTES.login);
   };
 
-  // ✅ Close menu on outside click (mobile UX)
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        navbarRef.current &&
-        !navbarRef.current.contains(event.target as Node)
-      ) {
-        setToggleMenu(false);
-      }
-    };
-
-    if (toggleMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [toggleMenu]);
-
   const initials = user?.name
     ?.split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase();
 
+  const visibleNavItems = navItems.filter(item => item.show);
+
   return (
     <>
-      {/* Mobile Toggle Button (does NOT change styling of sidebar) */}
-
-      {!toggleMenu && (
-        <div className="text-primary-foreground cursor-pointerss fixed top-4 left-4 z-50 flex w-[8%] items-center justify-center rounded-sm border border-[#1a7f5a] bg-white shadow-sm lg:hidden">
-          {/* <Menu  className="textPrimary size-4" /> */}
-
-          <div onClick={handleToggleMenu} className="relative size-8">
-            <Image
-              src={'/icon.png'}
-              alt={`Logo`}
-              fill
-              className="object-contain"
-              priority
-              fetchPriority="high"
-            />
-          </div>
-        </div>
-      )}
-
+      {/* Desktop Sidebar */}
       <div
-        ref={navbarRef}
-        className={`bg-[#0d1117] text-white ${className} fixed top-0 left-0 z-40 flex h-full flex-col justify-between transition-transform duration-300 lg:static ${toggleMenu ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+        className={`hidden bg-[#0d1117] text-white ${className} h-full flex-col justify-between lg:flex`}
       >
         <Row className="w-full flex-col items-start gap-4">
           <div className="flex w-full items-center gap-3 border-b border-[#e6f5ef] p-2">
@@ -173,26 +131,23 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
           </div>
 
           <Row className={`gap- w-full flex-col`}>
-            {navItems
-              .filter(item => item.show)
-              .map(item => {
-                const isActive = pathname === item.linkTo;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                      isActive ? 'bg-[#FFFFFF1A]' : 'hover:bg-[#FFFFFF1A]'
-                    }`}
-                    key={item.title}
-                    href={item.linkTo}
-                    onClick={handleToggleMenu}
-                  >
-                    <Icon className="size-5" />
+            {visibleNavItems.map(item => {
+              const isActive = pathname === item.linkTo;
+              const Icon = item.icon;
+              return (
+                <Link
+                  className={`poppins flex w-full items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                    isActive ? 'bg-[#FFFFFF1A]' : 'hover:bg-[#FFFFFF1A]'
+                  }`}
+                  key={item.title}
+                  href={item.linkTo}
+                >
+                  <Icon className="size-5" />
 
-                    <TextElement as="h4">{item.title}</TextElement>
-                  </Link>
-                );
-              })}
+                  <TextElement as="h4">{item.title}</TextElement>
+                </Link>
+              );
+            })}
           </Row>
         </Row>
 
@@ -218,32 +173,51 @@ const Navbar: React.FC<INavbar> = ({ className }) => {
             <span className="poppins">Logout</span>
           </button>
         </div>
-
-        {/* Logout Modal */}
-        <AlertDialog
-          open={isDeleteModalOpen}
-          onOpenChange={setIsDeleteModalOpen}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className="capitalize">Logout</AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogDescription>
-              Are you sure you want to logout?
-            </AlertDialogDescription>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="">Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="!bg-destructive"
-                onClick={handleLogout}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Logging out...' : 'Logout'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-[#1f2937] bg-[#0d1117] px-1 pt-2 pb-[calc(--spacing(2)+env(safe-area-inset-bottom))] lg:hidden">
+        {visibleNavItems.map(item => {
+          const isActive = pathname === item.linkTo;
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.title}
+              href={item.linkTo}
+              className={`flex flex-1 flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-white transition-colors ${
+                isActive ? 'text-[#2fbf83]' : 'text-white/50'
+              }`}
+            >
+              <Icon
+                className="size-6"
+                strokeWidth={isActive ? 2.5 : 2}
+              />
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Logout Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="capitalize">Logout</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            Are you sure you want to logout?
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="!bg-destructive"
+              onClick={handleLogout}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging out...' : 'Logout'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -36,6 +36,7 @@ import TransactionDialog from './Transaction.dialog';
 import { Badge } from '@/components/ui/badge';
 import { CATEGORY_ICONS } from '../category/Category.dialog';
 import { deleteTransactionAction } from '@/lib/server-actions/transaction.server-action';
+import { formatCompactAmount } from '@/lib/utils';
 
 interface ITransactionTableProps {
   transactions: ITransaction[];
@@ -140,7 +141,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
             transactions.map(trx => (
               <TableRow key={trx._id}>
                 <TableCell className="capitalize">
-                  {trx?.amount?.toLocaleString()}
+                  {trx?.amount != null ? formatCompactAmount(trx.amount) : '-'}
                 </TableCell>
                 <TableCell className="capitalize">
                   <Badge

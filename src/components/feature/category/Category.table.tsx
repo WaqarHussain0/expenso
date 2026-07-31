@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Card, CardContent } from '@/components/ui/card';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 
 import { toast } from 'sonner';
 
@@ -58,22 +51,6 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
     [],
   );
 
-  const columns = useMemo(
-    () => [
-      {
-        label: 'Name',
-      },
-      {
-        label: 'Type',
-      },
-
-      {
-        label: 'Actions',
-      },
-    ],
-    [],
-  );
-
   const getActions = (category: ICategory) => {
     return [
       {
@@ -119,23 +96,14 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
   };
   return (
     <div className={`${className}`}>
-      <Table className="">
-        <TableHeader className="bg-slate-100">
-          <TableRow>
-            {columns.map(column => (
-              <TableHead key={column.label}>{column.label}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-
-      
-        <TableBody>
-          {categories.length > 0 ? (
-            categories.map(category => (
-              <TableRow key={category.name} className="">
-                <TableCell className="flex items-center gap-1 capitalize">
+      {categories.length > 0 ? (
+        <div className="w-full grid grid-cols-2 gap-3 p-3 lg:grid-cols-3 h-fit">
+          {categories.map(category => (
+            <Card key={category._id} className="gap-0 py-3 ">
+              <CardContent className="flex items-center justify-between gap-2 px-3">
+                <div className=" flex items-center gap-2 capitalize">
                   <div
-                    className="flex size-8 items-center justify-center rounded-full"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full"
                     style={{
                       backgroundColor: category.color + '1A', // 1A is ~10% opacity in hex
                     }}
@@ -155,62 +123,60 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
                         );
                       })()}
                   </div>
-                  {category?.name}
-                </TableCell>
-                <TableCell className="capitalize">
-                  <Badge
-                    variant={
-                      category.type === CategoryTypeEnum.EXPENSE
-                        ? 'destructive'
-                        : 'default'
-                    }
-                    className={
-                      category.type === CategoryTypeEnum.INVESTMENT
-                        ? 'bg-yellow-100 text-yellow-500'
-                        : ''
-                    }
-                  >
-                    {category?.type}
-                  </Badge>
-                </TableCell>
 
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {getActions(category)
-                        ?.filter(action => action.show)
-                        .map(action => (
-                          <div key={action.label}>
-                            <DropdownMenuItem onClick={action.onClick}>
-                              {action.icon && (
-                                <action.icon className="mr-2 size-4" />
-                              )}
-                              {action.label}
-                            </DropdownMenuItem>
-                            {action.separatorAfter && <DropdownMenuSeparator />}
-                          </div>
-                        ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                <TextElement as="p" className="text-center">
-                  No results.
-                </TextElement>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                  <div className="flex flex-col gap-1">
+                    <TextElement as="h4">{category?.name}</TextElement>
+
+                    <Badge
+                      variant={
+                        category.type === CategoryTypeEnum.EXPENSE
+                          ? 'destructive'
+                          : 'default'
+                      }
+                      className={
+                        category.type === CategoryTypeEnum.INVESTMENT
+                          ? 'bg-yellow-100 text-yellow-500'
+                          : ''
+                      }
+                    >
+                      {category?.type}
+                    </Badge>
+                  </div>
+                </div>
+
+                <DropdownMenu >
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {getActions(category)
+                      ?.filter(action => action.show)
+                      .map(action => (
+                        <div key={action.label}>
+                          <DropdownMenuItem onClick={action.onClick}>
+                            {action.icon && (
+                              <action.icon className="mr-2 size-4" />
+                            )}
+                            {action.label}
+                          </DropdownMenuItem>
+                          {action.separatorAfter && <DropdownMenuSeparator />}
+                        </div>
+                      ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="flex h-24 items-center justify-center">
+          <TextElement as="p" className="text-center">
+            No results.
+          </TextElement>
+        </div>
+      )}
 
       {isEditModalOpen && (
         <CategoryDialog
