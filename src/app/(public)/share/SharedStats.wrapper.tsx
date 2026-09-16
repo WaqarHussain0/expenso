@@ -3,6 +3,7 @@
 
 'use client';
 import Row from '@/components/common/Row';
+import TextElement from '@/components/common/TextElement';
 import CTA from '@/components/feature/landing-page/CTA';
 import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
 import MonthStatsWrapper from '@/components/feature/stats/MonthStats.wrapper';
@@ -87,6 +88,8 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
             isLoading={false}
             monthlySeries={response?.monthlySeries}
             expenseBreakdown={response?.expenseBreakdown}
+            incomeBreakdown={response?.incomeBreakdown}
+            investmentBreakdown={response?.investmentBreakdown}
             totals={totals}
           />
         );
@@ -110,14 +113,16 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
       {/* ── Hero ── */}
       <div className="border-border flex w-full flex-col items-center border-b bg-[#0d1117] p-4 md:px-6">
         {/* User row */}
-        <div className="mb-2 flex items-center gap-2.5 text-[#2ea878]">
+        <div className="mb-2 flex items-center gap-2.5">
           <div className="poppins flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-sm font-medium text-emerald-700">
-            {initials(userName)}
+            <TextElement as="h4" className="text-[#2ea878]">
+              {initials(userName)}
+            </TextElement>
           </div>
 
-          <h1 className="poppins text-xl leading-snug font-medium">
+          <TextElement as="h3" className="text-[#2ea878]">
             {userName}'s financial snapshot
-          </h1>
+          </TextElement>
         </div>
 
         <Row className="inter flex-wrap justify-center gap-2">
@@ -125,13 +130,17 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
 
           <Badge variant={'outline'} className="py-4 text-[#FFFFFFB3]">
             <Icon className="size-3" />
-            {label} · Shared with you
+            <TextElement className="!text-[#FFFFFFB3]">
+              {label} · Shared with you
+            </TextElement>
           </Badge>
 
           {/* Date range */}
           <Badge variant={'outline'} className="py-4 text-[#FFFFFFB3]">
             <CalendarDays className="size-3" />
             {dateLabel}
+
+            <TextElement className="!text-[#FFFFFFB3]">{dateLabel}</TextElement>
           </Badge>
         </Row>
       </div>

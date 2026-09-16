@@ -41,6 +41,8 @@ import {
   deleteUserAction,
   toggleUserStatusAction,
 } from '@/lib/server-actions/user.server-action';
+import Row from '@/components/common/Row';
+import { Badge } from '@/components/ui/badge';
 
 interface IUserTableProps {
   users: IUser[];
@@ -59,7 +61,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
   const columns = useMemo(
     () => [
       {
-        label: 'Name',
+        label: 'User',
       },
 
       {
@@ -68,9 +70,6 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
 
       {
         label: 'Contact ',
-      },
-      {
-        label: 'Email',
       },
 
       {
@@ -163,12 +162,21 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className }) => {
                 onClick={() => handleViewClick(user.id)}
                 className="cursor-pointer"
               >
-                <TableCell className="capitalize">{user.name}</TableCell>
+                <TableCell className="">
+                  <Row className="flex-col items-start">
+                    <TextElement as="h4">{user.name}</TextElement>
+
+                    <Row>
+                      <TextElement>
+                        <Badge variant={'outline'}>{user.email || '-'}</Badge>
+                      </TextElement>
+                    </Row>
+                  </Row>
+                </TableCell>
                 <TableCell className="capitalize">
                   {user.profile?.gender || '-'}
                 </TableCell>
                 <TableCell>{user.profile?.contact || '-'}</TableCell>
-                <TableCell>{user.email || '-'}</TableCell>
                 <TableCell className="">
                   <Switch
                     checked={user.isActive}

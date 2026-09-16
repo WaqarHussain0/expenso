@@ -29,8 +29,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Copy } from 'lucide-react';
+import { Copy, Send } from 'lucide-react';
 import { getStatsLinkAction } from '@/lib/server-actions/user.server-action';
+import TextElement from '@/components/common/TextElement';
+import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 
 const now = new Date();
 
@@ -176,7 +179,9 @@ const Page = () => {
             isLoading={yearDataFetching}
             monthlySeries={yearData?.response?.monthlySeries}
             expenseBreakdown={yearData?.response?.expenseBreakdown}
-            totals={yearData?.response?.totals}
+            incomeBreakdown={yearData?.response?.incomeBreakdown}
+            investmentBreakdown={yearData?.response?.investmentBreakdown}
+            totals={totals}
           />
         );
 
@@ -234,131 +239,156 @@ const Page = () => {
     }
   }, [isDialogOpen, shareUrl, filterOption, startDate, endDate, year]);
 
-
   return (
     <div className="w-full space-y-3">
+      <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
+        <Row className="flex-col items-start">
+          <TextElement as="h3" className="">
+            Stats
+          </TextElement>
+          <TextElement as="p" className="text-[#5a6070]">
+            View and share your stats with others from here
+          </TextElement>
+        </Row>
+      </Row>
+
+      <CustomBreadcrumb
+        items={[
+          { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
+          { label: 'Stats' },
+        ]}
+      />
       {/* Filter */}
       <Card>
-        <CardContent className="flex flex-col gap-6">
+        <CardContent className="flex flex-wrap items-end gap-2">
           {/* Filter type selector — always visible */}
 
           <div className="space-y-2">
             <Label>Filter By</Label>
-            <div className="flex gap-2">
-              {DATE_FILTER_OPTIONS.map(f => (
-                <Button
-                  key={f}
-                  type="button"
-                  variant={filterOption === f ? 'default' : 'outline'}
-                  onClick={() => setFilterOption(f)}
-                  className="px-4 capitalize"
+
+            <Select
+              value={filterOption}
+              onValueChange={value =>
+                setFilterOption(value as FilterOptionEnum)
+              }
+            >
+              <SelectTrigger className="w-24 capitalize">
+                <SelectValue placeholder="Select filter" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {DATE_FILTER_OPTIONS.map(option => (
+                  <SelectItem
+                    key={option}
+                    value={option}
+                    className="capitalize"
+                  >
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* ── MONTH filter inputs ── */}
+          {filterOption === FilterOptionEnum.MONTH && (
+            <>
+              <div className="space-y-2">
+                <Label>Month</Label>
+                <Select
+                  value={String(month)}
+                  onValueChange={val => setMonth(Number(val))}
                 >
-                  {f}
-                </Button>
-              ))}
+                  <SelectTrigger className="w-24">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent
+                    position="popper"
+                    side="bottom"
+                    align="start"
+                    sideOffset={4}
+                    className="max-h-40"
+                  >
+                    {MONTH_NAMES.map((m, i) => (
+                      <SelectItem key={m} value={String(i)}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Year</Label>
+                <Select
+                  value={String(year)}
+                  onValueChange={val => setYear(Number(val))}
+                >
+                  <SelectTrigger className="w-24">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map(y => (
+                      <SelectItem key={y} value={String(y)}>
+                        {y}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
+
+          {/* ── YEAR filter inputs ── */}
+          {filterOption === FilterOptionEnum.YEAR && (
+            <div className="space-y-2">
+              <Label>Year</Label>
+              <Select
+                value={String(year)}
+                onValueChange={val => setYear(Number(val))}
+              >
+                <SelectTrigger className="w-20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {YEARS.map(y => (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </div>
+          )}
 
-          <div className="flex items-end gap-2">
-            {/* ── MONTH filter inputs ── */}
-            {filterOption === FilterOptionEnum.MONTH && (
-              <Row className="gap-2">
-                <div className="space-y-2">
-                  <Label>Month</Label>
-                  <Select
-                    value={String(month)}
-                    onValueChange={val => setMonth(Number(val))}
-                  >
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent
-                      position="popper"
-                      side="bottom"
-                      align="start"
-                      sideOffset={4}
-                      className='max-h-40'
-                    >
-                      {MONTH_NAMES.map((m, i) => (
-                        <SelectItem key={m} value={String(i)}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {/* ── CUSTOM filter inputs ── */}
+          {filterOption === FilterOptionEnum.CUSTOM && (
+            <>
+              <div className="space-y-2">
+                <Label>From </Label>
+                <Input
+                  type="date"
+                  value={fromDate}
+                  onChange={e => setFromDate(e.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label>Year</Label>
-                  <Select
-                    value={String(year)}
-                    onValueChange={val => setYear(Number(val))}
-                  >
-                    <SelectTrigger className="w-28">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {YEARS.map(y => (
-                        <SelectItem key={y} value={String(y)}>
-                          {y}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </Row>
-            )}
+              <div className="space-y-2">
+                <Label>To </Label>
+                <Input
+                  type="date"
+                  value={toDate}
+                  min={fromDate} // prevent selecting before 'fromDate'
+                  onChange={e => setToDate(e.target.value)}
+                />
+              </div>
+            </>
+          )}
 
-            {/* ── YEAR filter inputs ── */}
-            {filterOption === FilterOptionEnum.YEAR && (
-              <Row className="gap-2">
-                <div className="space-y-2">
-                  <Label>Year</Label>
-                  <Select
-                    value={String(year)}
-                    onValueChange={val => setYear(Number(val))}
-                  >
-                    <SelectTrigger className="w-28">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {YEARS.map(y => (
-                        <SelectItem key={y} value={String(y)}>
-                          {y}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </Row>
-            )}
-
-            {/* ── CUSTOM filter inputs ── */}
-            {filterOption === FilterOptionEnum.CUSTOM && (
-              <Row className="gap-2">
-                <div className="space-y-2">
-                  <Label>From</Label>
-                  <Input
-                    type="date"
-                    value={fromDate}
-                    onChange={e => setFromDate(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>To</Label>
-                  <Input
-                    type="date"
-                    value={toDate}
-                    min={fromDate} // prevent selecting before 'fromDate'
-                    onChange={e => setToDate(e.target.value)}
-                  />
-                </div>
-              </Row>
-            )}
-
-            <Button onClick={handleOpenDialog}>Share</Button>
-          </div>
+          <Button onClick={handleOpenDialog}>
+            <Send />
+            Share
+          </Button>
         </CardContent>
       </Card>
 

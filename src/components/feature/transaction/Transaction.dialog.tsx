@@ -123,42 +123,40 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* Amount & Date */}
 
-          <div className="grid w-full grid-cols-2 gap-2">
-            <div className="space-y-2">
-              <Label>Amount *</Label>
+          <div className="space-y-2">
+            <Label>Amount *</Label>
 
-              <Input
-                type="number"
-                placeholder="Amount"
-                disabled={isSubmitting}
-                {...register('amount', {
-                  required: 'Amount is required',
-                  min: {
-                    value: 1,
-                    message: 'Amount must be greater than 0',
-                  },
-                })}
-              />
-              {errors.amount && (
-                <p className="text-sm text-red-500">{errors.amount.message}</p>
-              )}
-            </div>
+            <Input
+              type="number"
+              placeholder="Amount"
+              disabled={isSubmitting}
+              {...register('amount', {
+                required: 'Amount is required',
+                min: {
+                  value: 1,
+                  message: 'Amount must be greater than 0',
+                },
+              })}
+            />
+            {errors.amount && (
+              <p className="text-sm text-red-500">{errors.amount.message}</p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label>Date *</Label>
+          <div className="space-y-2">
+            <Label>Date *</Label>
 
-              <Input
-                type="date"
-                placeholder="Date"
-                disabled={isSubmitting}
-                {...register('date', {
-                  required: 'Date is required',
-                })}
-              />
-              {errors.date && (
-                <p className="text-sm text-red-500">{errors.date.message}</p>
-              )}
-            </div>
+            <Input
+              type="date"
+              placeholder="Date"
+              disabled={isSubmitting}
+              {...register('date', {
+                required: 'Date is required',
+              })}
+            />
+            {errors.date && (
+              <p className="text-sm text-red-500">{errors.date.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">

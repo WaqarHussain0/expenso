@@ -68,6 +68,7 @@ const Transactions: React.FC<ITransactionsProps> = ({
                     </Badge>
                   </Row>
                   <TextElement
+                    as="h4"
                     className={`${
                       category === CategoryTypeEnum.INVESTMENT
                         ? 'text-yellow-500'
@@ -76,11 +77,13 @@ const Transactions: React.FC<ITransactionsProps> = ({
                           : 'text-red-500'
                     }`}
                   >
-                    {item?.amount != null ? formatCompactAmount(item.amount) : ''}
+                    {item?.amount != null
+                      ? formatCompactAmount(item.amount)
+                      : ''}
                   </TextElement>
                 </CardTitle>
                 <CardDescription>
-                  {item.note || 'No note available'}
+                  <TextElement>{item.note || 'No note available'}</TextElement>
                 </CardDescription>
               </CardHeader>
             </Card>

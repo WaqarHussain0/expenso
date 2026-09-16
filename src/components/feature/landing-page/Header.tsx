@@ -14,7 +14,7 @@ interface IHeaderProps {
 const Header: React.FC<IHeaderProps> = ({ className = '', user }) => {
   return (
     <section
-      className={`relative flex w-full flex-col items-center justify-center gap-4 bg-[#0d1117] pb-16 text-center md:py-24 ${className}`}
+      className={`relative flex w-full flex-col items-center justify-center gap-4 bg-[#0d1117] py-16 text-center md:py-24 ${className}`}
     >
       {/* Grid texture */}
       <div className="fr-grid-bg pointer-events-none absolute inset-0" />

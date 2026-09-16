@@ -4,7 +4,7 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import TextElement from '@/components/common/TextElement';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { CATEGORY_ICONS } from '../category/Category.dialog';
 import { formatCompactAmount } from '@/lib/utils';
+import Row from '@/components/common/Row';
 
 interface IRecentTransactionsProps {
   className?: string;
@@ -31,12 +32,10 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
   const columns = useMemo(
     () => [
       {
-        label: 'Type',
+        label: 'Transaction',
       },
+
       {
-        label: 'Amount',
-      },
-       {
         label: 'Date',
       },
       {
@@ -47,8 +46,8 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
   );
 
   return (
-    <Card className={`gap-0 px-4 ${className}`}>
-      <CardHeader className="flex items-center justify-between p-0">
+    <Card className={`p-0 gap-0 ${className}`}>
+      <CardHeader className="flex items-center justify-between py-2 px-4">
         <CardTitle>Recent Transactions</CardTitle>
 
         <Button
@@ -59,68 +58,77 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
         </Button>
       </CardHeader>
 
-      <Table>
-        <TableHeader className="">
-          <TableRow>
-            {columns.map(column => (
-              <TableHead key={column.label}>{column.label}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
+      <CardContent className="px-0">
+        <Table>
+          <TableHeader className="">
+            <TableRow>
+              {columns.map(column => (
+                <TableHead key={column.label}>{column.label}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
 
-        <TableBody>
-          {transactions.length > 0 ? (
-            transactions.map(trx => (
-              <TableRow key={trx._id}>
-                <TableCell className="capitalize">
-                  <Badge
-                    style={{
-                      color: trx.category.color,
-                      backgroundColor: trx.category.color + '1A', // 1A is ~10% opacity in hex
-                    }}
-                  >
-                    {trx.category.icon &&
-                      (() => {
-                        const iconObj = CATEGORY_ICONS.find(
-                          item => item.name === trx.category.icon,
-                        );
-                        if (!iconObj) return null;
-                        const IconComponent = iconObj.icon;
-                        return (
-                          <IconComponent
-                            className="size-4"
-                            style={{ color: trx.category.color }}
-                          />
-                        );
-                      })()}
-                    {trx?.category.name}
-                  </Badge>
-                </TableCell>
+          <TableBody>
+            {transactions.length > 0 ? (
+              transactions.map(trx => (
+                <TableRow key={trx._id}>
+                  <TableCell className="capitalize">
+                    <Row className="gap-3">
+                      <TextElement as="h4" className="">
+                        {trx?.amount != null
+                          ? formatCompactAmount(trx.amount)
+                          : '-'}
+                      </TextElement>
 
-                <TableCell className="capitalize">
-                  {trx?.amount != null ? formatCompactAmount(trx.amount) : '-'}
-                </TableCell>
+                      <Badge
+                        variant={'outline'}
+                        style={{
+                          borderColor: trx.category.color,
+                        }}
+                      >
+                        {trx.category.icon &&
+                          (() => {
+                            const iconObj = CATEGORY_ICONS.find(
+                              item => item.name === trx.category.icon,
+                            );
+                            if (!iconObj) return null;
+                            const IconComponent = iconObj.icon;
+                            return (
+                              <IconComponent
+                                className="size-4"
+                                style={{ color: trx.category.color }}
+                              />
+                            );
+                          })()}
+                        {trx?.category.name}
+                      </Badge>
+                    </Row>
+                  </TableCell>
 
                   <TableCell className="capitalize">
-                  {trx?.date.toDateString()}
-                </TableCell>
+                    {trx?.date.toDateString()}
+                  </TableCell>
 
-                <TableCell className="capitalize">
-                  {trx?.note || '-'}{' '}
+                  <TableCell className="capitalize">
+                    {trx?.note || '-'}{' '}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <TextElement as="p" className="text-center">
+                    No results.
+                  </TextElement>
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                <TextElement as="p" className="text-center">
-                  No results.
-                </TextElement>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
     </Card>
   );
 };

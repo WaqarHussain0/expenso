@@ -537,8 +537,10 @@ export class TransactionService {
       });
     }
 
-    // ── 3. Expense category breakdown (for expense graph) ────────
+    // ── 3. Category breakdown (for income/expense/investment graphs) ──
     const expenseCategoryMap = new Map<string, number>();
+    const incomeCategoryMap = new Map<string, number>();
+    const investmentCategoryMap = new Map<string, number>();
 
     for (const tx of transactions) {
       const category = tx.categoryId as ICategory;
@@ -551,14 +553,28 @@ export class TransactionService {
       // monthly series
       monthlySeriesMap.get(month)![type] += tx.amount;
 
-      // expense category breakdown
-      if (type === CategoryTypeEnum.EXPENSE) {
-        expenseCategoryMap.set(
+      // category breakdown
+      const categoryMap =
+        type === CategoryTypeEnum.EXPENSE
+          ? expenseCategoryMap
+          : type === CategoryTypeEnum.INCOME
+            ? incomeCategoryMap
+            : type === CategoryTypeEnum.INVESTMENT
+              ? investmentCategoryMap
+              : null;
+
+      if (categoryMap) {
+        categoryMap.set(
           category.name,
-          (expenseCategoryMap.get(category.name) ?? 0) + tx.amount,
+          (categoryMap.get(category.name) ?? 0) + tx.amount,
         );
       }
     }
+
+    const toBreakdown = (map: Map<string, number>) =>
+      [...map.entries()]
+        .map(([name, total]) => ({ name, total }))
+        .sort((a, b) => b.total - a.total); // highest first
 
     return {
       // 1. Cards
@@ -570,10 +586,10 @@ export class TransactionService {
         freeCash: m.income - (m.expense + m.investment),
       })),
 
-      // 3. Expense graph — one entry per expense category
-      expenseBreakdown: [...expenseCategoryMap.entries()]
-        .map(([name, total]) => ({ name, total }))
-        .sort((a, b) => b.total - a.total), // highest first
+      // 3. Category graphs — one entry per category
+      expenseBreakdown: toBreakdown(expenseCategoryMap),
+      incomeBreakdown: toBreakdown(incomeCategoryMap),
+      investmentBreakdown: toBreakdown(investmentCategoryMap),
     };
   }
 

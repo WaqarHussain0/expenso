@@ -52,7 +52,7 @@ const AssistantShowcase: React.FC<IAssistantShowcaseProps> = ({
             from your own transactions.
           </p>
 
-          <div className="space-x-1 md:space-x-2">
+          <div className="flex gap-2 items-center flex-wrap">
             {['Read-only', 'No manual filters', 'Instant answers'].map(item => (
               <Badge
                 variant={'outline'}

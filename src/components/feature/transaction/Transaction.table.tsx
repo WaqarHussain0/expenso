@@ -37,6 +37,7 @@ import { Badge } from '@/components/ui/badge';
 import { CATEGORY_ICONS } from '../category/Category.dialog';
 import { deleteTransactionAction } from '@/lib/server-actions/transaction.server-action';
 import { formatCompactAmount } from '@/lib/utils';
+import Row from '@/components/common/Row';
 
 interface ITransactionTableProps {
   transactions: ITransaction[];
@@ -62,11 +63,9 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   const columns = useMemo(
     () => [
       {
-        label: 'Amount',
+        label: 'Transaction',
       },
-      {
-        label: 'Category',
-      },
+
       {
         label: 'Date',
       },
@@ -128,7 +127,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
   return (
     <div className={className}>
       <Table>
-        <TableHeader className="bg-slate-100">
+        <TableHeader className="">
           <TableRow>
             {columns.map(column => (
               <TableHead key={column.label}>{column.label}</TableHead>
@@ -141,37 +140,44 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
             transactions.map(trx => (
               <TableRow key={trx._id}>
                 <TableCell className="capitalize">
-                  {trx?.amount != null ? formatCompactAmount(trx.amount) : '-'}
-                </TableCell>
-                <TableCell className="capitalize">
-                  <Badge
-                    style={{
-                      color: trx.category.color,
-                      backgroundColor: trx.category.color + '1A', // 1A is ~10% opacity in hex
-                    }}
-                  >
-                    {trx.category.icon &&
-                      (() => {
-                        const iconObj = CATEGORY_ICONS.find(
-                          item => item.name === trx.category.icon,
-                        );
-                        if (!iconObj) return null;
-                        const IconComponent = iconObj.icon;
-                        return (
-                          <IconComponent
-                            className="size-4"
-                            style={{ color: trx.category.color }}
-                          />
-                        );
-                      })()}
-                    {trx?.category.name}
-                  </Badge>
+                  <Row className="gap-3">
+                    <TextElement as="h4" className="">
+                      {trx?.amount != null
+                        ? formatCompactAmount(trx.amount)
+                        : '-'}
+                    </TextElement>
+
+                    <Badge
+                      variant={'outline'}
+                      style={{
+                        borderColor: trx.category.color,
+                      }}
+                    >
+                      {trx.category.icon &&
+                        (() => {
+                          const iconObj = CATEGORY_ICONS.find(
+                            item => item.name === trx.category.icon,
+                          );
+                          if (!iconObj) return null;
+                          const IconComponent = iconObj.icon;
+                          return (
+                            <IconComponent
+                              className="size-4"
+                              style={{ color: trx.category.color }}
+                            />
+                          );
+                        })()}
+                      {trx?.category.name}
+                    </Badge>
+                  </Row>
                 </TableCell>
 
                 <TableCell className="capitalize">
                   {trx?.date.toDateString()}
                 </TableCell>
-                <TableCell className="capitalize">{trx?.note}</TableCell>
+                <TableCell className="capitalize">
+                  <TextElement>{trx?.note}</TextElement>
+                </TableCell>
 
                 <TableCell>
                   <DropdownMenu>

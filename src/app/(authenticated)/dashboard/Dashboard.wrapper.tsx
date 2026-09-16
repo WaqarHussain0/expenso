@@ -111,63 +111,61 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
   ];
 
   return (
-    <>
-      <Row className="w-full flex-col gap-3">
-        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Quick Actions */}
-          <Card className="w-full gap-2 px-4">
-            <CardHeader className="p-0">
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
+    <Row className="w-full flex-col gap-3">
+      <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2">
+        {/* Quick Actions */}
+        <Card className="w-full gap-2 px-4">
+          <CardHeader className="p-0">
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
 
-            <div className="grid grid-cols-1 gap-2">
-              {quickActions
-                .filter(item => item.show)
-                .map(action => {
-                  const Icon = action.icon;
+          <div className="grid grid-cols-1 gap-2">
+            {quickActions
+              .filter(item => item.show)
+              .map(action => {
+                const Icon = action.icon;
 
-                  return (
-                    <Card
-                      key={action.title}
-                      className="cursor-pointer"
-                      onClick={action?.onClick}
-                    >
-                      <CardHeader className="">
-                        <div className="flex items-center gap-2">
-                          <Icon
-                            className={`size-4 shrink-0 ${action.className}`}
-                          />
-                          <CardTitle>{action.title}</CardTitle>
-                        </div>
-                        <CardDescription>{action.description}</CardDescription>
-                      </CardHeader>
-                    </Card>
-                  );
-                })}
-            </div>
-          </Card>
-          {/* Stats  */}
-
-          <div className="grid w-full grid-cols-2 gap-2">
-            {stats.map(item => (
-              <StatCard key={item.label} stat={item} />
-            ))}
+                return (
+                  <Card
+                    key={action.title}
+                    className="cursor-pointer"
+                    onClick={action?.onClick}
+                  >
+                    <CardHeader className="">
+                      <div className="flex items-center gap-2">
+                        <Icon
+                          className={`size-4 shrink-0 ${action.className}`}
+                        />
+                        <CardTitle>{action.title}</CardTitle>
+                      </div>
+                      <CardDescription>{action.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                );
+              })}
           </div>
+        </Card>
+        {/* Stats  */}
+
+        <div className="grid w-full grid-cols-2 gap-2">
+          {stats.map(item => (
+            <StatCard key={item.label} stat={item} />
+          ))}
         </div>
+      </div>
 
-        <RecentTransactions transactions={transactions} className="w-full" />
+      <RecentTransactions transactions={transactions} className="w-full" />
 
-        <CategoryDialog
-          onClose={handleCloseCategoryDialog}
-          open={showCategoryDialog}
-        />
+      <CategoryDialog
+        onClose={handleCloseCategoryDialog}
+        open={showCategoryDialog}
+      />
 
-        <TransactionDialog
-          onClose={handleCloseTransactionDialog}
-          open={showTransactionDialog}
-        />
-      </Row>
-    </>
+      <TransactionDialog
+        onClose={handleCloseTransactionDialog}
+        open={showTransactionDialog}
+      />
+    </Row>
   );
 };
 
