@@ -1,3 +1,6 @@
+// Must load before any decorator runs: class-transformer reads design-time
+// type metadata via Reflect.getMetadata when this module is evaluated.
+import 'reflect-metadata';
 import {
   IsNotEmpty,
   IsOptional,

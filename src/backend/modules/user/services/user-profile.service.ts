@@ -1,4 +1,3 @@
- 
 import { initDB } from '@/backend/utils/dbInit.util';
 import mongoose from 'mongoose';
 import UserProfileEntity from '../entities/user-profile.entity';
