@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowUp, Lock, RotateCcw, Sparkles } from 'lucide-react';
+import { ArrowUp, KeyRound, Lock, RotateCcw, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import {
+  AI_PROVIDERS,
+  AiKeySource,
+  AiProviderEnum,
+} from '@/app/constants/ai-providers.constant';
 import { useSession } from 'next-auth/react';
 import { useAskAssistantMutation } from '@/lib/rtk/services/assistant.rtk.service';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
@@ -30,6 +36,10 @@ const SUGGESTIONS = [
 interface IMessage {
   role: 'user' | 'assistant';
   content: string;
+  /** Error text — rendered as plain text, never as HTML */
+  isError?: boolean;
+  provider?: AiProviderEnum;
+  source?: AiKeySource;
 }
 
 const AssistantAvatar = () => (
@@ -82,7 +92,12 @@ const AssistantWrapper: React.FC = () => {
 
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: result.response },
+        {
+          role: 'assistant',
+          content: result.response,
+          provider: result.provider,
+          source: result.source,
+        },
       ]);
     } catch (error) {
       const message =
@@ -90,7 +105,10 @@ const AssistantWrapper: React.FC = () => {
         'Something went wrong, please try again.';
 
       toast.error(message);
-      setMessages(prev => [...prev, { role: 'assistant', content: message }]);
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: message, isError: true },
+      ]);
     } finally {
       inputRef.current?.focus();
     }
@@ -138,10 +156,26 @@ const AssistantWrapper: React.FC = () => {
                 ) : (
                   <div key={index} className="flex items-start gap-3">
                     <AssistantAvatar />
-                    <div
-                      className={`inter max-w-[88%] min-w-0 overflow-x-auto rounded-2xl rounded-tl-md bg-[#f6f7f5] px-4 py-3 text-sm leading-relaxed text-[#2b313b] ring-1 ring-[#0d1117]/[0.05] ${ASSISTANT_HTML_CLASSES}`}
-                      dangerouslySetInnerHTML={{ __html: message.content }}
-                    />
+                    <div className="flex max-w-[88%] min-w-0 flex-col gap-1.5">
+                      {message.isError ? (
+                        <div className="inter rounded-2xl rounded-tl-md bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-700 ring-1 ring-red-200">
+                          {message.content}
+                        </div>
+                      ) : (
+                        <div
+                          className={`inter min-w-0 overflow-x-auto rounded-2xl rounded-tl-md bg-[#f6f7f5] px-4 py-3 text-sm leading-relaxed text-[#2b313b] ring-1 ring-[#0d1117]/[0.05] ${ASSISTANT_HTML_CLASSES}`}
+                          dangerouslySetInnerHTML={{ __html: message.content }}
+                        />
+                      )}
+                      {message.provider && (
+                        <span className="inter pl-1 text-[11px] text-[#8b93a1]">
+                          via{' '}
+                          {AI_PROVIDERS[message.provider]?.label ??
+                            message.provider}
+                          {message.source === 'user' ? ' · your key' : ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ),
               )}
@@ -229,6 +263,14 @@ const AssistantWrapper: React.FC = () => {
           <p className="inter mx-auto mt-2 flex max-w-3xl items-center justify-center gap-1.5 text-[11px] text-[#8b93a1]">
             <Lock className="size-3" />
             Read-only — the assistant can&apos;t add, edit, or delete anything.
+            <span aria-hidden>·</span>
+            <Link
+              href={`${PAGE_ROUTES.profile}#ai-keys`}
+              className="inline-flex items-center gap-1 text-[#1a7f5a] hover:underline"
+            >
+              <KeyRound className="size-3" />
+              Use your own API keys
+            </Link>
           </p>
         </div>
       </div>

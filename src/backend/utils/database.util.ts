@@ -6,6 +6,7 @@ import UserEntity from '../modules/user/entities/user.entity';
 import StatEntity from '../modules/stats/entities/stats.entity';
 import UserProfileEntity from '../modules/user/entities/user-profile.entity';
 import RefreshTokenEntity from '../modules/auth/entities/refresh-token.entity';
+import UserAiKeyEntity from '../modules/ai-keys/entities/user-ai-key.entity';
 
 /**
  * Global is used to maintain a cached connection across hot reloads in development
@@ -24,6 +25,7 @@ const models = {
   Stat: StatEntity,
   UserProfile: UserProfileEntity,
   RefreshToken: RefreshTokenEntity,
+  UserAiKey: UserAiKeyEntity,
 };
 
 async function connectToDB() {

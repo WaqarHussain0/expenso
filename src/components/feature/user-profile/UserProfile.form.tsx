@@ -77,11 +77,10 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
 
   const onSubmit = async (data: FormValues) => {
     startTransition(async () => {
-      const result = await setUserProfileAction(user?.id || '', {
+      const result = await setUserProfileAction({
         name: data.name,
         contact: data.contact,
         gender: data.gender,
-        userId: user?.id || '',
       });
 
       if (result.success) {
@@ -196,7 +195,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
           </p>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-x-5 gap-y-5 p-6 md:grid-cols-2">
+        <div className="grid flex-1 grid-cols-1 items-start gap-x-5 gap-y-6 p-6 md:grid-cols-2">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="profile-name">Full name</Label>

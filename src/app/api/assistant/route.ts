@@ -12,10 +12,19 @@ export const POST = withAuth(async (req: NextRequest, user) => {
     const body = await req.json();
     const dto = await validateDto(AskAssistantDto, body);
 
-    const response = await assistantService.ask(user.id, dto.question);
+    const { answer, provider, source } = await assistantService.ask(
+      user.id,
+      dto.question,
+    );
 
     return NextResponse.json(
-      { response, message: 'Assistant response', success: true },
+      {
+        response: answer,
+        provider,
+        source,
+        message: 'Assistant response',
+        success: true,
+      },
       { status: 200 },
     );
   } catch (error: any) {

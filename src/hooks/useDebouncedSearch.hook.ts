@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback } from "react";
-import debounce from "lodash.debounce";
+import { useState, useMemo, useCallback } from 'react';
+import debounce from 'lodash.debounce';
 
 interface UseDebouncedSearchProps {
   delay?: number;
@@ -10,8 +10,8 @@ interface UseDebouncedSearchProps {
 export const useDebouncedSearch = ({
   delay = 500,
 }: UseDebouncedSearchProps = {}) => {
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
 
   const debouncedUpdateSearch = useMemo(
     () =>
@@ -30,8 +30,8 @@ export const useDebouncedSearch = ({
   );
 
   const clearSearch = useCallback(() => {
-    setSearchInput("");
-    setDebouncedSearch("");
+    setSearchInput('');
+    setDebouncedSearch('');
   }, []);
 
   return { searchInput, debouncedSearch, handleSearchChange, clearSearch };

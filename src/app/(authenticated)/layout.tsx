@@ -1,6 +1,9 @@
 import 'react-loading-skeleton/dist/skeleton.css';
 import Navbar from '@/components/common/Navbar';
 import TopBar from '@/components/common/TopBar';
+// Redux (RTK Query) is only needed inside the app and on /share — keeping the
+// provider here keeps it out of the landing and auth page bundles.
+import RTKProvider from '@/components/providers/RTK.provider';
 import { cookies } from 'next/headers';
 import { SIDEBAR_COOKIE } from '@/app/constants/app.constant';
 
@@ -26,7 +29,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
         <TopBar />
 
         <div className="relative w-full flex-1 px-3 pt-4 pb-24 md:px-6 md:pt-6 lg:pb-8">
-          {children}
+          <RTKProvider>{children}</RTKProvider>
         </div>
       </main>
     </div>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import 'reflect-metadata';
@@ -6,9 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { CategoryService } from '@/backend/modules/category/category.service';
 import { CreateCategoryDto } from '@/backend/modules/category/dto/create-category.dto';
 import { validateDto } from '@/backend/utils/input-validator.util';
-import mongoose from 'mongoose';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import { getServerSideSession } from '../next-auth.util';
+import { requireUser, toObjectId } from './action-guard';
 
 const categoryService = new CategoryService();
 
@@ -24,18 +22,20 @@ interface ActionResult {
   error?: string;
 }
 
+const errorMessage = (error: unknown) =>
+  (error as Error)?.message || 'Something went wrong';
+
 export async function createCategoryAction(
   payload: CategoryPayload,
 ): Promise<ActionResult> {
   try {
-    const user = await getServerSideSession(); // replace with your actual auth
-    const userId = new mongoose.Types.ObjectId(user?.user.id);
+    const user = await requireUser();
     const dto = await validateDto(CreateCategoryDto, payload);
-    await categoryService.create(dto, userId);
-    revalidatePath('/'); // adjust path as needed
+    await categoryService.create(dto, user.objectId);
+    revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -44,35 +44,35 @@ export async function updateCategoryAction(
   payload: CategoryPayload,
 ): Promise<ActionResult> {
   try {
-    const user = await getServerSideSession();
-    const userId = new mongoose.Types.ObjectId(user?.user.id);
-    const categoryId = new mongoose.Types.ObjectId(id);
-
+    const user = await requireUser();
+    const categoryId = toObjectId(id, 'category id');
     const dto = await validateDto(CreateCategoryDto, payload);
-    await categoryService.update(categoryId, dto, userId); // adjust to your service method
+    // Service only matches categories owned by this user
+    await categoryService.update(categoryId, dto, user.objectId);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
 export async function deleteCategoryAction(id: string): Promise<ActionResult> {
-  const categoryId = new mongoose.Types.ObjectId(id);
-
   try {
-    await categoryService.delete(categoryId);
+    const user = await requireUser();
+    const categoryId = toObjectId(id, 'category id');
+    await categoryService.delete(categoryId, user.objectId);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
 export async function getCategoryByIdAction(id: string) {
   try {
-    const categoryId = new mongoose.Types.ObjectId(id);
-    const category = await categoryService.findById(categoryId);
+    const user = await requireUser();
+    const categoryId = toObjectId(id, 'category id');
+    const category = await categoryService.findById(categoryId, user.objectId);
 
     if (!category) return { success: false, error: 'Category not found' };
 
@@ -80,8 +80,8 @@ export async function getCategoryByIdAction(id: string) {
     const serialized = JSON.parse(JSON.stringify(category));
 
     return { success: true, data: serialized as ICategory };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -89,33 +89,42 @@ export async function getAllCategoriesAction(payload: {
   name?: string;
   limit?: number;
 }) {
-  const { name, limit } = payload;
   try {
-    const user = await getServerSideSession();
+    const user = await requireUser();
+    const name =
+      typeof payload?.name === 'string' ? payload.name.slice(0, 100) : '';
+    // Clamp so a caller can't request the whole collection
+    const limit = Math.min(Math.max(Number(payload?.limit) || 10, 1), 50);
+
     const categories = await categoryService.findAll({
-      search: name,
+      search: name || undefined,
       limit,
       page: 1,
       type: undefined,
-      userId: user?.user.id?.toString() || '',
+      userId: user.id,
     });
     return { success: true, data: categories };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
 export async function setPreferencesAction(payload: CategoryPayload[]) {
   try {
-    const user = await getServerSideSession();
-    const userId = new mongoose.Types.ObjectId(user?.user.id);
+    const user = await requireUser();
+    if (!Array.isArray(payload) || payload.length > 100) {
+      throw new Error('Invalid preferences.');
+    }
 
-    // Create transaction using the service
-    await categoryService.setPreferences(userId, payload);
+    const validated = await Promise.all(
+      payload.map(item => validateDto(CreateCategoryDto, item)),
+    );
+
+    await categoryService.setPreferences(user.objectId, validated);
 
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }

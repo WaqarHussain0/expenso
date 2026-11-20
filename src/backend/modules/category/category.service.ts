@@ -9,11 +9,17 @@ const userService = new UserService();
 export class CategoryService {
   private readonly categoryEntity = CategoryEntity;
 
-  async findById(id: string | mongoose.Types.ObjectId) {
+  /**
+   * @param userId when given, only a category owned by this user is returned
+   */
+  async findById(
+    id: string | mongoose.Types.ObjectId,
+    userId?: mongoose.Types.ObjectId,
+  ) {
     await initDB();
 
     const data = await this.categoryEntity
-      .findById(id)
+      .findOne({ _id: id, ...(userId && { userId }) })
       .lean({ virtuals: true });
 
     if (!data) {
@@ -128,10 +134,11 @@ export class CategoryService {
     return { data, meta: { page, totalRecords, totalPages } };
   }
 
-  async delete(id: mongoose.Types.ObjectId) {
+  async delete(id: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) {
     await initDB();
-    const deletedData = await this.categoryEntity.findByIdAndUpdate(
-      id,
+    // Scoped to the owner — another user's id simply isn't found
+    const deletedData = await this.categoryEntity.findOneAndUpdate(
+      { _id: id, userId },
       {
         isActive: false,
       },
@@ -156,7 +163,7 @@ export class CategoryService {
     const { name, type, color, icon } = payload;
 
     const [data, existingName] = await Promise.all([
-      this.findById(id),
+      this.findById(id, userId),
       this.findByNameUserAndType(name, userId, type),
     ]);
 
@@ -170,8 +177,8 @@ export class CategoryService {
       );
     }
 
-    return await this.categoryEntity.findByIdAndUpdate(
-      id,
+    return await this.categoryEntity.findOneAndUpdate(
+      { _id: id, userId },
       { name, type, color, icon },
       { new: true }, // return updated document
     );

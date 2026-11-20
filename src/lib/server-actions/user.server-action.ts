@@ -3,7 +3,6 @@
 
 import 'reflect-metadata';
 import { revalidatePath } from 'next/cache';
-import mongoose from 'mongoose';
 
 import { UserService } from '@/backend/modules/user/user.service';
 import { UserGenderEnum } from '@/types/user-profile.type';
@@ -11,7 +10,7 @@ import { CreateUserProfileDto } from '@/backend/modules/user/dto/create-user-pro
 import { UserProfileService } from '@/backend/modules/user/services/user-profile.service';
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { StatsService } from '@/backend/modules/stats/stats.service';
-import { getServerSideSession } from '../next-auth.util';
+import { requireAdmin, requireUser, toObjectId } from './action-guard';
 
 const userService = new UserService();
 const userProfileService = new UserProfileService();
@@ -27,7 +26,6 @@ interface ISetProfilePayload {
   name: string;
   gender: UserGenderEnum;
   contact: string;
-  userId: string;
 }
 
 interface ActionResult {
@@ -40,7 +38,11 @@ export async function toggleUserStatusAction(
   id: string,
 ): Promise<ActionResult> {
   try {
-    const userId = new mongoose.Types.ObjectId(id);
+    const admin = await requireAdmin();
+    const userId = toObjectId(id, 'user id');
+    if (userId.equals(admin.objectId)) {
+      throw new Error("You can't deactivate your own account.");
+    }
 
     await userService.toggleUserStatus(userId);
 
@@ -51,12 +53,12 @@ export async function toggleUserStatusAction(
   }
 }
 
+/** Updates the signed-in user's own profile — the id comes from the session. */
 export async function setUserProfileAction(
-  id: string,
   payload: ISetProfilePayload,
 ): Promise<ActionResult> {
   try {
-    const userId = new mongoose.Types.ObjectId(id);
+    const { objectId: userId } = await requireUser();
 
     const profilePayload = {
       contact: payload.contact,
@@ -78,7 +80,11 @@ export async function setUserProfileAction(
 
 export async function deleteUserAction(id: string): Promise<ActionResult> {
   try {
-    const userId = new mongoose.Types.ObjectId(id);
+    const admin = await requireAdmin();
+    const userId = toObjectId(id, 'user id');
+    if (userId.equals(admin.objectId)) {
+      throw new Error("You can't delete your own account here.");
+    }
     await userService.delete(userId);
 
     revalidatePath('/');
@@ -90,10 +96,9 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
 
 export async function getStatsLinkAction(body: any): Promise<ActionResult> {
   try {
-    const user = await getServerSideSession();
-    const userId = new mongoose.Types.ObjectId(user?.user.id);
+    const { objectId: userId } = await requireUser();
 
-    const { startDate, endDate, year, type } = body;
+    const { startDate, endDate, year, type } = body ?? {};
 
     const payload: any = {
       userId,

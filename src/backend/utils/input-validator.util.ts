@@ -3,7 +3,7 @@ import { validate } from 'class-validator';
 
 export async function validateDto<T extends object>(
   dtoClass: new () => T,
-  plain: any,
+  plain: unknown,
 ): Promise<T> {
   const instance = plainToInstance(dtoClass, plain, {
     enableImplicitConversion: true,

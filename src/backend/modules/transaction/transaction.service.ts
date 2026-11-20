@@ -14,11 +14,17 @@ const categoryService = new CategoryService();
 export class TransactionService {
   private readonly transactionEntity = TransactionEntity;
 
-  async findById(id: mongoose.Types.ObjectId) {
+  /**
+   * @param userId when given, only a transaction owned by this user is returned
+   */
+  async findById(
+    id: mongoose.Types.ObjectId,
+    userId?: mongoose.Types.ObjectId,
+  ) {
     await initDB();
 
     const data = await this.transactionEntity
-      .findById(id)
+      .findOne({ _id: id, ...(userId && { userId }) })
       .lean({ virtuals: true });
 
     if (!data) {
@@ -33,7 +39,10 @@ export class TransactionService {
 
     await initDB();
 
-    const category = await categoryService.findById(categoryId);
+    // The category must belong to the same user
+    const category = await categoryService
+      .findById(categoryId, userId)
+      .catch(() => null);
 
     if (!category || !category._id) {
       throw new Error(
@@ -48,9 +57,13 @@ export class TransactionService {
     });
   }
 
-  async delete(id: mongoose.Types.ObjectId) {
+  async delete(id: mongoose.Types.ObjectId, userId: mongoose.Types.ObjectId) {
     await initDB();
-    const deletedData = await this.transactionEntity.findByIdAndDelete(id);
+    // Scoped to the owner — another user's id simply isn't found
+    const deletedData = await this.transactionEntity.findOneAndDelete({
+      _id: id,
+      userId,
+    });
 
     if (!deletedData) {
       throw new Error(`Transaction with id ${id} not found`);
@@ -62,10 +75,14 @@ export class TransactionService {
     };
   }
 
-  async update(id: mongoose.Types.ObjectId, payload: CreateTransactionDto) {
+  async update(
+    id: mongoose.Types.ObjectId,
+    payload: CreateTransactionDto,
+    userId: mongoose.Types.ObjectId,
+  ) {
     const [data, category] = await Promise.all([
-      this.findById(id),
-      categoryService.findById(payload.categoryId),
+      this.findById(id, userId),
+      categoryService.findById(payload.categoryId, userId).catch(() => null),
     ]);
 
     if (!category || !category._id) {
@@ -78,9 +95,15 @@ export class TransactionService {
       throw new Error(`Category with id ${id} not found`);
     }
 
-    return await this.transactionEntity.findByIdAndUpdate(
-      id,
-      payload,
+    const { amount, date, note, categoryId } = payload;
+    return await this.transactionEntity.findOneAndUpdate(
+      { _id: id, userId },
+      {
+        amount,
+        date,
+        note,
+        categoryId: new mongoose.Types.ObjectId(categoryId),
+      },
       { new: true }, // return updated document
     );
   }

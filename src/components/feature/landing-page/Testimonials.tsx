@@ -1,5 +1,19 @@
 /* eslint-disable react/no-unescaped-entities */
 import Reveal from '@/components/common/Reveal';
+import { DM_Sans, Fraunces } from 'next/font/google';
+
+// Self-hosted at build time (no runtime request to Google, no layout shift)
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  display: 'swap',
+});
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
 
 const testimonials = [
   {
@@ -80,12 +94,10 @@ export default function Testimonials() {
       className="w-full px-4 py-16 md:px-8 md:py-12"
       style={{
         background: 'linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%)',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: dmSans.style.fontFamily,
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap');
-
         .testi-section * { box-sizing: border-box; }
 
         .testi-card {
@@ -158,7 +170,7 @@ export default function Testimonials() {
 
           <h2
             style={{
-              fontFamily: "'Fraunces', serif",
+              fontFamily: fraunces.style.fontFamily,
               fontSize: 'clamp(30px, 4vw, 48px)',
               fontWeight: 600,
               letterSpacing: '-1.5px',

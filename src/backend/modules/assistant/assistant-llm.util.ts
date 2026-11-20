@@ -1,11 +1,5 @@
-import { GoogleGenAI, Type } from '@google/genai';
 import DOMPurify from 'isomorphic-dompurify';
-
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-
-function getClient() {
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-}
+import { LlmClient } from './llm/llm-providers';
 
 // Static, versioned-with-the-code description of the entities the model is
 // allowed to query — not read from the .entity.ts files at runtime.
@@ -26,33 +20,40 @@ Strict rules:
 
 Respond with strict JSON matching: { "refusal": boolean, "reason": string, "pipeline": array }`;
 
+const ANSWER_SYSTEM_PROMPT =
+  'You turn raw financial query results into a friendly, concise answer for the user, formatted as a small HTML fragment. ' +
+  'Only use values present in the result — never invent numbers. If the result is empty, say so plainly. ' +
+  'Only use these tags: <p>, <strong>, <ul>, <ol>, <li>, <table>, <thead>, <tbody>, <tr>, <th>, <td>. Never use attributes, inline styles, scripts, or any other tags. ' +
+  'Lead with a one-line headline answer wrapped in <p>, with the key number in <strong>. ' +
+  'If the result has more than 3 items (e.g. a category breakdown), present them as an HTML table with sensible column headers instead of a run-on sentence, sorted by amount descending. ' +
+  'Amounts are in PKR — write plain numbers with thousands separators and no currency symbol or code. Keep any prose outside the table brief. ' +
+  'Respond with strict JSON matching: { "answer": string } where "answer" is the HTML fragment.';
+
 export interface GeneratedPipeline {
   refusal: boolean;
   reason: string;
   pipeline: unknown[];
 }
 
+/** Some models wrap JSON in ```json fences despite JSON mode — strip them. */
+function parseJson(content: string) {
+  const cleaned = content
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '');
+  return JSON.parse(cleaned);
+}
+
 export async function generatePipeline(
+  llm: LlmClient,
   question: string,
 ): Promise<GeneratedPipeline> {
-  const client = getClient();
-
-  const response = await client.models.generateContent({
-    model: MODEL,
-    contents: question,
-    config: {
-      systemInstruction: PIPELINE_SYSTEM_PROMPT,
-      responseMimeType: 'application/json',
-    },
+  const content = await llm.completeJson({
+    system: PIPELINE_SYSTEM_PROMPT,
+    user: question,
   });
 
-  const content = response.text;
-
-  if (!content) {
-    throw new Error('The assistant did not return a response.');
-  }
-
-  const parsed = JSON.parse(content);
+  const parsed = parseJson(content);
 
   if (
     typeof parsed?.refusal !== 'boolean' ||
@@ -65,42 +66,21 @@ export async function generatePipeline(
 }
 
 export async function phraseAnswer(
+  llm: LlmClient,
   question: string,
   result: unknown[],
 ): Promise<string> {
-  const client = getClient();
-
-  const response = await client.models.generateContent({
-    model: MODEL,
-    contents: `Question: ${question}\nQuery result (JSON): ${JSON.stringify(result)}`,
-    config: {
-      systemInstruction:
-        'You turn raw financial query results into a friendly, concise answer for the user, formatted as a small HTML fragment. ' +
-        'Only use values present in the result — never invent numbers. If the result is empty, say so plainly. ' +
-        'Only use these tags: <p>, <strong>, <ul>, <ol>, <li>, <table>, <thead>, <tbody>, <tr>, <th>, <td>. Never use attributes, inline styles, scripts, or any other tags. ' +
-        'Lead with a one-line headline answer wrapped in <p>, with the key number in <strong>. ' +
-        'If the result has more than 3 items (e.g. a category breakdown), present them as an HTML table with sensible column headers instead of a run-on sentence, sorted by amount descending. ' +
-        'Amounts are in PKR — write plain numbers with thousands separators and no currency symbol or code. Keep any prose outside the table brief.',
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          answer: { type: Type.STRING },
-        },
-        required: ['answer'],
-      },
-    },
+  const content = await llm.completeJson({
+    system: ANSWER_SYSTEM_PROMPT,
+    user: `Question: ${question}\nQuery result (JSON): ${JSON.stringify(result)}`,
   });
 
-  const content = response.text;
-
-  if (!content) {
-    throw new Error('The assistant did not return a response.');
+  const parsed = parseJson(content);
+  if (typeof parsed?.answer !== 'string') {
+    throw new Error('The assistant returned an unexpected response format.');
   }
 
-  const parsed = JSON.parse(content);
-
-  return DOMPurify.sanitize(parsed.answer as string, {
+  return DOMPurify.sanitize(parsed.answer, {
     ALLOWED_TAGS: [
       'p',
       'strong',

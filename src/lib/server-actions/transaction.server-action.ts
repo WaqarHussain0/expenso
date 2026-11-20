@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import 'reflect-metadata';
 import { revalidatePath } from 'next/cache';
 import { validateDto } from '@/backend/utils/input-validator.util';
-import mongoose from 'mongoose';
-import { getServerSideSession } from '../next-auth.util';
 import { TransactionService } from '@/backend/modules/transaction/transaction.service';
 import { CreateTransactionDto } from '@/backend/modules/transaction/dto/create-transaction.dto';
+import { requireUser, toObjectId } from './action-guard';
 
 const transactionService = new TransactionService();
 
@@ -23,18 +21,21 @@ interface ActionResult {
   error?: string;
 }
 
+const errorMessage = (error: unknown) =>
+  (error as Error)?.message || 'Something went wrong';
+
 export async function createTransactionAction(
   payload: TransactionPayload,
 ): Promise<ActionResult> {
   try {
-    const user = await getServerSideSession();
-    const userId = new mongoose.Types.ObjectId(user?.user.id);
+    const user = await requireUser();
     const dto = await validateDto(CreateTransactionDto, payload);
-    await transactionService.create(dto, userId);
-    revalidatePath('/'); // adjust path as needed
+    // Service checks the category belongs to this user
+    await transactionService.create(dto, user.objectId);
+    revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -43,28 +44,28 @@ export async function updateTransactionAction(
   payload: TransactionPayload,
 ): Promise<ActionResult> {
   try {
-    const transactionId = new mongoose.Types.ObjectId(id);
-
+    const user = await requireUser();
+    const transactionId = toObjectId(id, 'transaction id');
     const dto = await validateDto(CreateTransactionDto, payload);
-    await transactionService.update(transactionId, dto); // adjust to your service method
+    // Service only matches transactions (and categories) owned by this user
+    await transactionService.update(transactionId, dto, user.objectId);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
 export async function deleteTransactionAction(
   id: string,
 ): Promise<ActionResult> {
-  const transactionId = new mongoose.Types.ObjectId(id);
-
   try {
-    await transactionService.delete(transactionId);
-
+    const user = await requireUser();
+    const transactionId = toObjectId(id, 'transaction id');
+    await transactionService.delete(transactionId, user.objectId);
     revalidatePath('/');
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Something went wrong' };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
   }
 }

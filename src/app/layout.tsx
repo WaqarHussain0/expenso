@@ -1,25 +1,25 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'sonner';
-import RTKProvider from '@/components/providers/RTK.provider';
 import NextAuthProvider from '@/components/providers/NextAuth.provider';
 import { Poppins, Manrope, Inter } from 'next/font/google';
+import { connection } from 'next/server';
 
-export const poppins = Poppins({
+const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-poppins',
   display: 'swap',
 });
 
-export const inter = Inter({
+const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-inter',
   display: 'swap',
 });
 
-export const manrope = Manrope({
+const manrope = Manrope({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-manrope',
@@ -93,11 +93,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // The CSP uses a per-request nonce (see src/proxy.ts), so every page must be
+  // rendered per request for Next.js to stamp the nonce on its scripts.
+  await connection();
+
   return (
     <html lang="en">
       <body
@@ -105,9 +109,7 @@ export default function RootLayout({
       >
         <Toaster position="bottom-right" richColors />
 
-        <NextAuthProvider>
-          <RTKProvider>{children}</RTKProvider>
-        </NextAuthProvider>
+        <NextAuthProvider>{children}</NextAuthProvider>
       </body>
     </html>
   );

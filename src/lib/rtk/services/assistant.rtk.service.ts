@@ -1,7 +1,14 @@
 import { api } from '@/lib/rtk';
+import {
+  AiKeySource,
+  AiProviderEnum,
+} from '@/app/constants/ai-providers.constant';
 
 export interface IAskAssistantResponse {
   response: string;
+  /** Provider that produced the answer (absent for local refusals) */
+  provider?: AiProviderEnum;
+  source?: AiKeySource;
   message: string;
   success: boolean;
 }

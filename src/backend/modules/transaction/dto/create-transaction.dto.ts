@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsDate,
   IsMongoId,
+  IsPositive,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
@@ -15,6 +16,7 @@ export class CreateTransactionDto {
 
   @Type(() => Number)
   @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   amount!: number;
 
