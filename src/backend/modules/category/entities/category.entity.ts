@@ -64,6 +64,9 @@ const CategorySchema = new Schema<ICategory>(
   },
 );
 
+// Category lists, stats and transaction type-filters query by user + type
+CategorySchema.index({ userId: 1, type: 1, isActive: 1 });
+
 CategorySchema.plugin(mongooseAutopopulate);
 
 const CategoryEntity: Model<ICategory> =

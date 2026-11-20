@@ -1,37 +1,21 @@
 'use client';
 
+import { COLOR_CODES } from '@/app/constants/app.constant';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
+import PageHeader from '@/components/common/PageHeader';
 import Pagination from '@/components/common/Pagination';
-import Row from '@/components/common/Row';
+import SearchInput from '@/components/common/SearchInput';
+import SegmentedControl from '@/components/common/SegmentedControl';
 import StatWrapper from '@/components/common/Stat.wrapper';
-import TextElement from '@/components/common/TextElement';
-import TransactionDialog from '@/components/feature/transaction/Transaction.dialog';
-
+import { LazyTransactionDialog } from '@/components/feature/lazy-dialogs';
 import TransactionTable from '@/components/feature/transaction/Transaction.table';
 import { CategorySelect } from '@/components/select/Category.select';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
-import {
-  Banknote,
-  BanknoteArrowDown,
-  Coins,
-  PlusIcon,
-  Search,
-  ShoppingCartIcon,
-} from 'lucide-react';
+import { PlusIcon, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
@@ -51,6 +35,25 @@ interface ITransactionWrapperProps {
   currentPage: number;
   monthStats: IMonthTransactionStats;
 }
+
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'All' },
+  {
+    value: CategoryTypeEnum.INCOME,
+    label: 'Income',
+    color: COLOR_CODES.income,
+  },
+  {
+    value: CategoryTypeEnum.EXPENSE,
+    label: 'Expense',
+    color: COLOR_CODES.expense,
+  },
+  {
+    value: CategoryTypeEnum.INVESTMENT,
+    label: 'Investment',
+    color: COLOR_CODES.investment,
+  },
+];
 
 const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
   currentPage,
@@ -134,169 +137,128 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
     [debouncedSearch, updateQueryParams, selectedCategory],
   );
 
-  const categoryTypes = [
-    { id: 'all', name: 'all' },
-    { id: CategoryTypeEnum.INCOME, name: CategoryTypeEnum.INCOME },
-    { id: CategoryTypeEnum.EXPENSE, name: CategoryTypeEnum.EXPENSE },
-    { id: CategoryTypeEnum.INVESTMENT, name: CategoryTypeEnum.INVESTMENT },
-  ];
-
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    updateQueryParams(1, debouncedSearch, undefined, categoryId);
+    const type =
+      selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
+    updateQueryParams(1, debouncedSearch, type, categoryId);
   };
 
+  const hasFilters =
+    !!searchInput || selectedType !== 'all' || !!selectedCategory;
+
   return (
-    <div className="no-scrollbar w-full space-y-2">
-      <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
-        <Row className="flex-col items-start">
-          <TextElement as="h3" className="">
-            {' '}
-            All Transactions
-          </TextElement>
-          <TextElement as="p" className="text-[#5a6070]">
-            Manage your transactions here
-          </TextElement>
-        </Row>
-
-        <Button className="" onClick={handleCloseDialog}>
-          <PlusIcon className="size-4" />
-          Add Transaction
-        </Button>
-      </Row>
-
-      <CustomBreadcrumb
-        items={[
+    <div className="page-fade flex w-full flex-col gap-5 lg:h-[calc(100dvh-7.5rem)]">
+      <PageHeader
+        title="Transactions"
+        description="Every rupee in and out — search, filter, and edit your entries."
+        breadcrumbs={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
           { label: 'Transactions' },
         ]}
+        actions={
+          <Button className="h-9 px-4" onClick={handleCloseDialog}>
+            <PlusIcon className="size-4" />
+            Add Transaction
+          </Button>
+        }
       />
 
-      {/* Stats  */}
+      {/* Stats */}
       <StatWrapper
-        stats={[
-          {
-            label: `Income`,
-            value: monthStats.income,
-            icon: BanknoteArrowDown,
-            iconClassName: 'text-[#4CAF50]',
-          },
-
-          {
-            label: `Expense`,
-            value: monthStats.expense,
-            icon: ShoppingCartIcon,
-            iconClassName: 'text-[#F44336]',
-          },
-
-          {
-            label: `Investment`,
-            value: monthStats.investment,
-            icon: Coins,
-            iconClassName: 'text-[#FF9800]',
-          },
-
-          {
-            label: `Free Cash`,
-            value:
-              monthStats.income - (monthStats.expense + monthStats.investment),
-            icon: Banknote,
-            iconClassName: 'text-[#2196F3]',
-          },
-        ]}
-        className="lg:grid-cols-4 grid grid-cols-2 gap-2"
+        stats={(() => {
+          const { income, expense, investment } = monthStats;
+          const base = income || 1;
+          const freeCash = income - (expense + investment);
+          return [
+            {
+              label: 'Income',
+              value: income,
+              percent: income ? 100 : 0,
+              color: COLOR_CODES.income,
+              hint: 'This month',
+            },
+            {
+              label: 'Expense',
+              value: expense,
+              percent: (expense / base) * 100,
+              color: COLOR_CODES.expense,
+              hint: 'This month',
+            },
+            {
+              label: 'Investment',
+              value: investment,
+              percent: (investment / base) * 100,
+              color: COLOR_CODES.investment,
+              hint: 'This month',
+            },
+            {
+              label: 'Free Cash',
+              value: freeCash,
+              percent: (freeCash / base) * 100,
+              color: COLOR_CODES.freeCash,
+              hint: 'This month',
+            },
+          ];
+        })()}
+        className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
       />
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="w-72 space-y-2">
-              <Label>Select Category</Label>
-
-              <CategorySelect
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Search by Note</Label>
-              <div className="relative">
-                <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
-                <form
-                  onSubmit={e => {
-                    e.preventDefault(); // prevent page reload
-                  }}
-                >
-                  <Input
-                    placeholder="Search by note"
-                    className="w-44 pl-10 md:w-80"
-                    value={searchInput}
-                    onChange={e => handleSearch(e.target.value)}
-                  />
-                </form>
-              </div>
-            </div>
-
-            <div className="w-28 space-y-2">
-              <Label>Select Type</Label>
-              <Select value={selectedType} onValueChange={handleTypeChange}>
-                <SelectTrigger className="w-full capitalize">
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {categoryTypes.map(type => (
-                    <SelectItem
-                      className="capitalize"
-                      key={type.id}
-                      value={type.id}
-                    >
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <TextElement
-              className={` ${
-                !searchInput && selectedType === 'all' && !selectedCategory
-                  ? 'hidden'
-                  : ''
-              }`}
-              as="span"
-              onClick={handleClearFilter}
-            >
-              Clear All
-            </TextElement>
-          </div>
-        </CardHeader>
-      </Card>
-
-      <Card className="p-0">
-        <CardContent className="p-0">
-          <TransactionTable
-            className="no-scrollbar h-[43vh] overflow-y-auto"
-            transactions={transactions || []}
+      {/* List */}
+      <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
+        <div className="flex flex-col gap-3 border-b border-[#0d1117]/[0.06] p-3 md:p-4 xl:flex-row xl:items-center">
+          <SearchInput
+            value={searchInput}
+            onChange={handleSearch}
+            placeholder="Search by note"
+            className="w-full xl:max-w-xs"
           />
 
-          {transactions && transactions?.length !== 0 && (
-            <Pagination
-              page={currentPage}
-              totalRecords={meta?.totalRecords}
-              onPageChange={handlePageChange}
-              totalPage={meta?.totalPages}
-            />
+          <CategorySelect
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            className="h-9 w-full xl:w-56"
+          />
+
+          <SegmentedControl
+            ariaLabel="Filter by type"
+            options={TYPE_OPTIONS}
+            value={selectedType}
+            onChange={handleTypeChange}
+            className="max-w-full"
+          />
+
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilter}
+              className="w-fit text-[#5a6070] xl:ml-auto"
+            >
+              <X className="size-3.5" />
+              Clear filters
+            </Button>
           )}
-        </CardContent>
+        </div>
+
+        <TransactionTable
+          className="scroll-area lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+          transactions={transactions || []}
+        />
+
+        {transactions && transactions?.length !== 0 && (
+          <Pagination
+            page={currentPage}
+            totalRecords={meta?.totalRecords}
+            onPageChange={handlePageChange}
+            totalPage={meta?.totalPages}
+          />
+        )}
       </Card>
 
-      <TransactionDialog
-        onClose={handleCloseDialog}
-        open={showTransactionDialog}
-      />
+      {showTransactionDialog && (
+        <LazyTransactionDialog onClose={handleCloseDialog} open />
+      )}
     </div>
   );
 };

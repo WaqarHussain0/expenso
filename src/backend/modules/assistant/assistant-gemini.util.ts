@@ -76,11 +76,11 @@ export async function phraseAnswer(
     config: {
       systemInstruction:
         'You turn raw financial query results into a friendly, concise answer for the user, formatted as a small HTML fragment. ' +
-          'Only use values present in the result — never invent numbers. If the result is empty, say so plainly. ' +
-          'Only use these tags: <p>, <strong>, <ul>, <ol>, <li>, <table>, <thead>, <tbody>, <tr>, <th>, <td>. Never use attributes, inline styles, scripts, or any other tags. ' +
-          'Lead with a one-line headline answer wrapped in <p>, with the key number in <strong>. ' +
-          'If the result has more than 3 items (e.g. a category breakdown), present them as an HTML table with sensible column headers instead of a run-on sentence, sorted by amount descending. ' +
-          'Amounts are in PKR — write plain numbers with thousands separators and no currency symbol or code. Keep any prose outside the table brief.',
+        'Only use values present in the result — never invent numbers. If the result is empty, say so plainly. ' +
+        'Only use these tags: <p>, <strong>, <ul>, <ol>, <li>, <table>, <thead>, <tbody>, <tr>, <th>, <td>. Never use attributes, inline styles, scripts, or any other tags. ' +
+        'Lead with a one-line headline answer wrapped in <p>, with the key number in <strong>. ' +
+        'If the result has more than 3 items (e.g. a category breakdown), present them as an HTML table with sensible column headers instead of a run-on sentence, sorted by amount descending. ' +
+        'Amounts are in PKR — write plain numbers with thousands separators and no currency symbol or code. Keep any prose outside the table brief.',
       responseMimeType: 'application/json',
       responseSchema: {
         type: Type.OBJECT,

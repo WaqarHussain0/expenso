@@ -1,10 +1,7 @@
 'use client';
 
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import TextElement from '@/components/common/TextElement';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -14,121 +11,97 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ITransaction } from '@/types/transaction.type';
-import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
-import { CATEGORY_ICONS } from '../category/Category.dialog';
-import { formatCompactAmount } from '@/lib/utils';
-import Row from '@/components/common/Row';
+import { ArrowRight, Receipt } from 'lucide-react';
+import Link from 'next/link';
+import {
+  TransactionAmount,
+  TransactionCategoryCell,
+  formatTransactionDate,
+} from '../transaction/TransactionDisplay';
 
 interface IRecentTransactionsProps {
   className?: string;
   transactions: ITransaction[];
 }
+
 const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
-  className,
+  className = '',
   transactions,
 }) => {
-  const router = useRouter();
-  const columns = useMemo(
-    () => [
-      {
-        label: 'Transaction',
-      },
-
-      {
-        label: 'Date',
-      },
-      {
-        label: 'Notes',
-      },
-    ],
-    [],
-  );
-
   return (
-    <Card className={`p-0 gap-0 ${className}`}>
-      <CardHeader className="flex items-center justify-between py-2 px-4">
-        <CardTitle>Recent Transactions</CardTitle>
+    <Card className={`gap-0 py-0 ${className}`}>
+      <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-4">
+        <div>
+          <p className="inter text-sm font-semibold text-[#0d1117]">
+            Recent transactions
+          </p>
+          <p className="inter text-xs text-[#8b93a1]">
+            Your latest {transactions.length || ''} entries
+          </p>
+        </div>
 
-        <Button
-          variant={'link'}
-          onClick={() => router.push(PAGE_ROUTES.transaction)}
+        <Link
+          href={PAGE_ROUTES.transaction}
+          className="inter group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-[#1a7f5a] transition-colors duration-300 hover:bg-[#1a7f5a]/[0.08]"
         >
-          View All
-        </Button>
-      </CardHeader>
+          View all
+          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+      </div>
 
-      <CardContent className="px-0">
-        <Table>
-          <TableHeader className="">
-            <TableRow>
-              {columns.map(column => (
-                <TableHead key={column.label}>{column.label}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            <TableHead>Category</TableHead>
+            <TableHead className="hidden md:table-cell">Note</TableHead>
+            <TableHead className="hidden sm:table-cell">Date</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+          </TableRow>
+        </TableHeader>
 
-          <TableBody>
-            {transactions.length > 0 ? (
-              transactions.map(trx => (
-                <TableRow key={trx._id}>
-                  <TableCell className="capitalize">
-                    <Row className="gap-3">
-                      <TextElement as="h4" className="">
-                        {trx?.amount != null
-                          ? formatCompactAmount(trx.amount)
-                          : '-'}
-                      </TextElement>
+        <TableBody>
+          {transactions.length > 0 ? (
+            transactions.map(trx => (
+              <TableRow key={trx._id}>
+                <TableCell>
+                  <TransactionCategoryCell
+                    category={trx.category}
+                    date={trx.date}
+                  />
+                </TableCell>
 
-                      <Badge
-                        variant={'outline'}
-                        style={{
-                          borderColor: trx.category.color,
-                        }}
-                      >
-                        {trx.category.icon &&
-                          (() => {
-                            const iconObj = CATEGORY_ICONS.find(
-                              item => item.name === trx.category.icon,
-                            );
-                            if (!iconObj) return null;
-                            const IconComponent = iconObj.icon;
-                            return (
-                              <IconComponent
-                                className="size-4"
-                                style={{ color: trx.category.color }}
-                              />
-                            );
-                          })()}
-                        {trx?.category.name}
-                      </Badge>
-                    </Row>
-                  </TableCell>
+                <TableCell className="hidden max-w-[320px] truncate text-sm text-[#5a6070] capitalize md:table-cell">
+                  {trx?.note || <span className="text-[#c4c9d0]">—</span>}
+                </TableCell>
 
-                  <TableCell className="capitalize">
-                    {trx?.date.toDateString()}
-                  </TableCell>
+                <TableCell className="hidden text-sm text-[#5a6070] sm:table-cell">
+                  {formatTransactionDate(trx.date)}
+                </TableCell>
 
-                  <TableCell className="capitalize">
-                    {trx?.note || '-'}{' '}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <TextElement as="p" className="text-center">
-                    No results.
-                  </TextElement>
+                <TableCell className="text-right text-sm">
+                  <TransactionAmount
+                    amount={trx.amount}
+                    type={trx.category?.type}
+                  />
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
+            ))
+          ) : (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={4} className="h-32 text-center">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-[#f6f7f5] text-[#8b93a1]">
+                    <Receipt className="size-5" />
+                  </span>
+                  <p className="inter text-sm text-[#8b93a1]">
+                    No transactions yet
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </Card>
   );
 };

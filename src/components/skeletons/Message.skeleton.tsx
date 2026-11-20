@@ -11,7 +11,7 @@ const MessageSkeleton = () => (
       </AvatarFallback>
     </Avatar>
 
-    <div className="max-w-[75%] rounded-xl bg-muted px-3 py-2">
+    <div className="bg-muted max-w-[75%] rounded-xl px-3 py-2">
       <Skeleton width={180} height={14} />
     </div>
   </Row>

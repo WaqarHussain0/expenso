@@ -7,12 +7,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Button } from '../ui/button';
-import { LogOut, Settings } from 'lucide-react';
+import { CalendarDays, ChevronDown, LogOut, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import {
   AlertDialog,
@@ -24,12 +26,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
+
+const noopSubscribe = () => () => {};
+const getToday = () =>
+  new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
 interface ITopBarProps {
   className?: string;
 }
-const TopBar: React.FC<ITopBarProps> = ({ className }) => {
+const TopBar: React.FC<ITopBarProps> = ({ className = '' }) => {
   const router = useRouter();
 
   const { data: session } = useSession();
@@ -44,6 +54,9 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
     .join('')
     .toUpperCase();
 
+  // Rendered only on the client so it uses the viewer's local date
+  const today = useSyncExternalStore(noopSubscribe, getToday, () => '');
+
   const handleLogout = async () => {
     setIsLoading(true);
     await signOut({ redirect: false });
@@ -51,47 +64,76 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
   };
 
   return (
-    <div
-      className={`flex w-full items-center justify-end border-b border-[#e6f5ef] px-4 py-2`}
+    <header
+      className={`sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#0d1117]/[0.06] bg-[#f6f7f5]/80 px-4 backdrop-blur-xl md:px-6 ${className}`}
     >
-      <div className={`flex w-full items-center justify-end ${className}`}>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild className="min-h-12">
-            <Button variant="ghost" className="flex items-center space-x-2">
-              <Avatar className="">
-                <AvatarImage src="" alt={user?.name || 'John Doe'} />
+      <div className="flex min-w-0 items-center gap-3">
+        {/* Logo on mobile, where the sidebar is hidden */}
+        <Link href={PAGE_ROUTES.dashboard} className="lg:hidden">
+          <div className="relative h-[28px] w-[86px]">
+            <Image
+              src="/dark-logo.png"
+              alt="Expenso"
+              fill
+              className="object-contain object-left"
+              priority
+            />
+          </div>
+        </Link>
 
-                <AvatarFallback className="poppins bg-[#0d1117] text-white">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-
-              <span className="hidden capitalize md:inline">
-                {user?.name || ''}
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => router.push(PAGE_ROUTES.profile)}
-              className="flex items-center gap-2"
-            >
-              <Settings className="mr-2 size-4" />
-              Profile
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive flex items-center gap-2"
-              onClick={() => setIsDeleteModalOpen(true)}
-            >
-              <LogOut className="mr-2 size-4" />
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {today && (
+          <span className="inter hidden items-center gap-2 text-sm text-[#5a6070] lg:inline-flex">
+            <CalendarDays className="size-4 text-[#1a7f5a]" />
+            {today}
+          </span>
+        )}
       </div>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="group flex cursor-pointer items-center gap-2.5 rounded-full border border-[#0d1117]/[0.06] bg-white py-1 pr-3 pl-1 shadow-[0_1px_2px_rgba(13,17,23,0.04)] transition-all duration-300 outline-none hover:border-[#1a7f5a]/30 hover:shadow-[0_4px_12px_-4px_rgba(13,17,23,0.12)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20">
+            <Avatar className="size-8">
+              <AvatarImage src="" alt={user?.name || ''} />
+              <AvatarFallback className="inter bg-gradient-to-br from-[#2ea878] to-[#1a7f5a] text-xs font-semibold text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+
+            <span className="inter hidden max-w-[160px] truncate text-sm font-medium text-[#0d1117] capitalize md:inline">
+              {user?.name || ''}
+            </span>
+            <ChevronDown className="size-4 text-[#8b93a1] transition-transform duration-300 group-data-[state=open]:rotate-180" />
+          </button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-60">
+          <DropdownMenuLabel className="font-normal">
+            <p className="inter truncate text-sm font-medium text-[#0d1117] capitalize">
+              {user?.name}
+            </p>
+            <p className="inter truncate text-xs text-[#8b93a1]">
+              {user?.email}
+            </p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => router.push(PAGE_ROUTES.profile)}
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <Settings className="size-4" />
+            Profile
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-destructive focus:text-destructive flex cursor-pointer items-center gap-2"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            <LogOut className="size-4" />
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* Logout Modal */}
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
@@ -114,7 +156,7 @@ const TopBar: React.FC<ITopBarProps> = ({ className }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </header>
   );
 };
 

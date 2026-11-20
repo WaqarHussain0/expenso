@@ -1,9 +1,7 @@
 'use client';
 
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import Row from '@/components/common/Row';
-import TextElement from '@/components/common/TextElement';
-import { CATEGORY_ICONS } from '@/components/feature/category/Category.dialog';
+import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +17,7 @@ import { Check, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import PageHeader from '@/components/common/PageHeader';
 
 const PreferenceWrapper = () => {
   const router = useRouter();
@@ -228,17 +227,11 @@ const PreferenceWrapper = () => {
   };
 
   return (
-    <div className="w-full space-y-3">
-      <Row className="flex-col items-start">
-        <TextElement as="h3" className="">
-          {' '}
-          Financial Preferences
-        </TextElement>
-
-        <TextElement as="p" className="text-[#5a6070]">
-          Select the categories you want to track in your budget.
-        </TextElement>
-      </Row>
+    <div className="page-fade flex w-full flex-col gap-5">
+      <PageHeader
+        title="Financial Preferences"
+        description="Select the categories you want to track in your budget."
+      />
 
       <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         {Object.entries(categories).map(([key, list]) => (

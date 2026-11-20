@@ -150,7 +150,9 @@ export function sanitizePipeline(
     firstStage.$match = { ...firstStage.$match, userId: userObjectId };
   }
 
-  return sanitized.map(coerceDateStrings) as unknown as mongoose.PipelineStage[];
+  return sanitized.map(
+    coerceDateStrings,
+  ) as unknown as mongoose.PipelineStage[];
 }
 
 function sanitizeStage(stage: unknown): Record<string, any> {

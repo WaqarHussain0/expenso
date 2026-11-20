@@ -250,20 +250,17 @@ export class UserService {
     }
 
     // Count total after filters
-    const totalRecordsAgg = await this.userEntity.aggregate([
-      ...aggregationPipeline,
-      { $count: 'total' },
+    // Count and page fetch are independent — run them concurrently
+    const [totalRecordsAgg, users] = await Promise.all([
+      this.userEntity.aggregate([...aggregationPipeline, { $count: 'total' }]),
+      this.userEntity.aggregate([
+        ...aggregationPipeline,
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limitRecords },
+      ]),
     ]);
     const totalRecords = totalRecordsAgg[0]?.total || 0;
-
-    // Pagination
-    aggregationPipeline.push({ $sort: { createdAt: -1 } });
-    aggregationPipeline.push({ $skip: skip });
-    aggregationPipeline.push({ $limit: limitRecords });
-
-    // ✅ FIX COUNT
-    // Fetch data
-    const users = await this.userEntity.aggregate(aggregationPipeline);
 
     // Map data
     const data = users.map(item => ({

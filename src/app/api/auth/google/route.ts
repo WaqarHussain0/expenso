@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
         message: 'Google login',
         data: response.userData,
         accessToken: response.accessToken,
+        accessTokenExpires: response.accessTokenExpires,
+        refreshToken: response.refreshToken,
+        refreshTokenExpires: response.refreshTokenExpires,
       },
       { status: 201 },
     );

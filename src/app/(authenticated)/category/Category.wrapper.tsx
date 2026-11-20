@@ -1,37 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { COLOR_CODES } from '@/app/constants/app.constant';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
-import Row from '@/components/common/Row';
-import TextElement from '@/components/common/TextElement';
+import PageHeader from '@/components/common/PageHeader';
+import Pagination from '@/components/common/Pagination';
+import SearchInput from '@/components/common/SearchInput';
+import SegmentedControl from '@/components/common/SegmentedControl';
+import StatWrapper from '@/components/common/Stat.wrapper';
+import { LazyCategoryDialog } from '@/components/feature/lazy-dialogs';
 import CategoryTable from '@/components/feature/category/Category.table';
 import { Button } from '@/components/ui/button';
-import {
-  BanknoteArrowDown,
-  Coins,
-  PlusIcon,
-  Search,
-  ShoppingCartIcon,
-} from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
-import Pagination from '@/components/common/Pagination';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import CategoryDialog from '@/components/feature/category/Category.dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-
-import StatWrapper from '@/components/common/Stat.wrapper';
-import { Label } from '@/components/ui/label';
+import { PlusIcon, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useState } from 'react';
 
 export interface ICategoryStats {
   income: number;
@@ -50,6 +34,25 @@ interface ICategoryWrapperProps {
 
   categoryStats: ICategoryStats;
 }
+
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'All' },
+  {
+    value: CategoryTypeEnum.INCOME,
+    label: 'Income',
+    color: COLOR_CODES.income,
+  },
+  {
+    value: CategoryTypeEnum.EXPENSE,
+    label: 'Expense',
+    color: COLOR_CODES.expense,
+  },
+  {
+    value: CategoryTypeEnum.INVESTMENT,
+    label: 'Investment',
+    color: COLOR_CODES.investment,
+  },
+];
 
 const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
   categories,
@@ -82,17 +85,17 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
     [router],
   );
 
+  const currentType = () =>
+    selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
+
   const handlePageChange = (newPage: number) => {
-    updateQueryParams(newPage, debouncedSearch);
+    updateQueryParams(newPage, debouncedSearch, currentType());
   };
 
-  const handleSearch = useCallback(
-    (value: string) => {
-      handleSearchChange(value);
-      updateQueryParams(1, value);
-    },
-    [handleSearchChange, updateQueryParams],
-  );
+  const handleSearch = (value: string) => {
+    handleSearchChange(value);
+    updateQueryParams(1, value, currentType());
+  };
 
   const handleTypeChange = useCallback(
     (value: string) => {
@@ -103,147 +106,114 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
     [debouncedSearch, updateQueryParams],
   );
 
-  const categoryTypes = [
-    { id: 'all', name: 'all' },
-    { id: CategoryTypeEnum.INCOME, name: CategoryTypeEnum.INCOME },
-    { id: CategoryTypeEnum.EXPENSE, name: CategoryTypeEnum.EXPENSE },
-    { id: CategoryTypeEnum.INVESTMENT, name: CategoryTypeEnum.INVESTMENT },
-  ];
-
   const handleClearFilter = () => {
     setSelectedType('all');
     clearSearch();
     router.push(PAGE_ROUTES.category);
   };
 
+  const hasFilters = !!searchInput || selectedType !== 'all';
+
   return (
-    <div className="w-full space-y-2">
-      <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
-        <Row className="flex-col items-start">
-          <TextElement as="h3" className="">
-            {' '}
-            All Categories
-          </TextElement>
-          <TextElement as="p" className="text-[#5a6070]">
-            Manage your categories here
-          </TextElement>
-        </Row>
-
-        <Button className="" onClick={handleCloseDialog}>
-          <PlusIcon className="size-4" />
-          Add Category
-        </Button>
-      </Row>
-
-      <CustomBreadcrumb
-        items={[
+    <div className="page-fade flex w-full flex-col gap-5 lg:h-[calc(100dvh-7.5rem)]">
+      <PageHeader
+        title="Categories"
+        description="The labels that organise your money — income, expenses, and investments."
+        breadcrumbs={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
           { label: 'Categories' },
         ]}
+        actions={
+          <Button className="h-9 px-4" onClick={handleCloseDialog}>
+            <PlusIcon className="size-4" />
+            Add Category
+          </Button>
+        }
       />
 
-      {/* Stats  */}
+      {/* Stats */}
       <StatWrapper
-        stats={[
-          {
-            label: `Income`,
-            value: categoryStats.income,
-            icon: BanknoteArrowDown,
-            iconClassName: `text-[#4CAF50]`,
-          },
-
-          {
-            label: `Expense`,
-            value: categoryStats.expense,
-            icon: ShoppingCartIcon,
-            iconClassName: 'text-[#F44336]',
-          },
-
-          {
-            label: `Investment`,
-            value: categoryStats.investment,
-            icon: Coins,
-            iconClassName: 'text-[#FF9800]',
-          },
-        ]}
-        className="grid grid-cols-2 gap-2 lg:grid-cols-3"
+        stats={(() => {
+          const { income, expense, investment } = categoryStats;
+          const total = income + expense + investment;
+          const pct = (n: number) => (total ? (n / total) * 100 : 0);
+          const hint = `of ${total} ${total === 1 ? 'category' : 'categories'}`;
+          return [
+            {
+              label: 'Income',
+              value: income,
+              percent: pct(income),
+              color: COLOR_CODES.income,
+              hint,
+            },
+            {
+              label: 'Expense',
+              value: expense,
+              percent: pct(expense),
+              color: COLOR_CODES.expense,
+              hint,
+            },
+            {
+              label: 'Investment',
+              value: investment,
+              percent: pct(investment),
+              color: COLOR_CODES.investment,
+              hint,
+            },
+          ];
+        })()}
+        className="grid-cols-1 sm:grid-cols-3"
       />
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="space-y-2">
-              <Label>Name</Label>
-
-              <div className="relative">
-                <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
-                <form
-                  onSubmit={e => {
-                    e.preventDefault(); // prevent page reload
-                  }}
-                >
-                  <Input
-                    placeholder="Search by name"
-                    className="w-44 pl-10 md:w-80"
-                    value={searchInput}
-                    onChange={e => handleSearch(e.target.value)}
-                  />
-                </form>
-              </div>
-            </div>
-
-            <div className="w-32 space-y-2">
-              <Label>Select Type</Label>
-              <Select value={selectedType} onValueChange={handleTypeChange}>
-                <SelectTrigger className="w-full capitalize">
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {categoryTypes.map(type => (
-                    <SelectItem
-                      className="capitalize"
-                      key={type.id}
-                      value={type.id}
-                    >
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <TextElement
-              className={` ${
-                !searchInput && selectedType === 'all' ? 'hidden' : ''
-              }`}
-              as="span"
-              onClick={handleClearFilter}
-            >
-              Clear All
-            </TextElement>
-          </div>
-        </CardHeader>
-      </Card>
-
-      <Card className="w-full p-0">
-        <CardContent className="p-0">
-          <CategoryTable
-            className="no-scrollbar h-[43vh] overflow-y-auto flex flex-column items-center"
-            categories={categories || []}
+      {/* List */}
+      <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
+        <div className="flex flex-col gap-3 border-b border-[#0d1117]/[0.06] p-3 md:flex-row md:items-center md:p-4">
+          <SearchInput
+            value={searchInput}
+            onChange={handleSearch}
+            placeholder="Search by name"
+            className="w-full md:max-w-xs"
           />
-          {categories && categories.length !== 0 && (
-            <Pagination
-              page={currentPage}
-              totalRecords={meta?.totalRecords}
-              onPageChange={handlePageChange}
-              totalPage={meta?.totalPages}
-            />
+
+          <SegmentedControl
+            ariaLabel="Filter by type"
+            options={TYPE_OPTIONS}
+            value={selectedType}
+            onChange={handleTypeChange}
+            className="max-w-full"
+          />
+
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilter}
+              className="w-fit text-[#5a6070] md:ml-auto"
+            >
+              <X className="size-3.5" />
+              Clear filters
+            </Button>
           )}
-        </CardContent>
+        </div>
+
+        <CategoryTable
+          className="scroll-area bg-[#fbfbfa] lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+          categories={categories || []}
+        />
+
+        {categories && categories.length !== 0 && (
+          <Pagination
+            page={currentPage}
+            totalRecords={meta?.totalRecords}
+            onPageChange={handlePageChange}
+            totalPage={meta?.totalPages}
+          />
+        )}
       </Card>
 
-      <CategoryDialog onClose={handleCloseDialog} open={showCategoryDialog} />
+      {showCategoryDialog && (
+        <LazyCategoryDialog onClose={handleCloseDialog} open />
+      )}
     </div>
   );
 };

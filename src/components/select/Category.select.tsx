@@ -18,7 +18,8 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { ICategory } from '@/types/category.type';
-import { CATEGORY_ICONS } from '../feature/category/Category.dialog';
+import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
+import { CategoryIconTile } from '../feature/transaction/TransactionDisplay';
 import {
   getAllCategoriesAction,
   getCategoryByIdAction,
@@ -99,11 +100,19 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'w-full justify-between font-normal capitalize',
+            'inter h-10 w-full justify-between border-[#0d1117]/[0.08] bg-[#fafbfa] bg-none font-normal text-[#0d1117] capitalize hover:border-[#1a7f5a]/40 hover:bg-white hover:text-[#0d1117] aria-expanded:border-[#1a7f5a] aria-expanded:bg-white aria-expanded:text-[#0d1117] aria-expanded:ring-3 aria-expanded:ring-[#1a7f5a]/15',
             className,
           )}
         >
-          {selectedLabel ?? (
+          {selectedLabel ? (
+            <span className="flex min-w-0 items-center gap-2">
+              <CategoryIconTile
+                category={options.find(c => c._id === value)}
+                className="size-5 rounded-md [&>svg]:size-3"
+              />
+              <span className="truncate">{selectedLabel}</span>
+            </span>
+          ) : (
             <span className="text-muted-foreground">{placeholder}</span>
           )}
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
@@ -111,7 +120,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-[--radix-popover-trigger-width] p-0"
+        className="w-(--radix-popover-trigger-width) min-w-56 p-0"
         side="bottom"
         align="start"
         // Keeps popover open when virtual keyboard pushes layout on mobile

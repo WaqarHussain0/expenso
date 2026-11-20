@@ -1,6 +1,4 @@
-import { MoveLeft, MoveRight } from 'lucide-react';
-import Row from './Row';
-import TextElement from './TextElement';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   page: number;
@@ -10,64 +8,57 @@ interface PaginationProps {
   className?: string;
 }
 
+const navButtonClass =
+  'flex size-8 cursor-pointer items-center justify-center rounded-lg border border-[#0d1117]/[0.08] bg-white text-[#5a6070] transition-all duration-300 hover:border-[#1a7f5a]/40 hover:text-[#1a7f5a] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#0d1117]/[0.08] disabled:hover:text-[#5a6070]';
+
 const Pagination = ({
   page = 0,
   totalRecords,
   onPageChange,
   totalPage = 0,
-  className,
+  className = '',
 }: PaginationProps) => {
-  const handlePrev = () => {
-    if (page > 1) {
-      onPageChange(page - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (page < totalPage) {
-      onPageChange(page + 1);
-    }
-  };
+  const canPrev = page > 1;
+  const canNext = page < totalPage;
 
   return (
-    <Row
-      className={`w-full flex-col justify-between gap-1 bg-slate-200 px-[20px] py-[6px] md:flex-row md:gap-0 ${className}`}
+    <div
+      className={`flex w-full items-center justify-between gap-3 border-t border-[#0d1117]/[0.06] bg-[#fbfbfa] px-4 py-3 md:px-5 ${className}`}
     >
-      <Row className="gap-2">
-        <TextElement as="p" className="">
-          Total Records:
-        </TextElement>
-        <TextElement as="h4" className="manropeBold">
+      <p className="inter text-xs text-[#8b93a1]">
+        <span className="font-semibold text-[#0d1117] tabular-nums">
           {totalRecords}
-        </TextElement>
-      </Row>
+        </span>{' '}
+        {totalRecords === 1 ? 'record' : 'records'}
+      </p>
 
-      <Row className="gap-2">
-        {page > 1 && (
-          <div
-            className="flex size-[30px] cursor-pointer items-center justify-center rounded-[10px] border border-[#EAEAEA] bg-white"
-            onClick={handlePrev}
-          >
-            <MoveLeft className="size-4" />
-          </div>
-        )}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="Previous page"
+          className={navButtonClass}
+          disabled={!canPrev}
+          onClick={() => canPrev && onPageChange(page - 1)}
+        >
+          <ChevronLeft className="size-4" />
+        </button>
 
-        <div className="flex items-center justify-center rounded-md bg-white px-2 py-1">
-          <TextElement as="h4" className="manropeBold">
-            {page} / {totalPage}
-          </TextElement>
-        </div>
+        <span className="inter min-w-[64px] text-center text-xs text-[#5a6070] tabular-nums">
+          Page <span className="font-semibold text-[#0d1117]">{page}</span> of{' '}
+          {totalPage}
+        </span>
 
-        {page !== totalPage && (
-          <div
-            className="flex size-[30px] cursor-pointer items-center justify-center rounded-[10px] border-[1px] border-[#EAEAEA] bg-white"
-            onClick={handleNext}
-          >
-            <MoveRight className="size-4" />
-          </div>
-        )}
-      </Row>
-    </Row>
+        <button
+          type="button"
+          aria-label="Next page"
+          className={navButtonClass}
+          disabled={!canNext}
+          onClick={() => canNext && onPageChange(page + 1)}
+        >
+          <ChevronRight className="size-4" />
+        </button>
+      </div>
+    </div>
   );
 };
 

@@ -104,23 +104,26 @@ const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
             label: 'Savings Rate',
             value: `${savingsRate}%`,
             icon: TrendingUp,
-            iconClassName: 'text-emerald-400',
+            color: COLOR_CODES.income,
+            hint: 'Of income kept',
           },
           {
             label: 'Top Expense',
             value: topExpenseCategory?.name ?? '—',
             icon: Flame,
-            iconClassName: `text-[#F44336]`,
+            color: COLOR_CODES.expense,
+            hint: 'Biggest spending category',
           },
           {
             label: 'Transactions',
             value: counts?.income + counts?.expense + counts?.investment,
             icon: Hash,
-            iconClassName: 'text-purple-400',
+            color: '#8b5cf6',
+            hint: 'In this range',
           },
         ]}
         skeletonCount={3}
-        className="grid-cols-2 gap-2 lg:grid-cols-4"
+        className="grid-cols-1 sm:grid-cols-3"
       />
 
       {/* ── 3. Expense Breakdown ── */}

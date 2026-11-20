@@ -1,24 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { COLOR_CODES } from '@/app/constants/app.constant';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Mail,
-  Phone,
-  VenusAndMars,
-  Banknote,
-  BanknoteArrowDown,
-  Coins,
-  ShoppingCartIcon,
-} from 'lucide-react';
+import { Mail, Phone, VenusAndMars } from 'lucide-react';
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
-import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { CATEGORY_ICONS } from '@/components/feature/category/Category.dialog';
+import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
 import { Badge } from '@/components/ui/badge';
 import { CategoryTypeEnum } from '@/types/category.type';
 import StatWrapper from '@/components/common/Stat.wrapper';
+import PageHeader from '@/components/common/PageHeader';
 
 interface IUserDetailsWrapperProps {
   userData: any;
@@ -54,21 +48,13 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
   ];
 
   return (
-    <div className="no-scrollbar w-full space-y-2">
-      <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
-        <Row className="flex-col items-start">
-          <TextElement as="h3" className="">
-            {' '}
-            User Details
-          </TextElement>
-          <TextElement as="p" className="text-[#5a6070]">
-            User details here
-          </TextElement>
-        </Row>
-      </Row>
-
-      <CustomBreadcrumb
-        items={[
+    <div className="page-fade flex w-full flex-col gap-5">
+      <PageHeader
+        title={
+          <span className="capitalize">{user.name || 'User details'}</span>
+        }
+        description="Profile and activity for this user."
+        breadcrumbs={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
           { label: 'Users', linkTo: PAGE_ROUTES.user },
           { label: user.name || '' },
@@ -89,15 +75,12 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                       {item.title}
                     </TextElement>
 
-                    <TextElement as="h4"
+                    <TextElement
+                      as="h4"
                       className={`font-medium ${item.title === 'Gender' ? 'capitalize' : ''}`}
                     >
                       {item.value}
-
                     </TextElement>
-
-
-                   
                   </div>
                 </div>
               );
@@ -114,38 +97,42 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
         <CardContent>
           {/* Stats  */}
           <StatWrapper
-            stats={[
-              {
-                label: `Income`,
-                value: monthStats.income,
-                icon: BanknoteArrowDown,
-                iconClassName: 'text-[#4CAF50]',
-              },
-
-              {
-                label: `Expense`,
-                value: monthStats.expense,
-                icon: ShoppingCartIcon,
-                iconClassName: 'text-[#F44336]',
-              },
-
-              {
-                label: `Investment`,
-                value: monthStats.investment,
-                icon: Coins,
-                iconClassName: 'text-[#FF9800]',
-              },
-
-              {
-                label: `Free Cash`,
-                value:
-                  monthStats.income -
-                  (monthStats.expense + monthStats.investment),
-                icon: Banknote,
-                iconClassName: 'text-[#2196F3]',
-              },
-            ]}
-            className="grid-cols-2 gap-2 lg:grid-cols-4"
+            stats={(() => {
+              const { income, expense, investment } = monthStats;
+              const base = income || 1;
+              const freeCash = income - (expense + investment);
+              return [
+                {
+                  label: 'Income',
+                  value: income,
+                  percent: income ? 100 : 0,
+                  color: COLOR_CODES.income,
+                  hint: 'This month',
+                },
+                {
+                  label: 'Expense',
+                  value: expense,
+                  percent: (expense / base) * 100,
+                  color: COLOR_CODES.expense,
+                  hint: 'This month',
+                },
+                {
+                  label: 'Investment',
+                  value: investment,
+                  percent: (investment / base) * 100,
+                  color: COLOR_CODES.investment,
+                  hint: 'This month',
+                },
+                {
+                  label: 'Free Cash',
+                  value: freeCash,
+                  percent: (freeCash / base) * 100,
+                  color: COLOR_CODES.freeCash,
+                  hint: 'This month',
+                },
+              ];
+            })()}
+            className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
           />
         </CardContent>
       </Card>
@@ -163,7 +150,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                 <Card key={item.id} className="w-full p-2">
                   <CardHeader className="flex flex-col items-center gap-2 p-0 md:flex-row">
                     <div
-                      className="flex size-7 md:size-9 shrink-0 items-center justify-center rounded-full"
+                      className="flex size-7 shrink-0 items-center justify-center rounded-full md:size-9"
                       style={{
                         backgroundColor: item.color + '1A', // 1A is ~10% opacity in hex
                       }}
@@ -177,7 +164,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                           const IconComponent = iconObj.icon;
                           return (
                             <IconComponent
-                              className="size-3 md:size-4 shrink-0"
+                              className="size-3 shrink-0 md:size-4"
                               style={{ color: item.color }}
                             />
                           );
@@ -195,10 +182,11 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                             ? 'destructive'
                             : 'default'
                         }
-                        className={`capitalize ${item.type === CategoryTypeEnum.INVESTMENT
-                          ? 'bg-yellow-100 text-yellow-500'
-                          : ''
-                          }`}
+                        className={`capitalize ${
+                          item.type === CategoryTypeEnum.INVESTMENT
+                            ? 'bg-yellow-100 text-yellow-500'
+                            : ''
+                        }`}
                       >
                         {item?.type}
                       </Badge>

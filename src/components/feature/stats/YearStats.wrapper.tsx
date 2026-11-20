@@ -114,7 +114,9 @@ const BreakdownBarChart: React.FC<{
         </div>
       </div>
     ) : data?.length === 0 ? (
-      <TextElement className='w-full text-center py-2'>{emptyMessage}</TextElement>
+      <TextElement className="w-full py-2 text-center">
+        {emptyMessage}
+      </TextElement>
     ) : (
       <ResponsiveContainer width="100%" height={240}>
         <BarChart

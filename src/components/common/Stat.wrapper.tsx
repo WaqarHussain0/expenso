@@ -1,71 +1,53 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import Row from './Row';
-import Skeleton from 'react-loading-skeleton';
-import { formatCompactAmount } from '@/lib/utils';
+import { LucideIcon } from 'lucide-react';
+import StatCard from './StatCard';
 
 interface IStatWrapperProps {
   stats: {
     label: string;
-    icon: any;
     value: number | string;
-    iconClassName?: string;
+    /** Accent colour (hex) */
+    color?: string;
+    /** 0–100 — shows a progress ring like the dashboard cards */
+    percent?: number;
+    /** Shown instead of the ring when there's no meaningful percentage */
+    icon?: LucideIcon;
+    hint?: string;
   }[];
   className?: string;
   isLoading?: boolean;
   skeletonCount?: number;
 }
 
+const DEFAULT_COLOR = '#1a7f5a';
+
+/** Grid of dashboard-style stat cards. */
 const StatWrapper: React.FC<IStatWrapperProps> = ({
   stats,
-  className,
+  className = '',
   isLoading = false,
   skeletonCount = 4,
 }) => {
+  const items = isLoading
+    ? Array.from({ length: skeletonCount }, (_, i) => ({
+        label: `loading-${i}`,
+        value: 0,
+        color: DEFAULT_COLOR,
+      }))
+    : stats;
+
   return (
-    <Row className={`grid grid-cols-1 gap-2 md:grid-cols-3 ${className}`}>
-      {isLoading
-        ? Array.from({ length: skeletonCount }).map((_, index) => (
-            <Card key={index} className="gap-1">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <Skeleton width={80} height={16} />
-                  <Skeleton circle width={25} height={25} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Skeleton width={120} height={28} />
-              </CardContent>
-            </Card>
-          ))
-        : stats.map(item => {
-            const Icon = item.icon;
-            return (
-              <Card key={item.label} className="gap-1">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className={`${item.iconClassName}`}>
-                      {item.label}
-                    </CardTitle>
-                    <Icon
-                      className={`size-4 md:size-5 ${item.iconClassName}`}
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="manropeBold text-lg text-gray-900 capitalize md:text-2xl">
-                        {item.value != null ? formatCompactAmount(item.value) : ''}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-    </Row>
+    <div
+      className={`grid w-full grid-cols-1 gap-3 md:grid-cols-3 md:gap-4 ${className}`}
+    >
+      {items.map(item => (
+        <StatCard
+          key={item.label}
+          isLoading={isLoading}
+          stat={{ ...item, color: item.color ?? DEFAULT_COLOR }}
+        />
+      ))}
+    </div>
   );
 };
 

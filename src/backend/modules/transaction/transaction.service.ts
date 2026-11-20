@@ -136,18 +136,21 @@ export class TransactionService {
 
     const skip = (page - 1) * limit;
 
-    const totalRecords = await this.transactionEntity.countDocuments(query);
-
-    const transactions = await this.transactionEntity
-      .find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort({ date: -1 })
-      .populate({
-        path: 'categoryId',
-        select: '_id name type color icon', // populate only relevant fields
-      })
-      .lean();
+    // Count and page fetch are independent — run them concurrently
+    const [totalRecords, transactions] = await Promise.all([
+      this.transactionEntity.countDocuments(query),
+      this.transactionEntity
+        .find(query)
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('amount date note categoryId createdAt updatedAt')
+        .populate({
+          path: 'categoryId',
+          select: '_id name type color icon', // populate only relevant fields
+        })
+        .lean(),
+    ]);
 
     const data = transactions.map(item => {
       const category = item.categoryId as ICategory;
@@ -494,7 +497,10 @@ export class TransactionService {
     const transactions = await TransactionEntity.find({
       userId,
       date: { $gte: startDate, $lte: endDate },
-    });
+    })
+      .select('amount date categoryId')
+      .populate({ path: 'categoryId', select: 'name type' })
+      .lean();
 
     // ── 1. Totals (for cards) ────────────────────────────────────
     const totals = { income: 0, expense: 0, investment: 0 };
@@ -608,7 +614,10 @@ export class TransactionService {
     const transactions = await TransactionEntity.find({
       userId,
       date: { $gte: start, $lte: end },
-    });
+    })
+      .select('amount categoryId')
+      .populate({ path: 'categoryId', select: 'name type' })
+      .lean();
 
     const totals = { income: 0, expense: 0, investment: 0, freeCash: 0 };
     const counts = { income: 0, expense: 0, investment: 0 };
@@ -652,16 +661,30 @@ export class TransactionService {
     await initDB();
     const userMongoObjectId = new mongoose.Types.ObjectId(userId);
 
-    const transactions = await TransactionEntity.find({
-      userId: userMongoObjectId,
-    });
+    // Sum per category type in MongoDB — previously this loaded every
+    // transaction (plus autopopulated user + category docs) into memory.
+    const grouped = await this.transactionEntity.aggregate<{
+      _id: CategoryTypeEnum;
+      total: number;
+    }>([
+      { $match: { userId: userMongoObjectId } },
+      { $group: { _id: '$categoryId', total: { $sum: '$amount' } } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      { $group: { _id: '$category.type', total: { $sum: '$total' } } },
+    ]);
 
     const totals = { income: 0, expense: 0, investment: 0, freeCash: 0 };
 
-    for (const tx of transactions) {
-      const category = tx?.categoryId as ICategory;
-      const type = category?.type as CategoryTypeEnum;
-      totals[type] += tx?.amount;
+    for (const { _id: type, total } of grouped) {
+      if (type in totals) totals[type] += total;
     }
 
     totals.freeCash = totals.income - (totals.expense + totals.investment);

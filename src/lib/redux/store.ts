@@ -1,6 +1,6 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { setupListeners } from "@reduxjs/toolkit/query";
-import { api } from "../rtk";
+import { configureStore } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { api } from '../rtk';
 
 export const store = configureStore({
   reducer: {
@@ -8,9 +8,9 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer,
     // add other reducers here
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(api.middleware),
-  devTools: process.env.NODE_ENV !== "production",
+  devTools: process.env.NODE_ENV !== 'production',
 });
 
 // optional: enables refetchOnFocus/refetchOnReconnect behaviors

@@ -292,3 +292,127 @@
   background-clip: text;
   color: transparent;
 }
+
+/* Shared brand textures (used by landing + auth screens) */
+.fr-grid-bg {
+  background-image:
+    linear-gradient(rgba(74, 222, 128, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 222, 128, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ===== Logo loader ===== */
+@keyframes logo-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes logo-loader-halo {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes logo-loader-mark {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes logo-loader-dots {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75%,
+  100% {
+    content: '...';
+  }
+}
+
+.logo-loader-arc {
+  transform-origin: 50% 50%;
+  animation: logo-loader-spin 1.1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+}
+
+.logo-loader-halo {
+  animation: logo-loader-halo 2.2s ease-in-out infinite;
+}
+
+.logo-loader-mark {
+  animation: logo-loader-mark 2.2s ease-in-out infinite;
+}
+
+.logo-loader-dots::after {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+  animation: logo-loader-dots 1.2s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-loader-halo,
+  .logo-loader-mark,
+  .logo-loader-dots::after {
+    animation: none;
+  }
+  .logo-loader-arc {
+    animation-duration: 2.4s;
+  }
+}
+
+/* ===== Scroll area (tables / lists that scroll inside a card) ===== */
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(13, 17, 23, 0.18) transparent;
+  overscroll-behavior: contain;
+}
+.scroll-area::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background-color: rgba(13, 17, 23, 0.16);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(13, 17, 23, 0.3);
+}

@@ -1,21 +1,35 @@
 import 'react-loading-skeleton/dist/skeleton.css';
 import Navbar from '@/components/common/Navbar';
-import Row from '@/components/common/Row';
 import TopBar from '@/components/common/TopBar';
+import { cookies } from 'next/headers';
+import { SIDEBAR_COOKIE } from '@/app/constants/app.constant';
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = async ({ children }: { children: React.ReactNode }) => {
+  // Read on the server so the sidebar renders at the right width on first paint
+  const sidebarCollapsed =
+    (await cookies()).get(SIDEBAR_COOKIE)?.value === 'true';
+
   return (
-    <Row className="h-screen w-full">
-      <Navbar className="h-full w-64" />
+    <div className="flex h-screen w-full bg-[#f6f7f5]">
+      <Navbar className="h-full" defaultCollapsed={sidebarCollapsed} />
 
-      <Row className="no-scrollbar h-full flex-1 flex-col overflow-y-auto bg-white">
-        <TopBar className="h-[50px] flex-shrink-0" />
+      <main className="no-scrollbar relative flex h-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+        {/* soft brand glow behind content */}
+        <div
+          className="pointer-events-none absolute -top-48 right-0 h-[420px] w-[640px]"
+          style={{
+            background:
+              'radial-gradient(ellipse, rgba(46,168,120,.08) 0%, transparent 70%)',
+          }}
+        />
 
-        <div className="w-full flex-1 overflow-y-auto bg-slate-50 px-3 pt-3 pb-20 lg:pb-3">
+        <TopBar />
+
+        <div className="relative w-full flex-1 px-3 pt-4 pb-24 md:px-6 md:pt-6 lg:pb-8">
           {children}
         </div>
-      </Row>
-    </Row>
+      </main>
+    </div>
   );
 };
 

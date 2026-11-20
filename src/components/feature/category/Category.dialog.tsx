@@ -3,12 +3,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useEffect, useTransition } from 'react';
 import { Input } from '@/components/ui/input';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -17,68 +18,19 @@ import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 
 import {
   BanknoteArrowDown,
+  Check,
   Coins,
-  Wallet,
   ShoppingCartIcon,
-  Fuel,
-  Car,
-  Home,
-  ShoppingCart,
-  Heart,
-  Plane,
-  Gamepad2,
-  Coffee,
-  Gift,
-  Book,
-  Music,
-  Dumbbell,
-  Smartphone,
-  Shirt,
-  Bike,
-  Briefcase,
-  TrendingUp,
-  Utensils,
-  Laptop,
-  CardSim,
-  Barcode,
-  Scissors,
-  HandHeart,
-  BriefcaseMedical,
 } from 'lucide-react';
+import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
 import {
   createCategoryAction,
   updateCategoryAction,
 } from '@/lib/server-actions/category.server-action';
+import CategoryTypeBadge, { CATEGORY_TYPE_COLORS } from './CategoryTypeBadge';
+import { CategoryIconTile } from '../transaction/TransactionDisplay';
 
-export const CATEGORY_ICONS = [
-  { name: 'Wallet', icon: Wallet },
-  { name: 'Barcode', icon: Barcode },
-  { name: 'Laptop', icon: Laptop },
-  { name: 'CardSim', icon: CardSim },
-  { name: 'Fuel', icon: Fuel },
-  { name: 'Car', icon: Car },
-  { name: 'Home', icon: Home },
-  { name: 'ShoppingCart', icon: ShoppingCart },
-  { name: 'Heart', icon: Heart },
-  { name: 'Plane', icon: Plane },
-  { name: 'Gamepad2', icon: Gamepad2 },
-  { name: 'Coffee', icon: Coffee },
-  { name: 'Gift', icon: Gift },
-  { name: 'Book', icon: Book },
-  { name: 'Music', icon: Music },
-  { name: 'Dumbbell', icon: Dumbbell },
-  { name: 'Smartphone', icon: Smartphone },
-  { name: 'Shirt', icon: Shirt },
-  { name: 'Bike', icon: Bike },
-  { name: 'Briefcase', icon: Briefcase },
-  { name: 'TrendingUp', icon: TrendingUp },
-  { name: 'Utensils', icon: Utensils },
-  { name: 'Scissors', icon: Scissors },
-  { name: 'HandHeart', icon: HandHeart },
-  { name: 'BriefcaseMedical', icon: BriefcaseMedical },
-
-  
-];
+export { CATEGORY_ICONS };
 
 const COLORS = [
   '#FF6B35',
@@ -180,60 +132,80 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
 
   const isSubmitting = isPending;
 
-  const getTypeColor = (type: CategoryTypeEnum | undefined) => {
+  const [watchedName, watchedType, watchedIcon, watchedColor] = useWatch({
+    control,
+    name: ['name', 'type', 'icon', 'color'],
+  });
+
+  const getTypeIcon = (type: CategoryTypeEnum | undefined) => {
     switch (type) {
       case CategoryTypeEnum.INCOME:
-        return 'bg-primary/20 text-primary border-primary';
+        return <BanknoteArrowDown className="size-4" />;
       case CategoryTypeEnum.EXPENSE:
-        return 'bg-destructive/20 text-destructive border-destructive';
+        return <ShoppingCartIcon className="size-4" />;
       case CategoryTypeEnum.INVESTMENT:
-        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500';
+        return <Coins className="size-4" />;
       default:
         return null;
     }
   };
 
-  const getTypeIcon = (type: CategoryTypeEnum | undefined) => {
-    switch (type) {
-      case CategoryTypeEnum.INCOME:
-        return <BanknoteArrowDown />;
-      case CategoryTypeEnum.EXPENSE:
-        return <ShoppingCartIcon />;
-      case CategoryTypeEnum.INVESTMENT:
-        return <Coins />;
-      default:
-        return null;
-    }
+  const handleCancel = () => {
+    onClose();
+    reset();
   };
 
   return (
     <Dialog
       open={open}
       onOpenChange={isOpen => {
-        if (!isOpen) {
-          onClose();
-          reset();
-        }
+        if (!isOpen) handleCancel();
       }}
     >
-      <DialogContent className="no-scrollbar max-h-[80vh] overflow-y-auto">
+      <DialogContent className="no-scrollbar max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{category ? 'Edit' : 'Add New'} Category</DialogTitle>
+          <DialogTitle>
+            {category ? 'Edit category' : 'New category'}
+          </DialogTitle>
           <DialogDescription>
             {category
-              ? "Update the category's information below."
-              : 'Create a new category.'}
+              ? "Update the category's details below."
+              : 'Give it a name, a type, and a look you will recognise.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div className="space-y-2">
-            <Label>Category Name *</Label>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Live preview */}
+          <div className="flex items-center gap-3 rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] p-3">
+            <CategoryIconTile
+              category={{ icon: watchedIcon, color: watchedColor }}
+              className="size-11 rounded-xl transition-colors duration-300 [&>svg]:size-5"
+            />
+            <div className="min-w-0 flex-1">
+              <p
+                className={`inter truncate text-sm font-semibold capitalize ${
+                  watchedName?.trim() ? 'text-[#0d1117]' : 'text-[#c4c9d0]'
+                }`}
+              >
+                {watchedName?.trim() || 'Category name'}
+              </p>
+              <CategoryTypeBadge type={watchedType} className="mt-1" />
+            </div>
+            <span className="inter text-[10px] font-semibold tracking-widest text-[#c4c9d0] uppercase">
+              Preview
+            </span>
+          </div>
 
+          {/* Name */}
+          <div className="space-y-2">
+            <Label htmlFor="category-name">Name</Label>
             <Input
+              id="category-name"
               type="text"
-              placeholder="Category Name"
+              placeholder="e.g. Groceries, Salary, SIP"
               disabled={isSubmitting}
+              aria-invalid={!!errors.name}
+              className="h-10 bg-[#fafbfa] px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15"
               {...register('name', {
                 required: 'Name is required',
                 validate: value =>
@@ -241,132 +213,161 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               })}
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name.message}</p>
+              <p className="text-xs text-red-500">{errors.name.message}</p>
             )}
           </div>
 
+          {/* Type */}
           <div className="space-y-2">
-            <Label htmlFor="role">Type *</Label>
-
+            <Label>Type</Label>
             <Controller
               name="type"
               control={control}
               rules={{ required: 'Type is required' }}
               render={({ field }) => (
-                <div className="flex flex-wrap gap-2">
+                <div
+                  role="radiogroup"
+                  aria-label="Category type"
+                  className="grid grid-cols-3 gap-2"
+                >
                   {categoryTypes.map(type => {
                     const isActive = field.value === type.id;
+                    const color = CATEGORY_TYPE_COLORS[type.id];
 
                     return (
-                      <Button
+                      <button
                         type="button"
+                        role="radio"
+                        aria-checked={isActive}
                         key={type.id}
                         onClick={() => field.onChange(type.id)}
-                        className={`flex items-center gap-2 border px-3 capitalize transition-all ${
+                        className={`inter flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium capitalize transition-all duration-300 ${
                           isActive
-                            ? `${getTypeColor(type.id)} `
-                            : 'text-muted-foreground hover:bg-muted border-gray-300 bg-transparent'
-                        } `}
+                            ? 'shadow-[0_4px_12px_-6px_rgba(13,17,23,0.2)]'
+                            : 'border-[#0d1117]/[0.08] text-[#5a6070] hover:border-[#0d1117]/[0.16] hover:text-[#0d1117]'
+                        }`}
+                        style={
+                          isActive
+                            ? {
+                                borderColor: color,
+                                background: `${color}10`,
+                                color,
+                              }
+                            : undefined
+                        }
                       >
                         {getTypeIcon(type.id)}
                         {type.name}
-                      </Button>
+                      </button>
                     );
                   })}
                 </div>
               )}
             />
-
             {errors.type && (
-              <p className="text-sm text-red-500">{errors.type.message}</p>
+              <p className="text-xs text-red-500">{errors.type.message}</p>
             )}
           </div>
 
+          {/* Icon */}
           <div className="space-y-2">
             <Label>Icon</Label>
-
             <Controller
               name="icon"
               control={control}
               rules={{ required: 'Icon is required' }}
               render={({ field }) => (
-                <div className="grid max-h-40 grid-cols-8 gap-2 overflow-y-auto rounded-md border p-3">
+                <div className="grid grid-cols-6 gap-1.5 rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] p-2 sm:grid-cols-9">
                   {CATEGORY_ICONS.map(item => {
                     const Icon = item.icon;
                     const isActive = field.value === item.name;
 
                     return (
-                      <Button
+                      <button
                         type="button"
                         key={item.name}
-                        variant={isActive ? 'default' : 'outline'}
+                        aria-label={item.name}
+                        aria-pressed={isActive}
                         onClick={() => field.onChange(item.name)}
+                        className={`flex aspect-square cursor-pointer items-center justify-center rounded-lg transition-all duration-200 ${
+                          isActive
+                            ? 'bg-white'
+                            : 'text-[#8b93a1] hover:bg-white hover:text-[#0d1117]'
+                        }`}
+                        style={
+                          isActive
+                            ? {
+                                color: watchedColor,
+                                boxShadow: `0 0 0 1.5px ${watchedColor}, 0 2px 8px -2px rgba(13,17,23,0.15)`,
+                              }
+                            : undefined
+                        }
                       >
                         <Icon className="size-4" />
-                      </Button>
+                      </button>
                     );
                   })}
                 </div>
               )}
             />
-
             {errors.icon && (
-              <p className="text-sm text-red-500">{errors.icon.message}</p>
+              <p className="text-xs text-red-500">{errors.icon.message}</p>
             )}
           </div>
 
+          {/* Colour */}
           <div className="space-y-2">
-            <Label>Color</Label>
-
+            <Label>Colour</Label>
             <Controller
               name="color"
               control={control}
               rules={{ required: 'Color is required' }}
               render={({ field }) => (
-                <div className="grid grid-cols-8 gap-2 rounded-md border p-3">
+                <div className="flex flex-wrap gap-2.5">
                   {COLORS.map(color => {
                     const isActive = field.value === color;
 
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={color}
-                        className={`flex size-9 items-center justify-center rounded-md ${isActive ? 'ring-primary ring-2 ring-offset-2' : ''}}`}
+                        aria-label={`Colour ${color}`}
+                        aria-pressed={isActive}
+                        onClick={() => field.onChange(color)}
+                        className="flex size-7 cursor-pointer items-center justify-center rounded-full text-white transition-transform duration-200 hover:scale-110"
+                        style={{
+                          backgroundColor: color,
+                          boxShadow: isActive
+                            ? `0 0 0 2px #fff, 0 0 0 4px ${color}`
+                            : undefined,
+                        }}
                       >
-                        <button
-                          type="button"
-                          onClick={() => field.onChange(color)}
-                          className={`size-8 cursor-pointer rounded-sm border-2`}
-                          style={{ backgroundColor: color }}
-                        />
-                      </div>
+                        {isActive && (
+                          <Check className="size-3.5" strokeWidth={3} />
+                        )}
+                      </button>
                     );
                   })}
                 </div>
               )}
             />
-
             {errors.color && (
-              <p className="text-sm text-red-500">{errors.color.message}</p>
+              <p className="text-xs text-red-500">{errors.color.message}</p>
             )}
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onClose();
-                reset();
-              }}
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {' '}
-              {isSubmitting ? 'Saving...' : 'Save'}
+            <Button type="submit" disabled={isSubmitting} className="px-5">
+              {isSubmitting
+                ? 'Saving...'
+                : category
+                  ? 'Save changes'
+                  : 'Create category'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

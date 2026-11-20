@@ -1,38 +1,159 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import mongoose from 'mongoose';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import jwt from 'jsonwebtoken';
 import { RegisterDto } from './dto/register.dto';
 import { UserRoleEnum } from '../user/entities/user.entity';
 import { OAuth2Client } from 'google-auth-library';
+import { initDB } from '@/backend/utils/dbInit.util';
+import RefreshTokenEntity from './entities/refresh-token.entity';
+import {
+  ACCESS_TOKEN_TTL_SECONDS,
+  REFRESH_TOKEN_REUSE_GRACE_MS,
+  REFRESH_TOKEN_TTL_SECONDS,
+  getJwtSecret,
+} from './auth.config';
 
 const userService = new UserService();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+export interface IAuthTokens {
+  accessToken: string;
+  /** epoch ms */
+  accessTokenExpires: number;
+  refreshToken: string;
+  /** epoch ms */
+  refreshTokenExpires: number;
+}
+
+const hashToken = (token: string) =>
+  crypto.createHash('sha256').update(token).digest('hex');
+
 export class AuthService {
+  /** Short-lived signed JWT used as the Bearer token for API calls. */
   generateToken(user: any) {
-    // Prepare payload for JWT
     const jwtPayload = {
-      id: user._id || '',
+      id: user._id?.toString?.() || user.id || '',
       email: user.email || '',
       role: user.role || '',
     };
 
-    // Get JWT secret from env
-    const JWT_SECRET =
-      process.env.NEXT_PUBLIC_JWT_SECRET || 'your_super_secret';
-    const JWT_EXPIRY_HOURS = Number(
-      process.env.NEXT_PUBLIC_JWT_EXPIRY_HOURS || '1',
+    return jwt.sign(jwtPayload, getJwtSecret(), {
+      expiresIn: ACCESS_TOKEN_TTL_SECONDS,
+    });
+  }
+
+  /** Issue a new access token + refresh token pair for a user. */
+  async issueTokens(user: any): Promise<IAuthTokens> {
+    await initDB();
+
+    const now = Date.now();
+    const refreshToken = crypto.randomBytes(48).toString('base64url');
+    const refreshTokenExpires = now + REFRESH_TOKEN_TTL_SECONDS * 1000;
+
+    await RefreshTokenEntity.create({
+      userId: new mongoose.Types.ObjectId(String(user._id ?? user.id)),
+      tokenHash: hashToken(refreshToken),
+      expiresAt: new Date(refreshTokenExpires),
+    });
+
+    return {
+      accessToken: this.generateToken(user),
+      accessTokenExpires: now + ACCESS_TOKEN_TTL_SECONDS * 1000,
+      refreshToken,
+      refreshTokenExpires,
+    };
+  }
+
+  /**
+   * Exchange a refresh token for a fresh token pair (rotation).
+   *
+   * - The presented token is revoked and replaced.
+   * - A token rotated less than REFRESH_TOKEN_REUSE_GRACE_MS ago is still
+   *   accepted (parallel requests racing the rotation).
+   * - Re-use of an older revoked token is treated as theft: every refresh
+   *   token for that user is revoked, forcing a fresh sign-in everywhere.
+   */
+  async refreshTokens(refreshToken: string) {
+    await initDB();
+
+    if (!refreshToken) throw new Error('Refresh token missing');
+
+    const now = new Date();
+    const tokenHash = hashToken(refreshToken);
+
+    // Atomically claim the token so two concurrent refreshes can't both rotate it
+    let record = await RefreshTokenEntity.findOneAndUpdate(
+      { tokenHash, revokedAt: null, expiresAt: { $gt: now } },
+      { $set: { revokedAt: now } },
+      { returnDocument: 'before' },
+    ).lean();
+
+    if (!record) {
+      const existing = await RefreshTokenEntity.findOne({ tokenHash }).lean();
+
+      if (!existing || existing.expiresAt <= now) {
+        throw new Error('Refresh token expired or invalid');
+      }
+
+      const revokedAgo = existing.revokedAt
+        ? now.getTime() - new Date(existing.revokedAt).getTime()
+        : Infinity;
+
+      if (revokedAgo > REFRESH_TOKEN_REUSE_GRACE_MS) {
+        // Reuse of a long-rotated token → assume it was stolen
+        await this.revokeAllForUser(existing.userId);
+        throw new Error('Refresh token reuse detected');
+      }
+
+      record = existing; // within grace window: allow
+    }
+
+    const user = await userService.findById(record.userId).catch(() => null);
+    if (!user || user.isActive === false) {
+      await this.revokeAllForUser(record.userId);
+      throw new Error('User not found or inactive');
+    }
+
+    const tokens = await this.issueTokens(user);
+
+    await RefreshTokenEntity.updateOne(
+      { _id: record._id, replacedByHash: null },
+      { $set: { replacedByHash: hashToken(tokens.refreshToken) } },
     );
 
-    // Convert hours to seconds
-    const expiresInSeconds = JWT_EXPIRY_HOURS * 60 * 60;
+    return {
+      tokens,
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  }
 
-    return jwt.sign(jwtPayload, JWT_SECRET, {
-      expiresIn: expiresInSeconds,
-    });
+  /** Revoke a single refresh token (logout). Silently ignores unknown tokens. */
+  async revokeRefreshToken(refreshToken?: string | null) {
+    if (!refreshToken) return;
+    await initDB();
+    await RefreshTokenEntity.updateOne(
+      { tokenHash: hashToken(refreshToken), revokedAt: null },
+      { $set: { revokedAt: new Date() } },
+    );
+  }
+
+  /** Revoke every active refresh token for a user (logout everywhere). */
+  async revokeAllForUser(userId: mongoose.Types.ObjectId | string) {
+    await initDB();
+    await RefreshTokenEntity.updateMany(
+      { userId, revokedAt: null },
+      { $set: { revokedAt: new Date() } },
+    );
   }
 
   async login(payload: LoginDto) {
@@ -56,9 +177,9 @@ export class AuthService {
       throw new Error('Invalid email or password');
     }
 
-    const token = await this.generateToken(user);
+    const tokens = await this.issueTokens(user);
 
-    // Return only necessary user details + token
+    // Return only necessary user details + tokens
     const userData = {
       id: user._id || '',
       name: user.name,
@@ -67,7 +188,7 @@ export class AuthService {
       isFirstLogin: user.isFirstLogin,
     };
 
-    return { user: userData, accessToken: token };
+    return { user: userData, ...tokens };
   }
 
   async signup(payload: RegisterDto) {
@@ -96,7 +217,6 @@ export class AuthService {
     }
 
     const { email, name } = payload;
-    // const { email, name, picture } = payload;
 
     let user = await userService.findByEmail(email!);
 
@@ -109,9 +229,15 @@ export class AuthService {
       });
     }
 
-    const accessToken = this.generateToken(user);
+    if (user && user.isActive === false) {
+      throw new Error(
+        'User account is inactive, please contact admin to activate your account',
+      );
+    }
 
-    // Return only necessary user details + token
+    const tokens = await this.issueTokens(user);
+
+    // Return only necessary user details + tokens
     const userData = {
       id: user._id || '',
       name: user.name,
@@ -120,6 +246,6 @@ export class AuthService {
       isFirstLogin: user.isFirstLogin,
     };
 
-    return { userData, accessToken };
+    return { userData, ...tokens };
   }
 }

@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -34,6 +35,9 @@ type FormValues = {
   date: string;
   note?: string;
 };
+
+const fieldClass =
+  'h-10 bg-[#fafbfa] px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15';
 
 const TransactionDialog: React.FC<ITransactionDialogProps> = ({
   onClose,
@@ -98,38 +102,48 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
 
   const isSubmitting = isPending;
 
+  const handleCancel = () => {
+    onClose();
+    reset();
+  };
+
   return (
     <Dialog
       open={open}
       onOpenChange={isOpen => {
-        if (!isOpen) {
-          onClose();
-          reset();
-        }
+        if (!isOpen) handleCancel();
       }}
     >
-      <DialogContent className="">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {transaction ? 'Edit' : 'Add New'} Transaction
+            {transaction ? 'Edit transaction' : 'New transaction'}
           </DialogTitle>
           <DialogDescription>
             {transaction
-              ? "Update the transaction's information below."
-              : 'Create a new transaction.'}
+              ? "Update the transaction's details below."
+              : 'Log money in or out — it takes five seconds.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* Amount & Date */}
-
-          <div className="space-y-2">
-            <Label>Amount *</Label>
-
-            <Input
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Amount — the hero field */}
+          <div className="rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] px-4 pt-3 pb-2 transition-colors focus-within:border-[#1a7f5a] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#1a7f5a]/15">
+            <Label
+              htmlFor="trx-amount"
+              className="text-[11px] font-semibold tracking-wider text-[#8b93a1] uppercase"
+            >
+              Amount
+            </Label>
+            <input
+              id="trx-amount"
               type="number"
-              placeholder="Amount"
+              inputMode="decimal"
+              placeholder="0"
               disabled={isSubmitting}
+              aria-invalid={!!errors.amount}
+              onFocus={e => e.currentTarget.select()}
+              className="manrope w-full [appearance:textfield] bg-transparent py-1 text-3xl font-bold tracking-tight text-[#0d1117] tabular-nums outline-none placeholder:text-[#c4c9d0] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               {...register('amount', {
                 required: 'Amount is required',
                 min: {
@@ -138,29 +152,16 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
                 },
               })}
             />
-            {errors.amount && (
-              <p className="text-sm text-red-500">{errors.amount.message}</p>
-            )}
           </div>
+          {errors.amount && (
+            <p className="-mt-3 text-xs text-red-500">
+              {errors.amount.message}
+            </p>
+          )}
 
+          {/* Category */}
           <div className="space-y-2">
-            <Label>Date *</Label>
-
-            <Input
-              type="date"
-              placeholder="Date"
-              disabled={isSubmitting}
-              {...register('date', {
-                required: 'Date is required',
-              })}
-            />
-            {errors.date && (
-              <p className="text-sm text-red-500">{errors.date.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>Category *</Label>
+            <Label>Category</Label>
             <Controller
               name="categoryId"
               control={control}
@@ -170,40 +171,58 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
               )}
             />
             {errors.categoryId && (
-              <p className="text-sm text-red-500">
+              <p className="text-xs text-red-500">
                 {errors.categoryId.message}
               </p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label>Notes</Label>
+          {/* Date & Note */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[150px_1fr]">
+            <div className="space-y-2">
+              <Label htmlFor="trx-date">Date</Label>
+              <Input
+                id="trx-date"
+                type="date"
+                disabled={isSubmitting}
+                className={fieldClass}
+                {...register('date', {
+                  required: 'Date is required',
+                })}
+              />
+              {errors.date && (
+                <p className="text-xs text-red-500">{errors.date.message}</p>
+              )}
+            </div>
 
-            <Input
-              type="text"
-              placeholder="Optional note"
-              disabled={isSubmitting}
-              {...register('note', {})}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="trx-note">
+                Note{' '}
+                <span className="font-normal text-[#8b93a1]">(optional)</span>
+              </Label>
+              <Input
+                id="trx-note"
+                type="text"
+                placeholder="e.g. Chai with the team"
+                disabled={isSubmitting}
+                className={fieldClass}
+                {...register('note', {})}
+              />
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onClose();
-                reset();
-              }}
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {' '}
-              {isSubmitting ? 'Saving...' : 'Save'}
+            <Button type="submit" disabled={isSubmitting} className="px-5">
+              {isSubmitting
+                ? 'Saving...'
+                : transaction
+                  ? 'Save changes'
+                  : 'Add transaction'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

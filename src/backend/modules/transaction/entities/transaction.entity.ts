@@ -54,6 +54,10 @@ const TransactionSchema = new Schema<ITransaction>(
   },
 );
 
+// Nearly every query filters by user and a date range, sorted by date
+TransactionSchema.index({ userId: 1, date: -1 });
+TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
+
 TransactionSchema.plugin(mongooseAutopopulate);
 
 const TransactionEntity: Model<ITransaction> =

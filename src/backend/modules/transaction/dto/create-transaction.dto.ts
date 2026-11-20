@@ -5,8 +5,8 @@ import {
   IsNumber,
   IsDate,
   IsMongoId,
-} from "class-validator";
-import { Type, Transform } from "class-transformer";
+} from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 export class CreateTransactionDto {
   @IsMongoId()

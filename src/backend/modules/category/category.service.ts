@@ -101,14 +101,15 @@ export class CategoryService {
     }
 
     const skip = (page - 1) * limit;
-    const totalRecords = await this.categoryEntity.countDocuments(query);
-
-    const categories = await this.categoryEntity
-      .find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 })
-      .lean();
+    const [totalRecords, categories] = await Promise.all([
+      this.categoryEntity.countDocuments(query),
+      this.categoryEntity
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+    ]);
 
     const data = categories?.map(item => {
       return {
@@ -259,6 +260,4 @@ export class CategoryService {
       session.endSession();
     }
   }
-
-
 }

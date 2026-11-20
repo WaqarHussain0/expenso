@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface IRow {
   className?: string;
@@ -6,7 +6,7 @@ interface IRow {
 }
 
 const Row: React.FC<IRow> = ({ className, children }) => {
-  return <div className={cn("flex items-center", className)}>{children}</div>;
+  return <div className={cn('flex items-center', className)}>{children}</div>;
 };
 
 export default Row;

@@ -17,8 +17,11 @@ export const MONTH_NAMES = [
 ];
 
 export const COLOR_CODES = {
-  income: '#4CAF50', // Green for income
-  expense: '#F44336', // Red for expense
-  investment: '#FF9800', // Blue for investment
-  freeCash: '#2196F3', // Orange for free cash
+  income: '#10b981', // Emerald for income
+  expense: '#f43f5e', // Rose for expense
+  investment: '#f59e0b', // Amber for investment
+  freeCash: '#3b82f6', // Blue for free cash
 };
+
+/** Cookie that remembers whether the desktop sidebar is collapsed */
+export const SIDEBAR_COOKIE = 'expenso-sidebar-collapsed';

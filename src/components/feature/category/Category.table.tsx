@@ -1,22 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Card, CardContent } from '@/components/ui/card';
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Pencil, Tags, Trash2 } from 'lucide-react';
 import { useCallback, useState, useTransition } from 'react';
 
 import { toast } from 'sonner';
 
-import TextElement from '@/components/common/TextElement';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import CategoryDialog, { CATEGORY_ICONS } from './Category.dialog';
+import { ICategory } from '@/types/category.type';
+import { LazyCategoryDialog } from '../lazy-dialogs';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -28,6 +16,10 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { deleteCategoryAction } from '@/lib/server-actions/category.server-action';
+import RowActions from '@/components/common/RowActions';
+import EmptyState from '@/components/common/EmptyState';
+import CategoryTypeBadge from './CategoryTypeBadge';
+import { CategoryIconTile } from '../transaction/TransactionDisplay';
 
 interface ICategoryTableProps {
   categories: ICategory[];
@@ -35,7 +27,7 @@ interface ICategoryTableProps {
 }
 const CategoryTable: React.FC<ICategoryTableProps> = ({
   categories,
-  className,
+  className = '',
 }) => {
   const [isPending, startTransition] = useTransition();
 
@@ -51,31 +43,28 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
     [],
   );
 
-  const getActions = (category: ICategory) => {
-    return [
-      {
-        label: 'Edit',
-        onClick: () => {
-          setSelectedCategory(category);
-          setIsEditModalOpen(true);
-        },
-        separatorAfter: false,
-        show: true,
-        icon: Edit,
-      },
-
-      {
-        label: 'Delete',
-        onClick: () => {
-          setIsDeleteModalOpen(true);
-          setSelectedCategory(category);
-        },
-        show: true,
-        separatorAfter: false,
-        icon: Trash,
-      },
-    ];
+  const openEdit = (category: ICategory) => {
+    setSelectedCategory(category);
+    setIsEditModalOpen(true);
   };
+
+  const getActions = (category: ICategory) => [
+    {
+      label: 'Edit',
+      icon: Pencil,
+      onClick: () => openEdit(category),
+    },
+    {
+      label: 'Delete',
+      icon: Trash2,
+      destructive: true,
+      separatorBefore: true,
+      onClick: () => {
+        setSelectedCategory(category);
+        setIsDeleteModalOpen(true);
+      },
+    },
+  ];
 
   const handleDelete = (category: ICategory | null) => {
     if (!category?._id) return;
@@ -94,92 +83,59 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
       }
     });
   };
+
   return (
-    <div className={`${className}`}>
+    <div className={className}>
       {categories.length > 0 ? (
-        <div className="w-full grid grid-cols-2 gap-3 p-3 lg:grid-cols-3 h-fit">
+        <div className="grid h-fit w-full grid-cols-1 gap-3 p-3 sm:grid-cols-2 md:p-4 xl:grid-cols-3">
           {categories.map(category => (
-            <Card key={category._id} className="gap-0 py-3 ">
-              <CardContent className="flex items-center justify-between gap-2 px-3">
-                <div className=" flex items-center gap-2 capitalize">
-                  <div
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor: category.color + '1A', // 1A is ~10% opacity in hex
-                    }}
-                  >
-                    {category.icon &&
-                      (() => {
-                        const iconObj = CATEGORY_ICONS.find(
-                          item => item.name === category.icon,
-                        );
-                        if (!iconObj) return null;
-                        const IconComponent = iconObj.icon;
-                        return (
-                          <IconComponent
-                            className="size-4"
-                            style={{ color: category.color }}
-                          />
-                        );
-                      })()}
-                  </div>
+            <div
+              key={category._id}
+              role="button"
+              tabIndex={0}
+              onClick={() => openEdit(category)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openEdit(category);
+                }
+              }}
+              className="group/row group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-[#0d1117]/[0.06] bg-white p-3.5 transition-all duration-300 outline-none hover:-translate-y-0.5 hover:border-[#0d1117]/[0.1] hover:shadow-[0_10px_24px_-12px_rgba(13,17,23,0.18)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20"
+            >
+              {/* colour accent on the left edge */}
+              <span
+                className="absolute inset-y-3 left-0 w-[3px] rounded-r-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ background: category.color }}
+              />
 
-                  <div className="flex flex-col gap-1">
-                    <TextElement as="h4">{category?.name}</TextElement>
+              <CategoryIconTile
+                category={category}
+                className="size-11 rounded-xl [&>svg]:size-5"
+              />
 
-                    <Badge
-                      variant={
-                        category.type === CategoryTypeEnum.EXPENSE
-                          ? 'destructive'
-                          : 'default'
-                      }
-                      className={
-                        category.type === CategoryTypeEnum.INVESTMENT
-                          ? 'bg-yellow-100 text-yellow-500'
-                          : ''
-                      }
-                    >
-                      {category?.type}
-                    </Badge>
-                  </div>
-                </div>
+              <div className="min-w-0 flex-1">
+                <p className="inter truncate text-sm font-semibold text-[#0d1117] capitalize">
+                  {category?.name}
+                </p>
+                <CategoryTypeBadge type={category.type} className="mt-1" />
+              </div>
 
-                <DropdownMenu >
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {getActions(category)
-                      ?.filter(action => action.show)
-                      .map(action => (
-                        <div key={action.label}>
-                          <DropdownMenuItem onClick={action.onClick}>
-                            {action.icon && (
-                              <action.icon className="mr-2 size-4" />
-                            )}
-                            {action.label}
-                          </DropdownMenuItem>
-                          {action.separatorAfter && <DropdownMenuSeparator />}
-                        </div>
-                      ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardContent>
-            </Card>
+              <div onClick={e => e.stopPropagation()}>
+                <RowActions actions={getActions(category)} />
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <div className="flex h-24 items-center justify-center">
-          <TextElement as="p" className="text-center">
-            No results.
-          </TextElement>
-        </div>
+        <EmptyState
+          icon={Tags}
+          title="No categories found"
+          description="Try a different search or type, or create a new category."
+        />
       )}
 
       {isEditModalOpen && (
-        <CategoryDialog
+        <LazyCategoryDialog
           onClose={handleCloseDialog}
           open={isEditModalOpen}
           category={selectedCategory}
@@ -191,16 +147,16 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="capitalize">
-              Delete {selectedCategory?.name}
+              Delete {selectedCategory?.name}?
             </AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the category. This can&apos;t be undone.
+            </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogDescription>
-            Are you sure you want to delete this category?
-          </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="!bg-destructive hover:bg-destructive/90"
+              className="!bg-destructive text-white"
               onClick={() => handleDelete(selectedCategory)}
               disabled={isPending}
             >

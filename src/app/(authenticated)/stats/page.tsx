@@ -14,12 +14,8 @@ import {
   useGetDashboardStatsQuery,
 } from '@/lib/rtk/services/dashboard.rtk.service';
 
-import MonthStatsWrapper from '@/components/feature/stats/MonthStats.wrapper';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import Row from '@/components/common/Row';
-import YearStatsWrapper from '@/components/feature/stats/YearStats.wrapper';
-import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
 import { Input } from '@/components/ui/input';
 import { MONTH_NAMES } from '@/app/constants/app.constant';
 import {
@@ -31,9 +27,31 @@ import {
 } from '@/components/ui/dialog';
 import { Copy, Send } from 'lucide-react';
 import { getStatsLinkAction } from '@/lib/server-actions/user.server-action';
-import TextElement from '@/components/common/TextElement';
-import { CustomBreadcrumb } from '@/components/common/CustomBreadcrumb';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import PageHeader from '@/components/common/PageHeader';
+import dynamic from 'next/dynamic';
+import StatWrapper from '@/components/common/Stat.wrapper';
+
+// Each view pulls in Recharts; only the selected one is downloaded.
+const StatsViewFallback = () => (
+  <StatWrapper
+    isLoading
+    stats={[]}
+    className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
+  />
+);
+const MonthStatsWrapper = dynamic(
+  () => import('@/components/feature/stats/MonthStats.wrapper'),
+  { loading: StatsViewFallback },
+);
+const YearStatsWrapper = dynamic(
+  () => import('@/components/feature/stats/YearStats.wrapper'),
+  { loading: StatsViewFallback },
+);
+const CustomDateStatsWrapper = dynamic(
+  () => import('@/components/feature/stats/CustomDateStats.wrapper'),
+  { loading: StatsViewFallback },
+);
 
 const now = new Date();
 
@@ -240,20 +258,11 @@ const Page = () => {
   }, [isDialogOpen, shareUrl, filterOption, startDate, endDate, year]);
 
   return (
-    <div className="w-full space-y-3">
-      <Row className="flex-col items-start justify-between space-y-3 md:flex-row md:items-center md:space-y-0">
-        <Row className="flex-col items-start">
-          <TextElement as="h3" className="">
-            Stats
-          </TextElement>
-          <TextElement as="p" className="text-[#5a6070]">
-            View and share your stats with others from here
-          </TextElement>
-        </Row>
-      </Row>
-
-      <CustomBreadcrumb
-        items={[
+    <div className="page-fade flex w-full flex-col gap-5">
+      <PageHeader
+        title="Stats"
+        description="See where your money went — by month, year, or a custom range — and share it."
+        breadcrumbs={[
           { label: 'Dashboard', linkTo: PAGE_ROUTES.dashboard },
           { label: 'Stats' },
         ]}

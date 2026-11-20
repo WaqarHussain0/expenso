@@ -2,7 +2,7 @@ import Skeleton from 'react-loading-skeleton';
 import { TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 const CategoryTableSkeleton = () => (
-  <TableBody className='w-full'>
+  <TableBody className="w-full">
     <TableRow>
       <TableCell>
         <div className="flex items-center gap-2">

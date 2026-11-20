@@ -20,10 +20,14 @@ export default withAuth(
     callbacks: {
       authorized: ({ token }) => {
         try {
-          if (!token || !token.accessToken) {
-            return false;
-          }
-          return true;
+          // Valid while the refresh token is alive and no refresh has failed.
+          // (An expired *access* token is fine here — it gets refreshed by
+          // the client's next /api/auth/session call.)
+          if (!token || token.error || !token.refreshToken) return false;
+          return (
+            typeof token.refreshTokenExpires === 'number' &&
+            Date.now() < token.refreshTokenExpires
+          );
         } catch (err) {
           console.error('❌ Authorization callback error:', err);
           return false;

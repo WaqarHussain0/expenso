@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,8 +8,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import React from "react";
+} from '@/components/ui/breadcrumb';
+import React from 'react';
+import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItemType {
   label: string;
@@ -24,23 +25,30 @@ interface CommonBreadcrumbProps {
 
 export function CustomBreadcrumb({
   items,
-  separator = <BreadcrumbSeparator />,
-  className,
+  separator = (
+    <BreadcrumbSeparator className="text-[#c4c9d0] [&>svg]:size-3">
+      <ChevronRight />
+    </BreadcrumbSeparator>
+  ),
+  className = 'mb-3',
 }: CommonBreadcrumbProps) {
   return (
-    <Breadcrumb className={`mb-3 ${className}`}>
-      <BreadcrumbList>
+    <Breadcrumb className={className}>
+      <BreadcrumbList className="gap-1 text-xs sm:gap-1.5">
         {items?.map((item, index) => (
           <React.Fragment key={`${item.label}-${index}`}>
-            <BreadcrumbItem className="poppins">
+            <BreadcrumbItem className="inter">
               {item.linkTo ? (
                 <BreadcrumbLink asChild>
-                  <Link className="capitalize" href={item.linkTo}>
+                  <Link
+                    className="text-[#8b93a1] capitalize transition-colors hover:text-[#1a7f5a]"
+                    href={item.linkTo}
+                  >
                     {item.label}
                   </Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage className="capitalize">
+                <BreadcrumbPage className="font-medium text-[#5a6070] capitalize">
                   {item.label}
                 </BreadcrumbPage>
               )}

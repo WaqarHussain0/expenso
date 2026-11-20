@@ -11,6 +11,7 @@ export interface IUser {
   email: string;
   isActive?: boolean;
   profile?: IUserProfile;
+  createdAt?: Date | string;
 }
 
 export interface ILoginResponse {

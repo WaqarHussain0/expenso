@@ -29,6 +29,7 @@ export class UserProfileService {
       role: user?.role,
       name: user?.name,
       email: user?.email,
+      createdAt: user?.createdAt,
       profile: {
         _id: profile?._id?.toString() || '',
         contact: profile?.contact,

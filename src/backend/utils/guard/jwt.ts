@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from '@/backend/modules/auth/auth.config';
 
 export interface IJwtPayload {
   id: string;
@@ -6,11 +7,9 @@ export interface IJwtPayload {
   role: string;
 }
 
-const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'your_super_secret';
-
 export function verifyToken(token: string): IJwtPayload {
   try {
-    return jwt.verify(token, JWT_SECRET) as IJwtPayload;
+    return jwt.verify(token, getJwtSecret()) as IJwtPayload;
   } catch {
     throw new Error('Invalid or expired token');
   }
