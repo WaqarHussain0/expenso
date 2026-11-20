@@ -7,6 +7,10 @@ import { AssistantService } from '@/backend/modules/assistant/assistant.service'
 
 const assistantService = new AssistantService();
 
+// Two LLM calls (+ fallbacks) can be slow when a provider is under load —
+// allow up to 2 minutes so Vercel doesn't cut the function off mid-answer.
+export const maxDuration = 120;
+
 export const POST = withAuth(async (req: NextRequest, user) => {
   try {
     const body = await req.json();

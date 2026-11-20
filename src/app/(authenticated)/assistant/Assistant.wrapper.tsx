@@ -15,7 +15,7 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 
-// The backend sanitizes this HTML (DOMPurify, restricted tag allowlist) before it ever
+// The backend sanitizes this HTML (sanitize-html, restricted tag allowlist) before it ever
 // reaches the client — rendering it via dangerouslySetInnerHTML here is safe as a result.
 const ASSISTANT_HTML_CLASSES =
   '[&_p]:mb-2 [&_p:last-child]:mb-0 ' +

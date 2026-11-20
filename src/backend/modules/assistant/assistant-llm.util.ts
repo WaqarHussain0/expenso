@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { LlmClient } from './llm/llm-providers';
 
 // Static, versioned-with-the-code description of the entities the model is
@@ -28,6 +28,32 @@ const ANSWER_SYSTEM_PROMPT =
   'If the result has more than 3 items (e.g. a category breakdown), present them as an HTML table with sensible column headers instead of a run-on sentence, sorted by amount descending. ' +
   'Amounts are in PKR — write plain numbers with thousands separators and no currency symbol or code. Keep any prose outside the table brief. ' +
   'Respond with strict JSON matching: { "answer": string } where "answer" is the HTML fragment.';
+
+/**
+ * Strict allowlist for the model's HTML answer: formatting/table tags only,
+ * no attributes at all (so no styles, links, event handlers or URLs).
+ * Disallowed tags are dropped; <script>/<style> are dropped with their content.
+ * (sanitize-html is DOM-free — unlike DOMPurify on the server, it doesn't pull
+ * in jsdom, which is heavy for serverless cold starts.)
+ */
+const ANSWER_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [
+    'p',
+    'strong',
+    'ul',
+    'ol',
+    'li',
+    'table',
+    'thead',
+    'tbody',
+    'tr',
+    'th',
+    'td',
+  ],
+  allowedAttributes: {},
+  allowedSchemes: [],
+  disallowedTagsMode: 'discard',
+};
 
 export interface GeneratedPipeline {
   refusal: boolean;
@@ -80,20 +106,5 @@ export async function phraseAnswer(
     throw new Error('The assistant returned an unexpected response format.');
   }
 
-  return DOMPurify.sanitize(parsed.answer, {
-    ALLOWED_TAGS: [
-      'p',
-      'strong',
-      'ul',
-      'ol',
-      'li',
-      'table',
-      'thead',
-      'tbody',
-      'tr',
-      'th',
-      'td',
-    ],
-    ALLOWED_ATTR: [],
-  });
+  return sanitizeHtml(parsed.answer, ANSWER_SANITIZE_OPTIONS);
 }
