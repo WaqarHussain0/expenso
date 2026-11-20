@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import 'reflect-metadata';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { AuthService } from '@/backend/modules/auth/auth.service';
+import { LoginDto } from '@/backend/modules/auth/dto/login.dto';
+import { validateDto } from '@/backend/utils/input-validator.util';
 import { REFRESH_TOKEN_TTL_SECONDS } from '@/backend/modules/auth/auth.config';
 import { isReadOnlySessionRead } from '@/lib/auth-context';
 import { IUser } from '@/types/user.type';
@@ -63,44 +66,28 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials): Promise<(IUser & TokenBundle) | null> {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-
         try {
-          const res = await fetch(`${baseUrl}api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
+          // Call the auth service directly — authorize() already runs on the
+          // server, so an HTTP round-trip to our own /api/auth/login only
+          // added latency and depended on NEXTAUTH_URL being exactly right.
+          const dto = await validateDto(LoginDto, {
+            email: credentials.email,
+            password: credentials.password,
           });
 
-          const data: any = await res.json();
-
-          if (data.error) {
-            // Throw error message so NextAuth can surface it to frontend
-            throw new Error(data?.error || 'Login failed');
-          }
-
-          const {
-            user,
-            accessToken,
-            accessTokenExpires,
-            refreshToken,
-            refreshTokenExpires,
-          } = data.data;
+          const { user, ...tokens } = await authService.login(dto);
 
           return {
-            ...user,
-            accessToken,
-            accessTokenExpires,
-            refreshToken,
-            refreshTokenExpires,
+            ...(user as unknown as IUser),
+            id: String(user.id),
+            ...tokens,
           };
-        } catch (err: string | any) {
-          console.error('Authorize error:', err);
-          // Important: rethrow to send the message back to signIn() response
-          throw new Error(err?.message || err || 'Login failed');
+        } catch (err: any) {
+          // Expected failures (wrong password, inactive account) aren't
+          // server errors — log them quietly and surface the message
+          console.warn('Authorize failed:', err?.message);
+          // Rethrow so the message reaches the signIn() response
+          throw new Error(err?.message || 'Login failed');
         }
       },
     }),
@@ -116,30 +103,19 @@ export const authOptions: NextAuthOptions = {
       // Only handle Google login here
       if (account?.provider === 'google') {
         try {
-          const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+          if (!account.id_token) throw new Error('Missing Google id_token');
 
-          const res = await fetch(`${baseUrl}api/auth/google`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              googleToken: account.id_token,
-            }),
-          });
-
-          const data = await res.json();
-
-          if (data.error) throw new Error(data.error);
+          // Verify with Google and issue our tokens directly (no HTTP hop)
+          const { userData, ...tokens } = await authService.googleLogin(
+            account.id_token,
+          );
 
           // Attach backend response to user
           const u = user as any;
-          u.id = data.data.id;
-          u.role = data.data.role;
-          u.accessToken = data.accessToken;
-          u.accessTokenExpires = data.accessTokenExpires;
-          u.refreshToken = data.refreshToken;
-          u.refreshTokenExpires = data.refreshTokenExpires;
+          u.id = String(userData.id);
+          u.name = userData.name;
+          u.role = userData.role;
+          Object.assign(u, tokens);
 
           return true;
         } catch (error) {
