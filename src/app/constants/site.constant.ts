@@ -45,3 +45,11 @@ export const SITE_KEYWORDS = [
 /** Absolute URL for a site path, e.g. absoluteUrl('/guide'). */
 export const absoluteUrl = (path = '/') =>
   `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+
+/**
+ * Search Console ownership token (public — it's printed in the page's HTML).
+ * The env var overrides it, e.g. when the property moves to a custom domain.
+ */
+export const GOOGLE_SITE_VERIFICATION =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+  '7NJNF7Nc7PlkzKNjD1Z7j-7ewS5NRXMtvhXFXfvFNGQ';

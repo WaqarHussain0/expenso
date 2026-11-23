@@ -11,6 +11,7 @@ import {
   isThemePreference,
 } from '@/app/constants/theme.constant';
 import {
+  GOOGLE_SITE_VERIFICATION,
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
   SITE_NAME,
@@ -93,7 +94,7 @@ export const metadata: Metadata = {
   },
   // Search Console / Bing ownership — set the env vars to verify
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    google: GOOGLE_SITE_VERIFICATION,
     other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
       ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
       : undefined,
