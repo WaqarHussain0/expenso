@@ -6,9 +6,10 @@ import LoginWrapper from './Login.wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login to Expenso',
+  title: 'Sign in',
   description:
-    'Access your Expenso dashboard to track expenses, income, and investments.',
+    'Sign in to Expenso to track your expenses, income and investments, and see your monthly budget at a glance.',
+  alternates: { canonical: '/login' },
 };
 
 const Page = async () => {

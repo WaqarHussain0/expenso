@@ -31,12 +31,23 @@ import { UserRoleEnum } from '@/types/user.type';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import Image from 'next/image';
 import { SIDEBAR_COOKIE } from '@/app/constants/app.constant';
+import { getInitials } from '@/lib/utils';
 
 interface INavbar {
   className?: string;
   /** Initial state, read from a cookie on the server to avoid a layout flash */
   defaultCollapsed?: boolean;
 }
+
+const NAV_ITEMS = [
+  { title: 'Dashboard', linkTo: PAGE_ROUTES.dashboard, icon: House },
+  { title: 'Stats', linkTo: PAGE_ROUTES.stats, icon: ChartPie },
+  { title: 'Category', linkTo: PAGE_ROUTES.category, icon: Tags },
+  { title: 'Transaction', linkTo: PAGE_ROUTES.transaction, icon: List },
+  { title: 'Assistant', linkTo: PAGE_ROUTES.assistant, icon: Sparkles },
+  { title: 'Users', linkTo: PAGE_ROUTES.user, icon: Users, adminOnly: true },
+  { title: 'Profile', linkTo: PAGE_ROUTES.profile, icon: Settings },
+];
 
 /** Small label that appears to the right of an icon when the sidebar is collapsed. */
 const CollapsedTooltip: React.FC<{ label: string; show: boolean }> = ({
@@ -57,14 +68,13 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(!!defaultCollapsed);
 
+  // Side effect lives in the handler, not inside the (pure) state updater
   const toggleCollapsed = useCallback(() => {
-    setCollapsed(prev => {
-      const next = !prev;
-      // Persist for a year so the server can render the right width next time
-      document.cookie = `${SIDEBAR_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
-      return next;
-    });
-  }, []);
+    const next = !collapsed;
+    setCollapsed(next);
+    // Persist for a year so the server can render the right width next time
+    document.cookie = `${SIDEBAR_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+  }, [collapsed]);
 
   // Ctrl/⌘ + B toggles the sidebar
   useEffect(() => {
@@ -83,68 +93,17 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
 
   const isAdminUser = user?.role === UserRoleEnum.ADMIN || false;
 
-  const navItems = [
-    {
-      title: 'Dashboard',
-      linkTo: PAGE_ROUTES.dashboard,
-      icon: House,
-      show: true,
-    },
-
-    {
-      title: 'Stats',
-      linkTo: PAGE_ROUTES.stats,
-      icon: ChartPie,
-      show: true,
-    },
-    {
-      title: 'Category',
-      icon: Tags,
-      linkTo: PAGE_ROUTES.category,
-      show: true,
-    },
-    {
-      title: 'Transaction',
-      icon: List,
-      linkTo: PAGE_ROUTES.transaction,
-      show: true,
-    },
-
-    {
-      title: 'Assistant',
-      icon: Sparkles,
-      linkTo: PAGE_ROUTES.assistant,
-      show: true,
-    },
-
-    {
-      title: 'Users',
-      linkTo: PAGE_ROUTES.user,
-      icon: Users,
-      show: isAdminUser,
-    },
-
-    {
-      title: 'Profile',
-      linkTo: PAGE_ROUTES.profile,
-      icon: Settings,
-      show: true,
-    },
-  ];
-
   const handleLogout = async () => {
     setIsLoading(true);
     await signOut({ redirect: false });
     router.push(PAGE_ROUTES.login);
   };
 
-  const initials = user?.name
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
+  const initials = getInitials(user?.name, '');
 
-  const visibleNavItems = navItems.filter(item => item.show);
+  const visibleNavItems = NAV_ITEMS.filter(
+    item => !item.adminOnly || isAdminUser,
+  );
 
   const isActiveRoute = (linkTo: string) =>
     pathname === linkTo || pathname.startsWith(`${linkTo}/`);
@@ -297,6 +256,7 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
                   <CollapsedTooltip label={user?.name ?? 'Profile'} show />
                 </Link>
                 <button
+                  type="button"
                   onClick={() => setIsDeleteModalOpen(true)}
                   aria-label="Logout"
                   className="group/nav relative flex size-8 cursor-pointer items-center justify-center rounded-lg text-white/45 transition-colors duration-300 hover:bg-white/[0.06] hover:text-[#f87171]"
@@ -323,6 +283,7 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setIsDeleteModalOpen(true)}
                   title="Logout"
                   aria-label="Logout"
@@ -346,6 +307,7 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
               key={item.title}
               href={item.linkTo}
               aria-label={item.title}
+              aria-current={isActive ? 'page' : undefined}
               className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-md px-1 py-1.5 transition-colors ${
                 isActive ? 'text-[#34d399]' : 'text-white/45'
               }`}

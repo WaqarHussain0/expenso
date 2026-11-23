@@ -18,7 +18,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { ICategory } from '@/types/category.type';
-import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
+import CategoryIcon from '@/components/common/CategoryIcon';
 import { CategoryIconTile } from '../feature/transaction/TransactionDisplay';
 import {
   getAllCategoriesAction,
@@ -51,45 +51,58 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
     return () => clearTimeout(timer);
   }, [search]);
 
+  // The selected category may not be in the (search-limited) list, so it's
+  // fetched separately and shown first
   const options = useMemo(() => {
-    const merged = [...(singleCategory ? [singleCategory] : []), ...categories];
-    const map = new Map();
+    const merged =
+      singleCategory && singleCategory._id === value
+        ? [singleCategory, ...categories]
+        : categories;
+    const map = new Map<string, ICategory>();
     merged.forEach(c => map.set(c._id, c));
     return Array.from(map.values());
-  }, [categories, singleCategory]);
+  }, [categories, singleCategory, value]);
 
-  const selectedLabel = options.find(c => c._id === value)?.name;
+  const selectedCategory = options.find(c => c._id === value);
 
   // Replaces useGetAllCategoriesQuery
   useEffect(() => {
-    const fetch = async () => {
+    // Ignore responses that arrive after a newer search has started
+    let ignore = false;
+
+    const fetchCategories = async () => {
       setIsFetching(true);
       const result = await getAllCategoriesAction({
         name: debouncedSearch || undefined,
         limit: 3,
       });
+      if (ignore) return;
       if (result.success) setCategories(result.data?.data ?? []);
       setIsFetching(false);
     };
-    fetch();
+    fetchCategories();
+
+    return () => {
+      ignore = true;
+    };
   }, [debouncedSearch]);
 
   useEffect(() => {
-    if (!value) return;
+    // Nothing to fetch if it's already in the list
+    if (!value || categories.some(c => c._id === value)) return;
 
-    const fetch = async () => {
-      // Already in the list — clear stale single and bail
-      if (categories.some((c: ICategory) => c._id === value)) {
-        setSingleCategory(null);
-        return;
-      }
+    let ignore = false;
 
+    const fetchSelected = async () => {
       const result = await getCategoryByIdAction(value);
-      if (result.success)
+      if (!ignore && result.success)
         setSingleCategory((result.data as unknown as ICategory) ?? null);
     };
+    fetchSelected();
 
-    fetch();
+    return () => {
+      ignore = true;
+    };
   }, [value, categories]);
 
   return (
@@ -104,13 +117,13 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
             className,
           )}
         >
-          {selectedLabel ? (
+          {selectedCategory?.name ? (
             <span className="flex min-w-0 items-center gap-2">
               <CategoryIconTile
-                category={options.find(c => c._id === value)}
+                category={selectedCategory}
                 className="size-5 rounded-md [&>svg]:size-3"
               />
-              <span className="truncate">{selectedLabel}</span>
+              <span className="truncate">{selectedCategory.name}</span>
             </span>
           ) : (
             <span className="text-muted-foreground">{placeholder}</span>
@@ -160,20 +173,11 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
                       }}
                       className="md:text-md text-xs capitalize"
                     >
-                      {category.icon &&
-                        (() => {
-                          const iconObj = CATEGORY_ICONS.find(
-                            item => item.name === category.icon,
-                          );
-                          if (!iconObj) return null;
-                          const IconComponent = iconObj.icon;
-                          return (
-                            <IconComponent
-                              className="size-3"
-                              style={{ color: category.color }}
-                            />
-                          );
-                        })()}
+                      <CategoryIcon
+                        name={category.icon}
+                        color={category.color}
+                        className="size-3"
+                      />
 
                       {category.name}
                       <Check

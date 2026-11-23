@@ -1,92 +1,32 @@
 import StatWrapper from '@/components/common/Stat.wrapper';
-import { Card, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Flame, Hash } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import Skeleton from 'react-loading-skeleton';
 import StatCard from '@/components/common/StatCard';
 import { COLOR_CODES } from '@/app/constants/app.constant';
+import { buildCashflowStats, ICashflowTotals } from '@/lib/stats.util';
+import type {
+  IBreakdownItem,
+  IByCategoryType,
+} from '@/lib/rtk/services/dashboard.rtk.service';
+import BreakdownBarChart, { EXPENSE_COLORS } from './BreakdownBarChart';
 
 interface ICustomDateStatsWrapperProps {
   isLoading: boolean;
-  totals: {
-    income: number;
-    expense: number;
-    investment: number;
-    freeCash: number;
-  };
-  counts: {
-    income: number;
-    expense: number;
-    investment: number;
-  };
-  savingsRate: number;
-  topExpenseCategory: { name: string; total: number } | null;
-  expenseBreakdown: { name: string; total: number }[];
+  totals?: ICashflowTotals;
+  counts?: IByCategoryType<number>;
+  savingsRate?: number;
+  topExpenseCategory?: IBreakdownItem | null;
+  expenseBreakdown?: IBreakdownItem[];
 }
-
-const EXPENSE_COLORS = [
-  '#f87171',
-  '#fb923c',
-  '#fbbf24',
-  '#a78bfa',
-  '#60a5fa',
-  '#34d399',
-  '#f472b6',
-  '#94a3b8',
-];
-
-// Static outside component — stable across renders
-const BAR_CHART_HEIGHTS = [140, 80, 120, 60, 100, 75];
-
-const formatCurrency = (value: number) =>
-  value >= 1000 ? `${(value / 1000).toFixed(1)}k` : `${value}`;
 
 const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
   isLoading,
-  totals = { income: 0, expense: 0, investment: 0, freeCash: 0 },
+  totals = { income: 0, expense: 0, investment: 0 },
   counts,
   savingsRate,
   topExpenseCategory,
   expenseBreakdown,
 }) => {
-  const { expense, income, investment, freeCash } = totals;
-  const total = income || 1;
-
-  const stats = [
-    {
-      label: 'Income',
-      value: income,
-      percent: 100,
-      color: COLOR_CODES.income,
-    },
-    {
-      label: 'Expense',
-      value: expense,
-      percent: (expense / total) * 100,
-      color: COLOR_CODES.expense,
-    },
-    {
-      label: 'Investment',
-      value: investment,
-      percent: (investment / total) * 100,
-      color: COLOR_CODES.investment,
-    },
-    {
-      label: 'Free Cash',
-      value: freeCash,
-      percent: (freeCash / total) * 100,
-      color: COLOR_CODES.freeCash,
-    },
-  ];
+  const stats = buildCashflowStats(totals);
 
   return (
     <div className="flex flex-col gap-4">
@@ -116,7 +56,9 @@ const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
           },
           {
             label: 'Transactions',
-            value: counts?.income + counts?.expense + counts?.investment,
+            value: counts
+              ? counts.income + counts.expense + counts.investment
+              : 0,
             icon: Hash,
             color: '#8b5cf6',
             hint: 'In this range',
@@ -127,76 +69,17 @@ const CustomDateStatsWrapper: React.FC<ICustomDateStatsWrapperProps> = ({
       />
 
       {/* ── 3. Expense Breakdown ── */}
-      <Card className="px-4">
-        <CardTitle>Expense Breakdown</CardTitle>
-
-        {isLoading ? (
-          <div className="flex h-[240px] flex-col justify-end gap-2 pb-2">
-            <div className="flex h-full items-end gap-3 px-2">
-              {BAR_CHART_HEIGHTS.map((h, i) => (
-                <div key={i} className="flex flex-1 flex-col justify-end">
-                  <Skeleton height={h} borderRadius={4} />
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3 px-2">
-              {BAR_CHART_HEIGHTS.map((_, i) => (
-                <div key={i} className="flex-1">
-                  <Skeleton height={10} borderRadius={4} />
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : expenseBreakdown?.length === 0 ? (
+      <BreakdownBarChart
+        title="Expense Breakdown"
+        isLoading={isLoading}
+        data={expenseBreakdown}
+        colors={EXPENSE_COLORS}
+        empty={
           <p className="text-muted-foreground py-10 text-center text-sm">
             No expense data for this period.
           </p>
-        ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart
-              data={expenseBreakdown}
-              margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-              className="inter p-1"
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tickFormatter={formatCurrency}
-                tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-                axisLine={false}
-                tickLine={false}
-                width={40}
-              />
-              <Tooltip
-                formatter={value => Number(value).toLocaleString()}
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                }}
-              />
-              <Bar dataKey="total" radius={[4, 4, 0, 0]}>
-                {expenseBreakdown?.map((_, index) => (
-                  <Cell
-                    key={index}
-                    fill={EXPENSE_COLORS[index % EXPENSE_COLORS.length]}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
+        }
+      />
     </div>
   );
 };

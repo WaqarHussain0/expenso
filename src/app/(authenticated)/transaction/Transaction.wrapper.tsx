@@ -13,10 +13,11 @@ import { CategorySelect } from '@/components/select/Category.select';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
+import { buildCashflowStats } from '@/lib/stats.util';
 import { CategoryTypeEnum } from '@/types/category.type';
 import { ITransaction } from '@/types/transaction.type';
 import { PlusIcon, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 export interface IMonthTransactionStats {
@@ -62,12 +63,15 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
   monthStats,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
-    useDebouncedSearch();
-
-  const [selectedType, setSelectedType] = useState<string>('all');
+  // Start from whatever filters are already in the URL (e.g. after a refresh)
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    () => searchParams.get('categoryId') ?? '',
+  );
+  const [selectedType, setSelectedType] = useState<string>(
+    () => searchParams.get('type') ?? 'all',
+  );
 
   const [showTransactionDialog, setShowTransactionDialog] =
     useState<boolean>(false);
@@ -102,23 +106,24 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
     [router],
   );
 
-  const handleSearch = useCallback(
-    (value: string) => {
-      handleSearchChange(value);
+  const currentType = () =>
+    selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
 
-      const type =
-        selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
-
-      updateQueryParams(1, value, type, selectedCategory);
-    },
-    [handleSearchChange, updateQueryParams, selectedType, selectedCategory],
-  );
+  // The URL (and so the server fetch) only updates once typing settles
+  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
+    useDebouncedSearch({
+      initialValue: searchParams.get('search') ?? '',
+      onDebouncedChange: value =>
+        updateQueryParams(1, value, currentType(), selectedCategory),
+    });
 
   const handlePageChange = (newPage: number) => {
-    const type =
-      selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
-
-    updateQueryParams(newPage, debouncedSearch, type, selectedCategory);
+    updateQueryParams(
+      newPage,
+      debouncedSearch,
+      currentType(),
+      selectedCategory,
+    );
   };
 
   const handleClearFilter = () => {
@@ -139,9 +144,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const type =
-      selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
-    updateQueryParams(1, debouncedSearch, type, categoryId);
+    updateQueryParams(1, debouncedSearch, currentType(), categoryId);
   };
 
   const hasFilters =
@@ -166,41 +169,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
       {/* Stats */}
       <StatWrapper
-        stats={(() => {
-          const { income, expense, investment } = monthStats;
-          const base = income || 1;
-          const freeCash = income - (expense + investment);
-          return [
-            {
-              label: 'Income',
-              value: income,
-              percent: income ? 100 : 0,
-              color: COLOR_CODES.income,
-              hint: 'This month',
-            },
-            {
-              label: 'Expense',
-              value: expense,
-              percent: (expense / base) * 100,
-              color: COLOR_CODES.expense,
-              hint: 'This month',
-            },
-            {
-              label: 'Investment',
-              value: investment,
-              percent: (investment / base) * 100,
-              color: COLOR_CODES.investment,
-              hint: 'This month',
-            },
-            {
-              label: 'Free Cash',
-              value: freeCash,
-              percent: (freeCash / base) * 100,
-              color: COLOR_CODES.freeCash,
-              hint: 'This month',
-            },
-          ];
-        })()}
+        stats={buildCashflowStats(monthStats, 'This month')}
         className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
       />
 
@@ -209,7 +178,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
         <div className="border-ink/[0.06] flex flex-col gap-3 border-b p-3 md:p-4 xl:flex-row xl:items-center">
           <SearchInput
             value={searchInput}
-            onChange={handleSearch}
+            onChange={handleSearchChange}
             placeholder="Search by note"
             className="w-full xl:max-w-xs"
           />

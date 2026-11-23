@@ -35,7 +35,9 @@ const RegisterWrapper = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<IFormValues>();
+  } = useForm<IFormValues>({
+    defaultValues: { name: '', email: '', password: '' },
+  });
 
   const onSubmit = async (data: IFormValues) => {
     startTransition(async () => {
@@ -78,7 +80,9 @@ const RegisterWrapper = () => {
         {/* Name Input */}
 
         <div className="space-y-2">
-          <Label className="text-ink">{nameInputField.label}</Label>
+          <Label htmlFor="register-name" className="text-ink">
+            {nameInputField.label}
+          </Label>
           <Controller
             name={nameInputField.name as 'name'}
             control={control}
@@ -87,6 +91,7 @@ const RegisterWrapper = () => {
               <div className="flex flex-col">
                 <Input
                   {...field}
+                  id="register-name"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type="text"
                   placeholder={nameInputField.placeholder}
@@ -106,7 +111,9 @@ const RegisterWrapper = () => {
 
         {/* Email Input */}
         <div className="space-y-2">
-          <Label className="text-ink">{emailInputField.label}</Label>
+          <Label htmlFor="register-email" className="text-ink">
+            {emailInputField.label}
+          </Label>
 
           <Controller
             name={emailInputField.name as 'email'}
@@ -116,6 +123,7 @@ const RegisterWrapper = () => {
               <div className="flex flex-col">
                 <Input
                   {...field}
+                  id="register-email"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type="email"
                   placeholder={emailInputField.placeholder}
@@ -135,7 +143,9 @@ const RegisterWrapper = () => {
 
         {/* Password Input */}
         <div className="space-y-2">
-          <Label className="text-ink">{passwordInputField.label}</Label>
+          <Label htmlFor="register-password" className="text-ink">
+            {passwordInputField.label}
+          </Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -144,6 +154,7 @@ const RegisterWrapper = () => {
               <div className="relative flex flex-col">
                 <Input
                   {...field}
+                  id="register-password"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type={showPassword ? 'text' : 'password'}
                   placeholder={passwordInputField.placeholder}
@@ -151,7 +162,9 @@ const RegisterWrapper = () => {
                 <button
                   type="button"
                   className="absolute top-[13px] right-3 cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword(prev => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>

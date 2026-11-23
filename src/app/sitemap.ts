@@ -1,33 +1,35 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
+import { absoluteUrl } from '@/app/constants/site.constant';
 
-const appURL = 'https://expenso-pi.vercel.app';
+// Bump when the landing page or guide content meaningfully changes, so
+// crawlers see a stable, honest lastModified instead of "now" on every fetch.
+const CONTENT_UPDATED = new Date('2026-11-23');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: appURL,
-      lastModified: new Date(),
+      url: absoluteUrl('/'),
+      lastModified: CONTENT_UPDATED,
       changeFrequency: 'weekly',
       priority: 1,
     },
-
     {
-      url: `${appURL}/guide`,
-      lastModified: new Date(),
+      url: absoluteUrl('/guide'),
+      lastModified: CONTENT_UPDATED,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: `${appURL}/login`,
-      lastModified: new Date(),
+      url: absoluteUrl('/register'),
+      lastModified: CONTENT_UPDATED,
       changeFrequency: 'yearly',
-      priority: 0.5,
+      priority: 0.6,
     },
     {
-      url: `${appURL}/register`,
-      lastModified: new Date(),
+      url: absoluteUrl('/login'),
+      lastModified: CONTENT_UPDATED,
       changeFrequency: 'yearly',
-      priority: 0.7,
+      priority: 0.4,
     },
   ];
 }

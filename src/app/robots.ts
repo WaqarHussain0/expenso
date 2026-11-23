@@ -1,6 +1,5 @@
-import { MetadataRoute } from 'next';
-
-const appURL = 'https://expenso-pi.vercel.app';
+import type { MetadataRoute } from 'next';
+import { absoluteUrl } from '@/app/constants/site.constant';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,16 +7,23 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
+        // Signed-in app screens and APIs have nothing to index. (Share
+        // links are left crawlable on purpose: they carry a `noindex` tag,
+        // which crawlers can only see if they're allowed to fetch the page.)
         disallow: [
+          '/api/',
           '/dashboard',
           '/stats',
           '/transaction',
           '/category',
+          '/assistant',
+          '/preferences',
           '/profile',
           '/user',
+          '/reset-password',
         ],
       },
     ],
-    sitemap: `${appURL}/sitemap.xml`,
+    sitemap: absoluteUrl('/sitemap.xml'),
   };
 }

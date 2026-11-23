@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryTypeEnum } from '@/types/category.type';
 import {
@@ -9,10 +8,18 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Skeleton from 'react-loading-skeleton';
+import type { IBreakdownItem } from '@/lib/rtk/services/dashboard.rtk.service';
+
+// Darkest shade first — the largest slice gets the strongest colour
+const COLOR_MAP: Record<CategoryTypeEnum, string[]> = {
+  [CategoryTypeEnum.EXPENSE]: ['#dc2626', '#ef4444', '#f87171'],
+  [CategoryTypeEnum.INCOME]: ['#16a34a', '#22c55e', '#4ade80'],
+  [CategoryTypeEnum.INVESTMENT]: ['#ca8a04', '#eab308', '#facc15'],
+};
 
 interface IPieGraphProps {
   className: string;
-  data: any[];
+  data: IBreakdownItem[];
   category: CategoryTypeEnum;
   isLoading?: boolean;
 }
@@ -23,13 +30,7 @@ const PieGraph: React.FC<IPieGraphProps> = ({
   category,
   isLoading = false,
 }) => {
-  const COLOR_MAP: Record<CategoryTypeEnum, string[]> = {
-    [CategoryTypeEnum.EXPENSE]: ['#f87171', '#ef4444', '#dc2626'],
-    [CategoryTypeEnum.INCOME]: ['#4ade80', '#22c55e', '#16a34a'],
-    [CategoryTypeEnum.INVESTMENT]: ['#facc15', '#eab308', '#ca8a04'],
-  };
-
-  const COLORS = [...COLOR_MAP[category]].reverse();
+  const COLORS = COLOR_MAP[category];
   const sortedData = [...data].sort((a, b) => b.total - a.total);
 
   return (
@@ -56,8 +57,11 @@ const PieGraph: React.FC<IPieGraphProps> = ({
                   `${name} ${(percent! * 100).toFixed(0)}%`
                 }
               >
-                {sortedData.map((_: any, i: any) => (
-                  <Cell key={i} fill={COLORS[Math.min(i, COLORS.length - 1)]} />
+                {sortedData.map((item, i) => (
+                  <Cell
+                    key={item.name}
+                    fill={COLORS[Math.min(i, COLORS.length - 1)]}
+                  />
                 ))}
               </Pie>
               <PieTooltip formatter={value => Number(value).toLocaleString()} />

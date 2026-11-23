@@ -1,6 +1,16 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+/** "Jane Doe" → "JD" (first two words); `fallback` when there's no name. */
+export const getInitials = (name?: string | null, fallback = '?') =>
+  (name ?? '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase() || fallback;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

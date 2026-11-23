@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import TextElement from '@/components/common/TextElement';
@@ -35,7 +34,9 @@ const LoginWrapper = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ILoginRequest>();
+  } = useForm<ILoginRequest>({
+    defaultValues: { email: '', password: '' },
+  });
 
   const onSubmit = async (data: ILoginRequest) => {
     setLoading(true);
@@ -79,7 +80,9 @@ const LoginWrapper = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Email Input */}
         <div className="space-y-2">
-          <Label className="text-ink">{emailInputField.label}</Label>
+          <Label htmlFor="login-email" className="text-ink">
+            {emailInputField.label}
+          </Label>
           <Controller
             name={emailInputField.name as 'email'}
             control={control}
@@ -88,6 +91,7 @@ const LoginWrapper = () => {
               <div className="flex flex-col">
                 <Input
                   {...field}
+                  id="login-email"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type="email"
                   placeholder={emailInputField.placeholder}
@@ -107,7 +111,9 @@ const LoginWrapper = () => {
 
         {/* Password Input */}
         <div className="space-y-2">
-          <Label className="text-ink">{passwordInputField.label}</Label>
+          <Label htmlFor="login-password" className="text-ink">
+            {passwordInputField.label}
+          </Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -116,6 +122,7 @@ const LoginWrapper = () => {
               <div className="relative flex flex-col">
                 <Input
                   {...field}
+                  id="login-password"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type={showPassword ? 'text' : 'password'}
                   placeholder={passwordInputField.placeholder}
@@ -123,7 +130,9 @@ const LoginWrapper = () => {
                 <button
                   type="button"
                   className="absolute top-[13px] right-3 cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword(prev => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -158,7 +167,7 @@ const LoginWrapper = () => {
 
         <Row className="flex-col justify-center">
           <TextElement as="p" className="">
-            Don't have an account?
+            Don&apos;t have an account?
           </TextElement>
           <Link href={PAGE_ROUTES.register}>
             <TextElement as="span" className="">

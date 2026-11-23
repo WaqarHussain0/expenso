@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useTransition } from 'react';
+import { useTransition } from 'react';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
@@ -29,8 +29,6 @@ import {
 } from '@/lib/server-actions/category.server-action';
 import CategoryTypeBadge, { CATEGORY_TYPE_COLORS } from './CategoryTypeBadge';
 import { CategoryIconTile } from '../transaction/TransactionDisplay';
-
-export { CATEGORY_ICONS };
 
 const COLORS = [
   '#FF6B35',
@@ -81,12 +79,21 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: {
-      name: '',
-      type: CategoryTypeEnum.INCOME,
-      icon: 'Wallet',
-      color: '#22C55E',
-    },
+    // The dialog is mounted fresh each time it opens, so the initial values
+    // can come straight from the category being edited
+    defaultValues: category
+      ? {
+          name: category.name,
+          type: category.type,
+          icon: category.icon,
+          color: category.color,
+        }
+      : {
+          name: '',
+          type: CategoryTypeEnum.EXPENSE,
+          icon: 'Wallet',
+          color: '#22C55E',
+        },
   });
 
   const [isPending, startTransition] = useTransition();
@@ -108,27 +115,6 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
       }
     });
   };
-
-  // Reset when editing
-  useEffect(() => {
-    if (!open) return;
-
-    if (category) {
-      reset({
-        name: category.name,
-        type: category.type,
-        icon: category.icon,
-        color: category.color,
-      });
-    } else {
-      reset({
-        name: '',
-        type: CategoryTypeEnum.EXPENSE,
-        icon: 'Wallet',
-        color: '#22C55E',
-      });
-    }
-  }, [category, reset, open]);
 
   const isSubmitting = isPending;
 

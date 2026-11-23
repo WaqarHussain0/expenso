@@ -7,6 +7,7 @@ import { TransactionService } from '@/backend/modules/transaction/transaction.se
 import SharedStatsWrapper from './SharedStats.wrapper';
 import mongoose from 'mongoose';
 import type { Metadata } from 'next';
+import { cache } from 'react';
 
 type IUser = {
   _id: string;
@@ -20,6 +21,20 @@ type SearchParams = Promise<{
 
 const statsService = new StatsService();
 const transactionService = new TransactionService();
+
+// generateMetadata and the page both need the share record — cache() makes
+// that one database lookup per request instead of two.
+const getSharedStat = cache((token: string) =>
+  statsService.getStatsByToken(token),
+);
+
+// Shared reports contain someone's personal finances: never index them.
+const PRIVATE_ROBOTS: Metadata['robots'] = {
+  index: false,
+  follow: false,
+  nocache: true,
+  googleBot: { index: false, follow: false },
+};
 
 // Type guard to check if userId is populated
 const isUser = (user: any): user is IUser => {
@@ -37,15 +52,17 @@ export async function generateMetadata({
     return {
       title: 'Shared Stats',
       description: 'View shared financial statistics.',
+      robots: PRIVATE_ROBOTS,
     };
   }
 
-  const stat = await statsService.getStatsByToken(m);
+  const stat = await getSharedStat(m);
 
   if (!stat || !stat.filter) {
     return {
       title: 'Shared Stats',
       description: 'Invalid or expired shared stats link.',
+      robots: PRIVATE_ROBOTS,
     };
   }
 
@@ -70,6 +87,7 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots: PRIVATE_ROBOTS,
 
     openGraph: {
       title,
@@ -91,7 +109,7 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
     redirect(PAGE_ROUTES.stats);
   }
 
-  const stat = await statsService.getStatsByToken(m);
+  const stat = await getSharedStat(m);
 
   if (!stat || !stat.filter) {
     redirect(PAGE_ROUTES.stats);

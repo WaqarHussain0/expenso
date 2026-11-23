@@ -1,7 +1,7 @@
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 import { formatCompactAmount } from '@/lib/utils';
 import { Receipt } from 'lucide-react';
-import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
+import { CATEGORY_ICON_MAP } from '@/components/common/CategoryIcon';
 import CategoryTypeBadge from '../category/CategoryTypeBadge';
 
 const FALLBACK_COLOR = '#64748b';
@@ -29,7 +29,7 @@ export const CategoryIconTile: React.FC<{
 }> = ({ category, className = 'size-9 rounded-xl' }) => {
   const color = category?.color || FALLBACK_COLOR;
   const IconComponent =
-    CATEGORY_ICONS.find(item => item.name === category?.icon)?.icon ?? Receipt;
+    (category?.icon && CATEGORY_ICON_MAP[category.icon]) || Receipt;
 
   return (
     <span

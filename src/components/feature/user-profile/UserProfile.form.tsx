@@ -19,6 +19,7 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useTransition } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
+import { getInitials } from '@/lib/utils';
 
 type FormValues = {
   name: string;
@@ -46,15 +47,6 @@ const toFormValues = (user?: IUser): FormValues => ({
   contact: user?.profile?.contact || '',
   gender: user?.profile?.gender || UserGenderEnum.MALE,
 });
-
-const getInitials = (name: string) =>
-  name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase() || '?';
 
 const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
   const { update } = useSession();
@@ -143,7 +135,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
             <div className="rounded-full bg-gradient-to-br from-[#34d399] to-[#1a7f5a] p-[3px] shadow-[0_10px_30px_-10px_rgba(52,211,153,0.6)]">
               <div className="bg-panel ring-ink flex size-20 items-center justify-center rounded-full ring-2">
                 <span className="manrope text-2xl font-bold text-white">
-                  {getInitials(name || user?.name || '')}
+                  {getInitials(name || user?.name)}
                 </span>
               </div>
             </div>

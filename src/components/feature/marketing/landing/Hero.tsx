@@ -35,10 +35,10 @@ const Hero: React.FC<{ signedIn?: boolean }> = ({ signedIn = false }) => (
 
         <Reveal delay={160}>
           <p className="inter mt-6 max-w-xl text-[16px] leading-relaxed text-white/60">
-            I built Expenso because I kept wondering where my salary went by the
-            20th of every month. Log income, expenses, and investments in
-            seconds — and see your month at a glance. You won&apos;t have to
-            wonder either.
+            I built Expenso, a free expense tracker and budget app, because I
+            kept wondering where my salary went by the 20th of every month. Log
+            income, expenses, and investments in seconds — and see your month at
+            a glance. You won&apos;t have to wonder either.
           </p>
         </Reveal>
 

@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
-import { useEffect, useTransition } from 'react';
+import { useTransition } from 'react';
 import { Input } from '@/components/ui/input';
 import { Controller, useForm } from 'react-hook-form';
 import { ITransaction } from '@/types/transaction.type';
@@ -26,7 +26,6 @@ interface ITransactionDialogProps {
   open: boolean;
   onClose: () => void;
   transaction?: ITransaction | null;
-  defaultCategoryId?: string;
 }
 
 type FormValues = {
@@ -36,6 +35,9 @@ type FormValues = {
   note?: string;
 };
 
+const formatDateForInput = (date: string | Date) =>
+  new Date(date).toISOString().split('T')[0];
+
 const fieldClass =
   'h-10 bg-surface-2 px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-surface focus-visible:ring-[#1a7f5a]/15';
 
@@ -44,9 +46,6 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
   open,
   transaction,
 }) => {
-  const formatDateForInput = (date: string | Date) =>
-    new Date(date).toISOString().split('T')[0];
-
   const [isPending, startTransition] = useTransition();
 
   const {
@@ -56,11 +55,20 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
     control,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: {
-      amount: 0,
-      date: formatDateForInput(new Date()),
-      note: '',
-    },
+    // The dialog is mounted fresh each time it opens, so the initial values
+    // can come straight from the transaction being edited
+    defaultValues: transaction
+      ? {
+          amount: transaction.amount,
+          date: formatDateForInput(transaction.date),
+          note: transaction.note,
+          categoryId: transaction.categoryId,
+        }
+      : {
+          amount: 0,
+          date: formatDateForInput(new Date()),
+          note: '',
+        },
   });
 
   const onSubmit = (data: FormValues) => {
@@ -80,25 +88,6 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
       }
     });
   };
-
-  // Reset when editing
-  useEffect(() => {
-    if (!open) return;
-    if (transaction) {
-      reset({
-        amount: transaction.amount,
-        date: formatDateForInput(transaction.date),
-        note: transaction.note,
-        categoryId: transaction.categoryId,
-      });
-    } else {
-      reset({
-        amount: 0,
-        date: formatDateForInput(new Date()),
-        note: '',
-      });
-    }
-  }, [transaction, reset, open]);
 
   const isSubmitting = isPending;
 

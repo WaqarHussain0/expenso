@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -53,17 +53,11 @@ const CustomDateStatsWrapper = dynamic(
   { loading: StatsViewFallback },
 );
 
-const now = new Date();
-
 const DATE_FILTER_OPTIONS = [
   FilterOptionEnum.MONTH,
   FilterOptionEnum.YEAR,
   FilterOptionEnum.CUSTOM,
 ];
-
-const YEARS = Array.from({ length: 6 }, (_, i) => now.getFullYear() - i);
-
-// const toInputDate = (d: Date) => d.toISOString().split('T')[0];
 
 const toInputDate = (d: Date) => {
   const year = d.getFullYear();
@@ -88,6 +82,11 @@ const getRangeForYear = (year: number) => ({
 const Page = () => {
   const [isPending, startTransition] = useTransition();
 
+  // Captured once per mount (not at module load, which on the server would
+  // be whenever the process started)
+  const [now] = useState(() => new Date());
+  const years = Array.from({ length: 6 }, (_, i) => now.getFullYear() - i);
+
   const [filterOption, setFilterOption] = useState<FilterOptionEnum>(
     FilterOptionEnum.MONTH,
   );
@@ -98,12 +97,12 @@ const Page = () => {
   const [shareUrl, setShareUrl] = useState('');
 
   // Month filter state
-  const [month, setMonth] = useState(now.getMonth());
-  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(() => now.getMonth());
+  const [year, setYear] = useState(() => now.getFullYear());
 
   // Custom filter state
-  const [fromDate, setFromDate] = useState(toInputDate(now));
-  const [toDate, setToDate] = useState(toInputDate(now));
+  const [fromDate, setFromDate] = useState(() => toInputDate(now));
+  const [toDate, setToDate] = useState(() => toInputDate(now));
 
   // Derive the date range based on active filter
   const { startDate, endDate } = (() => {
@@ -199,7 +198,7 @@ const Page = () => {
             expenseBreakdown={yearData?.response?.expenseBreakdown}
             incomeBreakdown={yearData?.response?.incomeBreakdown}
             investmentBreakdown={yearData?.response?.investmentBreakdown}
-            totals={totals}
+            totals={yearData?.response?.totals}
           />
         );
 
@@ -218,44 +217,35 @@ const Page = () => {
     }
   };
 
-  // Open dialog and prepare to generate URL
+  // Open the dialog and generate a share link for the current view
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
     setShareUrl('');
     setIsCopied(false);
+
+    startTransition(async () => {
+      const result = await getStatsLinkAction({
+        type: filterOption,
+        startDate,
+        endDate,
+        year,
+      });
+
+      if (result.success && result.url) {
+        setShareUrl(result.url);
+      }
+    });
   };
 
-  // Generate stats URL and copy it
   const handleCopy = async () => {
-    if (shareUrl) {
-      navigator.clipboard.writeText(shareUrl);
-      setIsCopied(true);
-    }
+    if (!shareUrl) return;
+
+    await navigator.clipboard.writeText(shareUrl);
+    setIsCopied(true);
 
     // Reset copied state after 2s
     setTimeout(() => setIsCopied(false), 2000);
   };
-
-  // Auto-generate URL when dialog opens
-  useEffect(() => {
-    if (isDialogOpen && !shareUrl) {
-      const generateURL = async () => {
-        startTransition(async () => {
-          const result = await getStatsLinkAction({
-            type: filterOption,
-            startDate,
-            endDate,
-            year,
-          });
-
-          if (result.success && result.url) {
-            setShareUrl(result.url);
-          }
-        });
-      };
-      generateURL();
-    }
-  }, [isDialogOpen, shareUrl, filterOption, startDate, endDate, year]);
 
   return (
     <div className="page-fade flex w-full flex-col gap-5">
@@ -273,7 +263,7 @@ const Page = () => {
           {/* Filter type selector — always visible */}
 
           <div className="space-y-2">
-            <Label>Filter By</Label>
+            <Label htmlFor="stats-filter">Filter By</Label>
 
             <Select
               value={filterOption}
@@ -281,7 +271,7 @@ const Page = () => {
                 setFilterOption(value as FilterOptionEnum)
               }
             >
-              <SelectTrigger className="w-24 capitalize">
+              <SelectTrigger id="stats-filter" className="w-24 capitalize">
                 <SelectValue placeholder="Select filter" />
               </SelectTrigger>
 
@@ -303,12 +293,12 @@ const Page = () => {
           {filterOption === FilterOptionEnum.MONTH && (
             <>
               <div className="space-y-2">
-                <Label>Month</Label>
+                <Label htmlFor="stats-month">Month</Label>
                 <Select
                   value={String(month)}
                   onValueChange={val => setMonth(Number(val))}
                 >
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger id="stats-month" className="w-24">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent
@@ -328,16 +318,16 @@ const Page = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Year</Label>
+                <Label htmlFor="stats-month-year">Year</Label>
                 <Select
                   value={String(year)}
                   onValueChange={val => setYear(Number(val))}
                 >
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger id="stats-month-year" className="w-24">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {YEARS.map(y => (
+                    {years.map(y => (
                       <SelectItem key={y} value={String(y)}>
                         {y}
                       </SelectItem>
@@ -351,16 +341,16 @@ const Page = () => {
           {/* ── YEAR filter inputs ── */}
           {filterOption === FilterOptionEnum.YEAR && (
             <div className="space-y-2">
-              <Label>Year</Label>
+              <Label htmlFor="stats-year">Year</Label>
               <Select
                 value={String(year)}
                 onValueChange={val => setYear(Number(val))}
               >
-                <SelectTrigger className="w-20">
+                <SelectTrigger id="stats-year" className="w-20">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {YEARS.map(y => (
+                  {years.map(y => (
                     <SelectItem key={y} value={String(y)}>
                       {y}
                     </SelectItem>
@@ -374,8 +364,9 @@ const Page = () => {
           {filterOption === FilterOptionEnum.CUSTOM && (
             <>
               <div className="space-y-2">
-                <Label>From </Label>
+                <Label htmlFor="stats-from">From </Label>
                 <Input
+                  id="stats-from"
                   type="date"
                   value={fromDate}
                   onChange={e => setFromDate(e.target.value)}
@@ -383,8 +374,9 @@ const Page = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>To </Label>
+                <Label htmlFor="stats-to">To </Label>
                 <Input
+                  id="stats-to"
                   type="date"
                   value={toDate}
                   min={fromDate} // prevent selecting before 'fromDate'
@@ -419,6 +411,7 @@ const Page = () => {
             <div className="flex items-center gap-2">
               <Input
                 type="text"
+                aria-label="Share URL"
                 value={shareUrl}
                 readOnly
                 className="flex-1"

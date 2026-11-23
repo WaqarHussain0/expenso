@@ -14,7 +14,7 @@ import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
 import { PlusIcon, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 export interface ICategoryStats {
@@ -61,11 +61,12 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
   categoryStats,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
-    useDebouncedSearch();
-
-  const [selectedType, setSelectedType] = useState<string>('all');
+  // Start from whatever filters are already in the URL (e.g. after a refresh)
+  const [selectedType, setSelectedType] = useState<string>(
+    () => searchParams.get('type') ?? 'all',
+  );
 
   const [showCategoryDialog, setShowCategoryDialog] = useState<boolean>(false);
   const handleCloseDialog = useCallback(
@@ -88,13 +89,15 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
   const currentType = () =>
     selectedType === 'all' ? undefined : (selectedType as CategoryTypeEnum);
 
+  // The URL (and so the server fetch) only updates once typing settles
+  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
+    useDebouncedSearch({
+      initialValue: searchParams.get('search') ?? '',
+      onDebouncedChange: value => updateQueryParams(1, value, currentType()),
+    });
+
   const handlePageChange = (newPage: number) => {
     updateQueryParams(newPage, debouncedSearch, currentType());
-  };
-
-  const handleSearch = (value: string) => {
-    handleSearchChange(value);
-    updateQueryParams(1, value, currentType());
   };
 
   const handleTypeChange = useCallback(
@@ -170,7 +173,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
         <div className="border-ink/[0.06] flex flex-col gap-3 border-b p-3 md:flex-row md:items-center md:p-4">
           <SearchInput
             value={searchInput}
-            onChange={handleSearch}
+            onChange={handleSearchChange}
             placeholder="Search by name"
             className="w-full md:max-w-xs"
           />

@@ -46,8 +46,8 @@ const AssistantSpotlight = () => (
 
         <ul className="mt-10 space-y-5">
           {POINTS.map(({ icon: Icon, title, body }, i) => (
-            <Reveal key={title} delay={i * 80}>
-              <li className="flex gap-4">
+            <li key={title}>
+              <Reveal delay={i * 80} className="flex gap-4">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-[#34d399]">
                   <Icon className="size-5" />
                 </span>
@@ -59,8 +59,8 @@ const AssistantSpotlight = () => (
                     {body}
                   </p>
                 </div>
-              </li>
-            </Reveal>
+              </Reveal>
+            </li>
           ))}
         </ul>
 

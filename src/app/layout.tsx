@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import NextAuthProvider from '@/components/providers/NextAuth.provider';
 import ThemeProvider from '@/components/providers/Theme.provider';
@@ -10,6 +10,13 @@ import {
   THEME_COOKIE,
   isThemePreference,
 } from '@/app/constants/theme.constant';
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_URL,
+} from '@/app/constants/site.constant';
 
 // Display serif for headings and the italic accents (replaces the Georgia
 // system font, which isn't installed on most Android devices)
@@ -34,71 +41,70 @@ const manrope = Manrope({
   display: 'swap',
 });
 
-const appURL = 'https://expenso-pi.vercel.app';
 export const metadata: Metadata = {
-  metadataBase: new URL(appURL), // change later if needed
-
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Expenso — Smart Expense, Income & Investment Tracker',
+    default: SITE_TITLE,
     template: '%s | Expenso',
   },
-
-  description:
-    'Expenso helps you track expenses, income, and investments in one place. Visual dashboards, category-based tracking, and financial insights to manage your money smarter.',
-
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: 'Waqar Hussain', url: SITE_URL }],
+  creator: 'Waqar Hussain',
+  publisher: SITE_NAME,
+  category: 'finance',
+  alternates: { canonical: '/' },
+  // Don't let iOS turn amounts into phone links
+  formatDetection: { telephone: false, email: false, address: false },
   icons: {
     icon: [
-      { url: '/favicon.ico' }, // fallback
-      { url: '/icon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
-    other: [
-      {
-        rel: 'android-chrome',
-        url: '/android-chrome-192x192.png',
-      },
-      {
-        rel: 'android-chrome',
-        url: '/android-chrome-512x512.png',
-      },
-    ],
   },
-  keywords: [
-    'expense tracker',
-    'budget app',
-    'income tracker',
-    'personal finance',
-    'expense management',
-    'financial dashboard',
-    'budget planner',
-  ],
-
-  authors: [{ name: 'Expenso' }],
-  creator: 'Expenso',
-
   openGraph: {
-    title: 'Expenso — Smart Expense & Income Tracker',
-    description:
-      'Track expenses, income, and investments with powerful dashboards and category insights.',
-    url: appURL,
-    siteName: 'Expenso',
     type: 'website',
+    siteName: SITE_NAME,
+    locale: 'en_US',
+    url: '/',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
-
   twitter: {
     card: 'summary_large_image',
-    title: 'Expenso — Expense & Income Tracker',
-    description:
-      'Track your money smarter with Expenso. Categorize transactions and visualize your finances.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
-
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
+  // Search Console / Bing ownership — set the env vars to verify
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f6f7f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b0e13' },
+  ],
 };
 
 export default async function RootLayout({

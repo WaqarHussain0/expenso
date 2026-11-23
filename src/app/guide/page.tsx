@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import { getServerSideSession } from '@/lib/next-auth.util';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import {
+  SITE_NAME,
+  SITE_URL,
+  absoluteUrl,
+} from '@/app/constants/site.constant';
+import JsonLd from '@/components/common/JsonLd';
 import MarketingNav from '@/components/feature/marketing/MarketingNav';
 import HashScroll from '@/components/feature/marketing/HashScroll';
 import MarketingFooter from '@/components/feature/marketing/MarketingFooter';
@@ -39,11 +45,33 @@ import {
   Ui,
 } from '@/components/feature/marketing/guide/guide-ui';
 
+const GUIDE_TITLE = 'How to Track Expenses & Build a Budget — Expenso Guide';
+const GUIDE_DESCRIPTION =
+  'Step-by-step guide to tracking your expenses with Expenso: set up income, expense and investment categories, log transactions, read your monthly dashboard, compare yearly stats, share reports, and ask the AI assistant about your money.';
+
 export const metadata: Metadata = {
-  title: 'Guide — How to use Expenso',
-  description:
-    'Step-by-step guide to Expenso: set up categories, log transactions, read your dashboard, explore stats, share reports, and ask the AI assistant about your money.',
+  title: { absolute: GUIDE_TITLE },
+  description: GUIDE_DESCRIPTION,
+  keywords: [
+    'how to track expenses',
+    'expense tracker guide',
+    'how to make a monthly budget',
+    'track spending by category',
+    'personal finance tutorial',
+    'Expenso guide',
+  ],
   alternates: { canonical: '/guide' },
+  openGraph: {
+    type: 'article',
+    url: '/guide',
+    title: GUIDE_TITLE,
+    description: GUIDE_DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: GUIDE_TITLE,
+    description: GUIDE_DESCRIPTION,
+  },
 };
 
 const TOC: ITocItem[] = [
@@ -86,6 +114,48 @@ const QUICK_START = [
   },
 ];
 
+const STRUCTURED_DATA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'TechArticle',
+      '@id': `${absoluteUrl('/guide')}#article`,
+      headline: GUIDE_TITLE,
+      description: GUIDE_DESCRIPTION,
+      url: absoluteUrl('/guide'),
+      image: absoluteUrl('/guide/opengraph-image'),
+      inLanguage: 'en',
+      proficiencyLevel: 'Beginner',
+      dateModified: '2026-11-23',
+      author: { '@type': 'Person', name: 'Waqar Hussain' },
+      publisher: {
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: absoluteUrl('/android-chrome-512x512.png'),
+      },
+      about: { '@type': 'Thing', name: 'Personal expense tracking' },
+      hasPart: TOC.map(({ id, label }) => ({
+        '@type': 'WebPageElement',
+        name: label,
+        url: `${absoluteUrl('/guide')}#${id}`,
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Guide',
+          item: absoluteUrl('/guide'),
+        },
+      ],
+    },
+  ],
+};
+
 const GuidePage = async () => {
   const session = await getServerSideSession();
   const signedIn = !!session?.user;
@@ -93,6 +163,7 @@ const GuidePage = async () => {
   return (
     <div className="bg-surface w-full overflow-x-clip">
       <MarketingNav signedIn={signedIn} />
+      <JsonLd data={STRUCTURED_DATA} />
       <HashScroll />
 
       {/* ───────── Header ───────── */}

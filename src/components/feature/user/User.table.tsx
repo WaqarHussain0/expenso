@@ -33,20 +33,12 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import RowActions from '@/components/common/RowActions';
 import EmptyState from '@/components/common/EmptyState';
+import { getInitials } from '@/lib/utils';
 
 interface IUserTableProps {
   users: IUser[];
   className?: string;
 }
-
-const getInitials = (name?: string) =>
-  (name ?? '')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase() || '?';
 
 const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
   const [isPending, startTransition] = useTransition();
@@ -119,7 +111,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
     <div className={className}>
       {users.length > 0 ? (
         <Table containerClassName="lg:overflow-visible">
-          <TableHeader className="sticky top-0 z-20 bg-surface/85 backdrop-blur-md">
+          <TableHeader className="bg-surface/85 sticky top-0 z-20 backdrop-blur-md">
             <TableRow className="hover:bg-transparent">
               <TableHead>User</TableHead>
               <TableHead className="hidden md:table-cell">Gender</TableHead>
@@ -135,12 +127,17 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
             {users.map((user, rowIndex) => (
               <TableRow
                 key={user.id}
+                tabIndex={0}
                 onClick={() => handleViewClick(user.id)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleViewClick(user.id);
+                }}
+                aria-label={`View ${user.name}`}
                 style={{
                   animationDelay: `${Math.min(rowIndex, 12) * 25}ms`,
                   animationFillMode: 'both',
                 }}
-                className="animate-in fade-in slide-in-from-bottom-1 cursor-pointer duration-300 hover:shadow-[inset_3px_0_0_#1a7f5a]"
+                className="animate-in fade-in slide-in-from-bottom-1 focus-visible:bg-canvas cursor-pointer duration-300 outline-none hover:shadow-[inset_3px_0_0_#1a7f5a] focus-visible:shadow-[inset_3px_0_0_#1a7f5a]"
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -182,6 +179,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
                   <div
                     className="flex items-center gap-2.5"
                     onClick={e => e.stopPropagation()}
+                    onKeyDown={e => e.stopPropagation()}
                   >
                     <Switch
                       checked={user.isActive}
@@ -209,6 +207,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
                 <TableCell
                   className="w-12 text-right"
                   onClick={e => e.stopPropagation()}
+                  onKeyDown={e => e.stopPropagation()}
                 >
                   <RowActions actions={getActions(user)} />
                 </TableCell>

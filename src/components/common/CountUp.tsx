@@ -26,6 +26,8 @@ const CountUp: React.FC<CountUpProps> = ({
     const el = ref.current;
     if (!el) return;
 
+    let frame = 0;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -37,16 +39,20 @@ const CountUp: React.FC<CountUpProps> = ({
           const progress = Math.min((now - start) / duration, 1);
           setValue(Math.round(to * easeOutExpo(progress)));
 
-          if (progress < 1) requestAnimationFrame(tick);
+          if (progress < 1) frame = requestAnimationFrame(tick);
         };
 
-        requestAnimationFrame(tick);
+        frame = requestAnimationFrame(tick);
       },
       { threshold: 0.4 },
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      // Stop an in-flight animation on unmount or when `to` changes
+      cancelAnimationFrame(frame);
+    };
   }, [to, duration]);
 
   return (

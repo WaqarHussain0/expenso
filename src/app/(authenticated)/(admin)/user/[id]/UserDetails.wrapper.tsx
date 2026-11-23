@@ -1,33 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-
-import { COLOR_CODES } from '@/app/constants/app.constant';
+import type { UserService } from '@/backend/modules/user/user.service';
+import { buildCashflowStats, ICashflowTotals } from '@/lib/stats.util';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, VenusAndMars } from 'lucide-react';
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
+import CategoryIcon from '@/components/common/CategoryIcon';
 import { Badge } from '@/components/ui/badge';
 import { CategoryTypeEnum } from '@/types/category.type';
 import StatWrapper from '@/components/common/Stat.wrapper';
 import PageHeader from '@/components/common/PageHeader';
 
 interface IUserDetailsWrapperProps {
-  userData: any;
-  monthStats: {
-    income: number;
-    investment: number;
-    expense: number;
-  };
+  userData: Awaited<ReturnType<UserService['getUserData']>>;
+  monthStats: ICashflowTotals;
 }
 
 const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
   userData,
   monthStats,
 }) => {
-  const { user, profile, categories } = userData || {};
+  const { user, profile, categories } = userData;
 
   const stats = [
     {
@@ -97,41 +91,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
         <CardContent>
           {/* Stats  */}
           <StatWrapper
-            stats={(() => {
-              const { income, expense, investment } = monthStats;
-              const base = income || 1;
-              const freeCash = income - (expense + investment);
-              return [
-                {
-                  label: 'Income',
-                  value: income,
-                  percent: income ? 100 : 0,
-                  color: COLOR_CODES.income,
-                  hint: 'This month',
-                },
-                {
-                  label: 'Expense',
-                  value: expense,
-                  percent: (expense / base) * 100,
-                  color: COLOR_CODES.expense,
-                  hint: 'This month',
-                },
-                {
-                  label: 'Investment',
-                  value: investment,
-                  percent: (investment / base) * 100,
-                  color: COLOR_CODES.investment,
-                  hint: 'This month',
-                },
-                {
-                  label: 'Free Cash',
-                  value: freeCash,
-                  percent: (freeCash / base) * 100,
-                  color: COLOR_CODES.freeCash,
-                  hint: 'This month',
-                },
-              ];
-            })()}
+            stats={buildCashflowStats(monthStats, 'This month')}
             className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
           />
         </CardContent>
@@ -144,56 +104,45 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
 
         <CardContent>
           <Row className="grid grid-cols-3 gap-2 md:grid-cols-6">
-            {categories &&
-              categories.length > 0 &&
-              categories?.map((item: any) => (
-                <Card key={item.id} className="w-full p-2">
-                  <CardHeader className="flex flex-col items-center gap-2 p-0 md:flex-row">
-                    <div
-                      className="flex size-7 shrink-0 items-center justify-center rounded-full md:size-9"
-                      style={{
-                        backgroundColor: item.color + '1A', // 1A is ~10% opacity in hex
-                      }}
+            {categories.map(item => (
+              <Card key={item.id} className="w-full p-2">
+                <CardHeader className="flex flex-col items-center gap-2 p-0 md:flex-row">
+                  <div
+                    className="flex size-7 shrink-0 items-center justify-center rounded-full md:size-9"
+                    style={{
+                      backgroundColor: item.color + '1A', // 1A is ~10% opacity in hex
+                    }}
+                  >
+                    <CategoryIcon
+                      name={item.icon}
+                      color={item.color}
+                      className="size-3 shrink-0 md:size-4"
+                    />
+                  </div>
+
+                  <Row className="flex-col gap-1 md:items-start">
+                    <CardTitle className="line-clamp-1 text-xs capitalize md:text-sm">
+                      {item.name}
+                    </CardTitle>
+
+                    <Badge
+                      variant={
+                        item.type === CategoryTypeEnum.EXPENSE
+                          ? 'destructive'
+                          : 'default'
+                      }
+                      className={`capitalize ${
+                        item.type === CategoryTypeEnum.INVESTMENT
+                          ? 'bg-yellow-100 text-yellow-500 dark:bg-yellow-500/15'
+                          : ''
+                      }`}
                     >
-                      {item.icon &&
-                        (() => {
-                          const iconObj = CATEGORY_ICONS.find(
-                            c => c.name === item.icon,
-                          );
-                          if (!iconObj) return null;
-                          const IconComponent = iconObj.icon;
-                          return (
-                            <IconComponent
-                              className="size-3 shrink-0 md:size-4"
-                              style={{ color: item.color }}
-                            />
-                          );
-                        })()}
-                    </div>
-
-                    <Row className="flex-col gap-1 md:items-start">
-                      <CardTitle className="line-clamp-1 text-xs capitalize md:text-sm">
-                        {item.name}
-                      </CardTitle>
-
-                      <Badge
-                        variant={
-                          item.type === CategoryTypeEnum.EXPENSE
-                            ? 'destructive'
-                            : 'default'
-                        }
-                        className={`capitalize ${
-                          item.type === CategoryTypeEnum.INVESTMENT
-                            ? 'bg-yellow-100 text-yellow-500 dark:bg-yellow-500/15'
-                            : ''
-                        }`}
-                      >
-                        {item?.type}
-                      </Badge>
-                    </Row>
-                  </CardHeader>
-                </Card>
-              ))}
+                      {item?.type}
+                    </Badge>
+                  </Row>
+                </CardHeader>
+              </Card>
+            ))}
           </Row>
         </CardContent>
       </Card>

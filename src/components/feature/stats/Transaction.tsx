@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Row from '@/components/common/Row';
 import TextElement from '@/components/common/TextElement';
 import { Badge } from '@/components/ui/badge';
@@ -11,9 +10,10 @@ import {
 import { CategoryTypeEnum } from '@/types/category.type';
 import Skeleton from 'react-loading-skeleton';
 import { formatCompactAmount } from '@/lib/utils';
+import { ITransaction } from '@/types/transaction.type';
 
 interface ITransactionsProps {
-  transactions: any[];
+  transactions: ITransaction[];
   className?: string;
   category?: CategoryTypeEnum;
   isLoading: boolean;
@@ -46,7 +46,7 @@ const Transactions: React.FC<ITransactionsProps> = ({
               </CardHeader>
             </Card>
           ))
-        : transactions.map((item: any) => (
+        : transactions.map(item => (
             <Card key={item._id}>
               <CardHeader>
                 <CardTitle className="flex flex-wrap justify-between capitalize">
@@ -54,12 +54,12 @@ const Transactions: React.FC<ITransactionsProps> = ({
                     <TextElement>{item?.category?.name}</TextElement>
                     <Badge
                       variant={
-                        item?.category.type === CategoryTypeEnum.INCOME
+                        item.category?.type === CategoryTypeEnum.INCOME
                           ? 'default'
                           : 'destructive'
                       }
                       className={
-                        item.category.type === CategoryTypeEnum.INVESTMENT
+                        item.category?.type === CategoryTypeEnum.INVESTMENT
                           ? 'bg-yellow-100 text-yellow-500 dark:bg-yellow-500/15'
                           : ''
                       }

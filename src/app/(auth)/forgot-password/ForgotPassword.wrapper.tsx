@@ -28,7 +28,7 @@ const ForgotPasswordWrapper = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<IForgotPasswordRequest>();
+  } = useForm<IForgotPasswordRequest>({ defaultValues: { email: '' } });
 
   const onSubmit = async (data: IForgotPasswordRequest) => {
     startTransition(async () => {
@@ -67,7 +67,9 @@ const ForgotPasswordWrapper = () => {
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {/* Email Input */}
         <div className="space-y-2">
-          <Label className="text-ink">{emailInputField.label}</Label>
+          <Label htmlFor="forgot-email" className="text-ink">
+            {emailInputField.label}
+          </Label>
           <Controller
             name={emailInputField.name as 'email'}
             control={control}
@@ -76,6 +78,7 @@ const ForgotPasswordWrapper = () => {
               <div className="flex flex-col">
                 <Input
                   {...field}
+                  id="forgot-email"
                   className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type="email"
                   placeholder={emailInputField.placeholder}

@@ -158,7 +158,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
     <div className={className}>
       {transactions.length > 0 ? (
         <Table containerClassName="lg:overflow-visible">
-          <TableHeader className="sticky top-0 z-20 bg-surface/85 backdrop-blur-md">
+          <TableHeader className="bg-surface/85 sticky top-0 z-20 backdrop-blur-md">
             <TableRow className="hover:bg-transparent">
               <TableHead>Category</TableHead>
               <TableHead className="hidden md:table-cell">Note</TableHead>
@@ -260,7 +260,6 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
           onClose={handleCloseDialog}
           open={isEditModalOpen}
           transaction={selectedTransaction}
-          defaultCategoryId={selectedTransaction?.categoryId}
         />
       )}
 

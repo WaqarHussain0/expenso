@@ -13,7 +13,7 @@ import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { UserGenderEnum } from '@/types/user-profile.type';
 import { IUser } from '@/types/user.type';
 import { X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 export interface IUserStats {
@@ -46,11 +46,12 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
   userStats,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
-    useDebouncedSearch();
-
-  const [selectedGender, setSelectedGender] = useState<string>('all');
+  // Start from whatever filters are already in the URL (e.g. after a refresh)
+  const [selectedGender, setSelectedGender] = useState<string>(
+    () => searchParams.get('gender') ?? 'all',
+  );
 
   // Function to update URL query params
   const updateQueryParams = useCallback(
@@ -67,13 +68,15 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
   const currentGender = () =>
     selectedGender === 'all' ? undefined : (selectedGender as UserGenderEnum);
 
+  // The URL (and so the server fetch) only updates once typing settles
+  const { searchInput, debouncedSearch, handleSearchChange, clearSearch } =
+    useDebouncedSearch({
+      initialValue: searchParams.get('search') ?? '',
+      onDebouncedChange: value => updateQueryParams(1, value, currentGender()),
+    });
+
   const handlePageChange = (newPage: number) => {
     updateQueryParams(newPage, debouncedSearch, currentGender());
-  };
-
-  const handleSearch = (value: string) => {
-    handleSearchChange(value);
-    updateQueryParams(1, value, currentGender());
   };
 
   const handleClearFilter = () => {
@@ -143,7 +146,7 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         <div className="border-ink/[0.06] flex flex-col gap-3 border-b p-3 md:flex-row md:items-center md:p-4">
           <SearchInput
             value={searchInput}
-            onChange={handleSearch}
+            onChange={handleSearchChange}
             placeholder="Search by name or email"
             className="w-full md:max-w-xs"
           />

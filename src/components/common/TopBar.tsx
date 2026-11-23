@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { signOut, useSession } from 'next-auth/react';
 
 import {
@@ -28,6 +28,7 @@ import {
 import { useState, useSyncExternalStore } from 'react';
 import ThemeToggle from './ThemeToggle';
 import BrandLogo from '@/components/common/BrandLogo';
+import { getInitials } from '@/lib/utils';
 
 const noopSubscribe = () => () => {};
 const getToday = () =>
@@ -49,11 +50,7 @@ const TopBar: React.FC<ITopBarProps> = ({ className = '' }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const initials = user?.name
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
+  const initials = getInitials(user?.name, '');
 
   // Rendered only on the client so it uses the viewer's local date
   const today = useSyncExternalStore(noopSubscribe, getToday, () => '');
@@ -86,9 +83,12 @@ const TopBar: React.FC<ITopBarProps> = ({ className = '' }) => {
         <ThemeToggle className="hidden sm:inline-flex" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group border-ink/[0.06] bg-surface flex cursor-pointer items-center gap-2.5 rounded-full border py-1 pr-3 pl-1 shadow-[0_1px_2px_rgba(13,17,23,0.04)] transition-all duration-300 outline-none hover:border-[#1a7f5a]/30 hover:shadow-[0_4px_12px_-4px_rgba(13,17,23,0.12)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20">
+            <button
+              type="button"
+              aria-label="Account menu"
+              className="group border-ink/[0.06] bg-surface flex cursor-pointer items-center gap-2.5 rounded-full border py-1 pr-3 pl-1 shadow-[0_1px_2px_rgba(13,17,23,0.04)] transition-all duration-300 outline-none hover:border-[#1a7f5a]/30 hover:shadow-[0_4px_12px_-4px_rgba(13,17,23,0.12)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20"
+            >
               <Avatar className="size-8">
-                <AvatarImage src="" alt={user?.name || ''} />
                 <AvatarFallback className="inter bg-gradient-to-br from-[#2ea878] to-[#1a7f5a] text-xs font-semibold text-white">
                   {initials}
                 </AvatarFallback>
@@ -112,11 +112,13 @@ const TopBar: React.FC<ITopBarProps> = ({ className = '' }) => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => router.push(PAGE_ROUTES.profile)}
+              asChild
               className="flex cursor-pointer items-center gap-2"
             >
-              <Settings className="size-4" />
-              Profile
+              <Link href={PAGE_ROUTES.profile}>
+                <Settings className="size-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />

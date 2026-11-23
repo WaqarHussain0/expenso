@@ -5,9 +5,10 @@ import RegisterWrapper from './Register.wrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Create Your Expenso Account',
+  title: 'Create a free account',
   description:
-    'Sign up for Expenso and start tracking your expenses, income, and investments with powerful financial insights.',
+    'Sign up for Expenso, the free expense tracker and budget app. Start tracking expenses, income and investments in two minutes — no card needed.',
+  alternates: { canonical: '/register' },
 };
 
 const Page = async () => {

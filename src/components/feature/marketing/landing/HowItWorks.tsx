@@ -36,39 +36,46 @@ const HowItWorks = () => (
         />
       </Reveal>
 
-      <ol className="relative mt-16 grid gap-6 md:grid-cols-3">
+      <div className="relative mt-16">
         {/* connecting line on desktop */}
-        <div className="pointer-events-none absolute top-8 right-[16%] left-[16%] hidden h-px bg-gradient-to-r from-transparent via-[#1a7f5a]/30 to-transparent md:block" />
-
-        {STEPS.map((step, i) => (
-          <Reveal key={step.n} delay={i * 100}>
-            <li className="relative flex h-full flex-col items-center text-center">
-              <span
-                className="bg-panel relative z-10 flex size-16 items-center justify-center rounded-2xl text-xl font-bold text-[#34d399] shadow-[0_12px_30px_-10px_rgba(13,17,23,0.5)]"
-                style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-8 right-[16%] left-[16%] hidden h-px bg-gradient-to-r from-transparent via-[#1a7f5a]/30 to-transparent md:block"
+        />
+        <ol className="relative grid gap-6 md:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <li key={step.n}>
+              <Reveal
+                delay={i * 100}
+                className="relative flex h-full flex-col items-center text-center"
               >
-                {step.n}
-              </span>
-              <h3
-                className="text-ink mt-6 text-xl font-bold"
-                style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
-              >
-                {step.title}
-              </h3>
-              <p className="inter text-ink-muted mt-3 max-w-xs text-sm leading-relaxed">
-                {step.body}
-              </p>
-              <Link
-                href={step.href}
-                className="inter group text-brand-fg mt-4 inline-flex items-center gap-1 text-sm font-medium"
-              >
-                Learn how
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+                <span
+                  className="bg-panel relative z-10 flex size-16 items-center justify-center rounded-2xl text-xl font-bold text-[#34d399] shadow-[0_12px_30px_-10px_rgba(13,17,23,0.5)]"
+                  style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
+                >
+                  {step.n}
+                </span>
+                <h3
+                  className="text-ink mt-6 text-xl font-bold"
+                  style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
+                >
+                  {step.title}
+                </h3>
+                <p className="inter text-ink-muted mt-3 max-w-xs text-sm leading-relaxed">
+                  {step.body}
+                </p>
+                <Link
+                  href={step.href}
+                  className="inter group text-brand-fg mt-4 inline-flex items-center gap-1 text-sm font-medium"
+                >
+                  Learn how
+                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </Reveal>
             </li>
-          </Reveal>
-        ))}
-      </ol>
+          ))}
+        </ol>
+      </div>
     </Container>
   </section>
 );
