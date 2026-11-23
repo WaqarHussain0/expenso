@@ -6,6 +6,11 @@ export enum UserRoleEnum {
   ADMIN = 'admin',
 }
 
+export enum LoginMethodEnum {
+  PASSWORD = 'password',
+  GOOGLE = 'google',
+}
+
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -20,6 +25,13 @@ export interface IUser extends Document {
 
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
+
+  // Activity tracking (admin insights)
+  lastLoginAt?: Date | null;
+  lastLoginMethod?: LoginMethodEnum | null;
+  /** Updated on sign-in and on every token refresh (≈ every 15 min while in use) */
+  lastActiveAt?: Date | null;
+  loginCount?: number;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -51,6 +63,15 @@ const UserSchema = new Schema<IUser>(
 
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
+
+    lastLoginAt: { type: Date, default: null },
+    lastLoginMethod: {
+      type: String,
+      enum: [...Object.values(LoginMethodEnum), null],
+      default: null,
+    },
+    lastActiveAt: { type: Date, default: null, index: true },
+    loginCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

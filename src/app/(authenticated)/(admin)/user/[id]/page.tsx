@@ -1,30 +1,33 @@
-import { UserService } from '@/backend/modules/user/user.service';
-import UserDetailsWrapper from './UserDetails.wrapper';
+import type { Metadata } from 'next';
 import mongoose from 'mongoose';
-import { TransactionService } from '@/backend/modules/transaction/transaction.service';
+import { notFound } from 'next/navigation';
+import { requireAdminPage } from '@/lib/admin-page-guard';
+import { UserInsightsService } from '@/backend/modules/user/services/user-insights.service';
+import UserDetailsWrapper from './UserDetails.wrapper';
 
 interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
-const userService = new UserService();
-const transactionService = new TransactionService();
+export const metadata: Metadata = { title: 'User details' };
+
+const insightsService = new UserInsightsService();
 
 const Page = async ({ params }: PageProps) => {
+  const admin = await requireAdminPage();
   const { id } = await params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return <>Invalid user id</>;
-  }
+  if (!mongoose.Types.ObjectId.isValid(id)) notFound();
 
-  const [data, currrentMonthStats] = await Promise.all([
-    userService.getUserData(id),
-    transactionService.getMonthlyStats(id),
-  ]);
+  const insights = await insightsService.getUserInsights(id);
+  if (!insights) notFound();
 
-  return <UserDetailsWrapper userData={data} monthStats={currrentMonthStats} />;
+  return (
+    <UserDetailsWrapper
+      insights={insights}
+      isSelf={admin.id === insights.user.id}
+    />
+  );
 };
 
 export default Page;

@@ -113,7 +113,7 @@ const YearStatsWrapper: React.FC<IYearStatsWrapperProps> = ({
             >
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
+                stroke="var(--border)"
               />
               <XAxis
                 dataKey="month"

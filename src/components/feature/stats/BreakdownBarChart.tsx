@@ -31,10 +31,12 @@ export const formatAxisAmount = (value: number) =>
   value >= 1000 ? `${(value / 1000).toFixed(1)}k` : `${value}`;
 
 export const CHART_TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: 'hsl(var(--card))',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: '8px',
+  backgroundColor: 'var(--surface)',
+  border: '1px solid var(--border)',
+  borderRadius: '10px',
   fontSize: '13px',
+  color: 'var(--ink)',
+  boxShadow: '0 12px 28px -12px rgba(13,17,23,0.35)',
 };
 
 export const formatTooltipAmount = (value: unknown) =>
@@ -90,7 +92,7 @@ const BreakdownBarChart: React.FC<IBreakdownBarChartProps> = ({
         >
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="hsl(var(--border))"
+            stroke="var(--border)"
             vertical={false}
           />
           <XAxis

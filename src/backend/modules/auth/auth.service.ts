@@ -6,7 +6,10 @@ import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import jwt from 'jsonwebtoken';
 import { RegisterDto } from './dto/register.dto';
-import { UserRoleEnum } from '../user/entities/user.entity';
+import {
+  LoginMethodEnum,
+  UserRoleEnum,
+} from '../user/entities/user.entity';
 import { OAuth2Client } from 'google-auth-library';
 import { initDB } from '@/backend/utils/dbInit.util';
 import RefreshTokenEntity from './entities/refresh-token.entity';
@@ -121,6 +124,9 @@ export class AuthService {
 
     const tokens = await this.issueTokens(user);
 
+    // Best-effort: activity tracking must never break a refresh
+    await userService.recordActivity(user._id).catch(() => undefined);
+
     await RefreshTokenEntity.updateOne(
       { _id: record._id, replacedByHash: null },
       { $set: { replacedByHash: hashToken(tokens.refreshToken) } },
@@ -178,6 +184,9 @@ export class AuthService {
     }
 
     const tokens = await this.issueTokens(user);
+    await userService
+      .recordLogin(user._id, LoginMethodEnum.PASSWORD)
+      .catch(() => undefined);
 
     // Return only necessary user details + tokens
     const userData = {
@@ -236,6 +245,9 @@ export class AuthService {
     }
 
     const tokens = await this.issueTokens(user);
+    await userService
+      .recordLogin(user._id, LoginMethodEnum.GOOGLE)
+      .catch(() => undefined);
 
     // Return only necessary user details + tokens
     const userData = {
