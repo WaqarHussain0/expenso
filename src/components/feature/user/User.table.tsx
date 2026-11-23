@@ -119,7 +119,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
     <div className={className}>
       {users.length > 0 ? (
         <Table containerClassName="lg:overflow-visible">
-          <TableHeader className="sticky top-0 z-20 bg-white/85 backdrop-blur-md">
+          <TableHeader className="sticky top-0 z-20 bg-surface/85 backdrop-blur-md">
             <TableRow className="hover:bg-transparent">
               <TableHead>User</TableHead>
               <TableHead className="hidden md:table-cell">Gender</TableHead>
@@ -150,31 +150,31 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
-                      <p className="inter flex items-center gap-2 text-sm font-medium text-[#0d1117] capitalize">
+                      <p className="inter text-ink flex items-center gap-2 text-sm font-medium capitalize">
                         <span className="truncate">{user.name}</span>
                         {user.role === UserRoleEnum.ADMIN && (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#1a7f5a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#1a7f5a] uppercase">
+                          <span className="text-brand-fg inline-flex shrink-0 items-center gap-1 rounded-full bg-[#1a7f5a]/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
                             <ShieldCheck className="size-3" />
                             Admin
                           </span>
                         )}
                       </p>
-                      <p className="inter truncate text-xs text-[#8b93a1]">
+                      <p className="inter text-ink-subtle truncate text-xs">
                         {user.email || '—'}
                       </p>
                     </div>
                   </div>
                 </TableCell>
 
-                <TableCell className="hidden text-sm text-[#5a6070] capitalize md:table-cell">
+                <TableCell className="text-ink-muted hidden text-sm capitalize md:table-cell">
                   {user.profile?.gender || (
-                    <span className="text-[#c4c9d0]">—</span>
+                    <span className="text-ink-faint">—</span>
                   )}
                 </TableCell>
 
-                <TableCell className="hidden text-sm text-[#5a6070] tabular-nums sm:table-cell">
+                <TableCell className="text-ink-muted hidden text-sm tabular-nums sm:table-cell">
                   {user.profile?.contact || (
-                    <span className="text-[#c4c9d0]">—</span>
+                    <span className="text-ink-faint">—</span>
                   )}
                 </TableCell>
 
@@ -192,13 +192,13 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
                     <span
                       className={`inter hidden items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium lg:inline-flex ${
                         user.isActive
-                          ? 'bg-[#059669]/10 text-[#059669]'
-                          : 'bg-[#0d1117]/[0.05] text-[#8b93a1]'
+                          ? 'bg-success/10 text-success'
+                          : 'bg-ink/[0.05] text-ink-subtle'
                       }`}
                     >
                       <span
                         className={`size-1.5 rounded-full ${
-                          user.isActive ? 'bg-[#059669]' : 'bg-[#8b93a1]'
+                          user.isActive ? 'bg-success' : 'bg-ink-subtle'
                         }`}
                       />
                       {user.isActive ? 'Active' : 'Inactive'}
@@ -232,7 +232,7 @@ const UserTable: React.FC<IUserTableProps> = ({ users, className = '' }) => {
             <AlertDialogDescription>
               {selectedUser?.name ? (
                 <>
-                  <span className="font-medium text-[#0d1117] capitalize">
+                  <span className="text-ink font-medium capitalize">
                     {selectedUser.name}
                   </span>{' '}
                   will be removed. This can&apos;t be undone.

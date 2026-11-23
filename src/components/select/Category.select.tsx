@@ -100,7 +100,7 @@ export const CategorySelect: React.FC<ICategorySelectProps> = ({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'inter h-10 w-full justify-between border-[#0d1117]/[0.08] bg-[#fafbfa] bg-none font-normal text-[#0d1117] capitalize hover:border-[#1a7f5a]/40 hover:bg-white hover:text-[#0d1117] aria-expanded:border-[#1a7f5a] aria-expanded:bg-white aria-expanded:text-[#0d1117] aria-expanded:ring-3 aria-expanded:ring-[#1a7f5a]/15',
+            'inter border-ink/[0.08] bg-surface-2 text-ink hover:bg-surface hover:text-ink aria-expanded:bg-surface aria-expanded:text-ink h-10 w-full justify-between bg-none font-normal capitalize hover:border-[#1a7f5a]/40 aria-expanded:border-[#1a7f5a] aria-expanded:ring-3 aria-expanded:ring-[#1a7f5a]/15',
             className,
           )}
         >

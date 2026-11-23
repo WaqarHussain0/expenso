@@ -99,14 +99,12 @@ const ProviderKeyRow: React.FC<IProviderKeyRowProps> = ({
           {meta.label.charAt(0)}
         </span>
         <div className="min-w-0">
-          <p className="inter text-sm font-semibold text-[#0d1117]">
-            {meta.label}
-          </p>
+          <p className="inter text-ink text-sm font-semibold">{meta.label}</p>
           <a
             href={meta.keyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inter inline-flex items-center gap-0.5 text-[11px] text-[#8b93a1] transition-colors hover:text-[#1a7f5a]"
+            className="inter text-ink-subtle hover:text-brand-fg inline-flex items-center gap-0.5 text-[11px] transition-colors"
           >
             Get a {meta.vendor} key
             <ArrowUpRight className="size-3" />
@@ -125,7 +123,7 @@ const ProviderKeyRow: React.FC<IProviderKeyRowProps> = ({
             className="flex flex-col gap-2 sm:flex-row"
           >
             <div className="relative flex-1">
-              <KeyRound className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#8b93a1]" />
+              <KeyRound className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <Input
                 type={reveal ? 'text' : 'password'}
                 value={value}
@@ -139,13 +137,13 @@ const ProviderKeyRow: React.FC<IProviderKeyRowProps> = ({
                 autoComplete="off"
                 spellCheck={false}
                 disabled={isSaving}
-                className="h-10 bg-[#fafbfa] pr-10 pl-9 font-mono text-[13px] focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15"
+                className="bg-surface-2 focus-visible:bg-surface h-10 pr-10 pl-9 font-mono text-[13px] focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
               />
               <button
                 type="button"
                 onClick={() => setReveal(r => !r)}
                 aria-label={reveal ? 'Hide key' : 'Show key'}
-                className="absolute top-1/2 right-2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-[#8b93a1] transition-colors hover:text-[#0d1117]"
+                className="text-ink-subtle hover:text-ink absolute top-1/2 right-2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md transition-colors"
               >
                 {reveal ? (
                   <EyeOff className="size-4" />
@@ -190,15 +188,15 @@ const ProviderKeyRow: React.FC<IProviderKeyRowProps> = ({
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="inter inline-flex items-center gap-1.5 rounded-full bg-[#059669]/10 px-2 py-0.5 text-[11px] font-medium text-[#059669]">
-                <span className="size-1.5 rounded-full bg-[#059669]" />
+              <span className="inter bg-success/10 text-success inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium">
+                <span className="bg-success size-1.5 rounded-full" />
                 Active
               </span>
-              <span className="font-mono text-sm tracking-wider text-[#0d1117]">
+              <span className="text-ink font-mono text-sm tracking-wider">
                 ••••••••{saved?.last4}
               </span>
               {saved?.updatedAt && (
-                <span className="inter hidden text-xs text-[#8b93a1] sm:inline">
+                <span className="inter text-ink-subtle hidden text-xs sm:inline">
                   Updated{' '}
                   {new Date(saved.updatedAt).toLocaleDateString('en-US', {
                     month: 'short',
@@ -273,14 +271,14 @@ const AiKeysCard: React.FC<IAiKeysCardProps> = ({ keys }) => {
   return (
     <section
       id="ai-keys"
-      className="scroll-mt-24 overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1 ring-[#0d1117]/[0.06]"
+      className="bg-surface ring-ink/[0.06] scroll-mt-24 overflow-hidden rounded-2xl shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1"
     >
-      <div className="flex flex-col gap-3 border-b border-[#0d1117]/[0.06] px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
+      <div className="border-ink/[0.06] flex flex-col gap-3 border-b px-6 py-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="inter text-sm font-semibold text-[#0d1117]">
+          <p className="inter text-ink text-sm font-semibold">
             AI provider keys
           </p>
-          <p className="inter mt-0.5 max-w-xl text-xs text-[#8b93a1]">
+          <p className="inter text-ink-subtle mt-0.5 max-w-xl text-xs">
             Use your own API keys for the assistant. Without any, Expenso&apos;s
             shared keys are used.
           </p>
@@ -288,20 +286,20 @@ const AiKeysCard: React.FC<IAiKeysCardProps> = ({ keys }) => {
         <span
           className={`inter inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
             usingOwnKeys
-              ? 'bg-[#1a7f5a]/10 text-[#1a7f5a]'
-              : 'bg-[#0d1117]/[0.05] text-[#5a6070]'
+              ? 'text-brand-fg bg-[#1a7f5a]/10'
+              : 'bg-ink/[0.05] text-ink-muted'
           }`}
         >
           <span
             className={`size-1.5 rounded-full ${
-              usingOwnKeys ? 'bg-[#1a7f5a]' : 'bg-[#8b93a1]'
+              usingOwnKeys ? 'bg-[#1a7f5a]' : 'bg-ink-subtle'
             }`}
           />
           {usingOwnKeys ? 'Using your keys' : "Using Expenso's shared keys"}
         </span>
       </div>
 
-      <div className="divide-y divide-[#0d1117]/[0.05]">
+      <div className="divide-ink/[0.05] divide-y">
         {AI_PROVIDER_ORDER.map(provider => (
           <ProviderKeyRow
             key={`${provider}-${byProvider.get(provider)?.updatedAt ?? 'none'}`}
@@ -311,18 +309,15 @@ const AiKeysCard: React.FC<IAiKeysCardProps> = ({ keys }) => {
         ))}
       </div>
 
-      <div className="flex gap-3 border-t border-[#0d1117]/[0.06] bg-[#fafbfa] px-6 py-4">
-        <Lock className="mt-0.5 size-4 shrink-0 text-[#1a7f5a]" />
-        <p className="inter text-xs leading-relaxed text-[#5a6070]">
+      <div className="border-ink/[0.06] bg-surface-2 flex gap-3 border-t px-6 py-4">
+        <Lock className="text-brand-fg mt-0.5 size-4 shrink-0" />
+        <p className="inter text-ink-muted text-xs leading-relaxed">
           Keys are verified with the provider, encrypted (AES-256-GCM) before
           they&apos;re stored, and never shown again — only the last four
           characters. When you save any key, the assistant uses{' '}
-          <strong className="font-semibold text-[#0d1117]">
-            only your keys
-          </strong>
-          , trying{' '}
-          {AI_PROVIDER_ORDER.map(p => AI_PROVIDERS[p].label).join(' → ')} and
-          falling back automatically if one fails.
+          <strong className="text-ink font-semibold">only your keys</strong>,
+          trying {AI_PROVIDER_ORDER.map(p => AI_PROVIDERS[p].label).join(' → ')}{' '}
+          and falling back automatically if one fails.
         </p>
       </div>
     </section>

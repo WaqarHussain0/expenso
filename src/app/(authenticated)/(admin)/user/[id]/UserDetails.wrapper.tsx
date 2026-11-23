@@ -71,7 +71,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                 <div key={item.title} className="flex items-center gap-3">
                   <Icon className="text-muted-foreground h-5 w-5" />
                   <div className="flex flex-col">
-                    <TextElement as="p" className="text-[#5a6070]">
+                    <TextElement as="p" className="text-ink-muted">
                       {item.title}
                     </TextElement>
 
@@ -184,7 +184,7 @@ const UserDetailsWrapper: React.FC<IUserDetailsWrapperProps> = ({
                         }
                         className={`capitalize ${
                           item.type === CategoryTypeEnum.INVESTMENT
-                            ? 'bg-yellow-100 text-yellow-500'
+                            ? 'bg-yellow-100 text-yellow-500 dark:bg-yellow-500/15'
                             : ''
                         }`}
                       >

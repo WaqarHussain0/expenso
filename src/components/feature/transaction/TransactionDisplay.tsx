@@ -7,9 +7,12 @@ import CategoryTypeBadge from '../category/CategoryTypeBadge';
 const FALLBACK_COLOR = '#64748b';
 
 const AMOUNT_STYLES: Record<string, { sign: string; className: string }> = {
-  [CategoryTypeEnum.INCOME]: { sign: '+', className: 'text-[#059669]' },
-  [CategoryTypeEnum.EXPENSE]: { sign: '−', className: 'text-[#0d1117]' },
-  [CategoryTypeEnum.INVESTMENT]: { sign: '', className: 'text-[#b45309]' },
+  [CategoryTypeEnum.INCOME]: { sign: '+', className: 'text-success' },
+  [CategoryTypeEnum.EXPENSE]: { sign: '−', className: 'text-ink' },
+  [CategoryTypeEnum.INVESTMENT]: {
+    sign: '',
+    className: 'text-[#b45309] dark:text-[#fbbf24]',
+  },
 };
 
 export const formatTransactionDate = (date: Date | string) =>
@@ -50,13 +53,13 @@ export const TransactionCategoryCell: React.FC<{
   <div className="flex items-center gap-3">
     <CategoryIconTile category={category} />
     <div className="min-w-0">
-      <p className="inter truncate text-sm font-medium text-[#0d1117] capitalize">
+      <p className="inter text-ink truncate text-sm font-medium capitalize">
         {category?.name ?? '—'}
       </p>
       {typeAsBadge ? (
         <CategoryTypeBadge type={category?.type} className="mt-1" />
       ) : (
-        <p className="inter text-[11px] text-[#8b93a1] capitalize">
+        <p className="inter text-ink-subtle text-[11px] capitalize">
           {category?.type}
           {showDateOnMobile && date && (
             <span className="sm:hidden">

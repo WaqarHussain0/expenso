@@ -39,7 +39,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed inset-0 isolate z-50 bg-[#0d1117]/45 duration-200 supports-backdrop-filter:backdrop-blur-sm',
+        'data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 bg-ink/45 fixed inset-0 isolate z-50 duration-200 supports-backdrop-filter:backdrop-blur-sm',
         className,
       )}
       {...props}
@@ -61,7 +61,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-background data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 rounded-2xl p-6 text-sm shadow-[0_32px_64px_-24px_rgba(13,17,23,0.35)] ring-1 ring-[#0d1117]/[0.06] duration-200 outline-none sm:max-w-sm',
+          'bg-surface data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 ring-ink/[0.06] fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 rounded-2xl p-6 text-sm shadow-[0_32px_64px_-24px_rgba(13,17,23,0.35)] ring-1 duration-200 outline-none sm:max-w-sm',
           className,
         )}
         {...props}
@@ -71,7 +71,7 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               variant="ghost"
-              className="absolute top-4 right-4 text-[#8b93a1] hover:text-[#0d1117]"
+              className="text-ink-subtle hover:text-ink absolute top-4 right-4"
               size="icon-sm"
             >
               <XIcon />
@@ -106,7 +106,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        '-mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-2xl border-t border-[#0d1117]/[0.06] bg-[#fafbfa] px-6 py-4 sm:flex-row sm:justify-end',
+        'border-ink/[0.06] bg-surface-2 -mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-2xl border-t px-6 py-4 sm:flex-row sm:justify-end',
         className,
       )}
       {...props}
@@ -129,7 +129,7 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        '[font-family:Georgia,serif] text-xl leading-tight font-bold tracking-tight text-[#0d1117]',
+        'text-ink [font-family:var(--font-display),Georgia,serif] text-xl leading-tight font-bold tracking-tight',
         className,
       )}
       {...props}

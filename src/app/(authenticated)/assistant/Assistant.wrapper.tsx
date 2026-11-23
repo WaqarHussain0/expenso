@@ -19,12 +19,12 @@ import { Button } from '@/components/ui/button';
 // reaches the client — rendering it via dangerouslySetInnerHTML here is safe as a result.
 const ASSISTANT_HTML_CLASSES =
   '[&_p]:mb-2 [&_p:last-child]:mb-0 ' +
-  '[&_strong]:font-semibold [&_strong]:text-[#0d1117] ' +
+  '[&_strong]:font-semibold [&_strong]:text-ink ' +
   '[&_ul]:mb-2 [&_ul]:list-disc [&_ul]:space-y-0.5 [&_ul]:pl-4 ' +
   '[&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:space-y-0.5 [&_ol]:pl-4 ' +
-  '[&_table]:my-2 [&_table]:w-full [&_table]:overflow-hidden [&_table]:rounded-lg [&_table]:border [&_table]:border-[#0d1117]/[0.08] [&_table]:bg-white [&_table]:text-sm ' +
-  '[&_th]:border-b [&_th]:border-[#0d1117]/[0.08] [&_th]:bg-[#fafbfa] [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:text-[#5a6070] ' +
-  '[&_td]:border-b [&_td]:border-[#0d1117]/[0.05] [&_td]:px-3 [&_td]:py-2 [&_td]:tabular-nums [&_tr:last-child_td]:border-0';
+  '[&_table]:my-2 [&_table]:w-full [&_table]:overflow-hidden [&_table]:rounded-lg [&_table]:border [&_table]:border-ink/[0.08] [&_table]:bg-surface [&_table]:text-sm ' +
+  '[&_th]:border-b [&_th]:border-ink/[0.08] [&_th]:bg-surface-2 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-xs [&_th]:font-semibold [&_th]:text-ink-muted ' +
+  '[&_td]:border-b [&_td]:border-ink/[0.05] [&_td]:px-3 [&_td]:py-2 [&_td]:tabular-nums [&_tr:last-child_td]:border-0';
 
 const SUGGESTIONS = [
   'How much did I spend this month?',
@@ -43,7 +43,7 @@ interface IMessage {
 }
 
 const AssistantAvatar = () => (
-  <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#0d1117] text-[#34d399] shadow-[0_4px_12px_-4px_rgba(13,17,23,0.4)]">
+  <span className="bg-panel flex size-8 shrink-0 items-center justify-center rounded-xl text-[#34d399] shadow-[0_4px_12px_-4px_rgba(13,17,23,0.4)]">
     <Sparkles className="size-4" />
   </span>
 );
@@ -51,11 +51,11 @@ const AssistantAvatar = () => (
 const TypingIndicator = () => (
   <div className="flex items-start gap-3">
     <AssistantAvatar />
-    <div className="flex items-center gap-1 rounded-2xl rounded-tl-md bg-[#f6f7f5] px-4 py-3.5 ring-1 ring-[#0d1117]/[0.05]">
+    <div className="bg-canvas ring-ink/[0.05] flex items-center gap-1 rounded-2xl rounded-tl-md px-4 py-3.5 ring-1">
       {[0, 150, 300].map(delay => (
         <span
           key={delay}
-          className="size-1.5 animate-bounce rounded-full bg-[#8b93a1]"
+          className="bg-ink-subtle size-1.5 animate-bounce rounded-full"
           style={{ animationDelay: `${delay}ms` }}
         />
       ))}
@@ -141,7 +141,7 @@ const AssistantWrapper: React.FC = () => {
         }
       />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1 ring-[#0d1117]/[0.06]">
+      <div className="bg-surface ring-ink/[0.06] flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1">
         {/* Conversation */}
         <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-6 md:px-8">
           {hasMessages ? (
@@ -158,17 +158,17 @@ const AssistantWrapper: React.FC = () => {
                     <AssistantAvatar />
                     <div className="flex max-w-[88%] min-w-0 flex-col gap-1.5">
                       {message.isError ? (
-                        <div className="inter rounded-2xl rounded-tl-md bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-700 ring-1 ring-red-200">
+                        <div className="inter rounded-2xl rounded-tl-md bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/25">
                           {message.content}
                         </div>
                       ) : (
                         <div
-                          className={`inter min-w-0 overflow-x-auto rounded-2xl rounded-tl-md bg-[#f6f7f5] px-4 py-3 text-sm leading-relaxed text-[#2b313b] ring-1 ring-[#0d1117]/[0.05] ${ASSISTANT_HTML_CLASSES}`}
+                          className={`inter bg-canvas text-ink-2 ring-ink/[0.05] min-w-0 overflow-x-auto rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed ring-1 ${ASSISTANT_HTML_CLASSES}`}
                           dangerouslySetInnerHTML={{ __html: message.content }}
                         />
                       )}
                       {message.provider && (
-                        <span className="inter pl-1 text-[11px] text-[#8b93a1]">
+                        <span className="inter text-ink-subtle pl-1 text-[11px]">
                           via{' '}
                           {AI_PROVIDERS[message.provider]?.label ??
                             message.provider}
@@ -187,13 +187,13 @@ const AssistantWrapper: React.FC = () => {
           ) : (
             /* Empty state */
             <div className="mx-auto flex h-full max-w-xl flex-col items-center justify-center text-center">
-              <span className="relative mb-5 flex size-14 items-center justify-center rounded-2xl bg-[#0d1117] text-[#34d399] shadow-[0_12px_30px_-10px_rgba(13,17,23,0.5)]">
+              <span className="bg-panel relative mb-5 flex size-14 items-center justify-center rounded-2xl text-[#34d399] shadow-[0_12px_30px_-10px_rgba(13,17,23,0.5)]">
                 <Sparkles className="size-6" />
                 <span className="absolute -inset-3 -z-10 rounded-3xl bg-[#34d399]/10 blur-xl" />
               </span>
               <h2
-                className="text-2xl font-bold text-[#0d1117] md:text-[28px]"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className="text-ink text-2xl font-bold md:text-[28px]"
+                style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
               >
                 {firstName ? `Hi ${firstName}, ask` : 'Ask'}{' '}
                 <em
@@ -203,7 +203,7 @@ const AssistantWrapper: React.FC = () => {
                   anything
                 </em>
               </h2>
-              <p className="inter mt-2 text-sm text-[#5a6070]">
+              <p className="inter text-ink-muted mt-2 text-sm">
                 I read your transactions and answer in seconds — no filters or
                 date pickers needed.
               </p>
@@ -214,10 +214,10 @@ const AssistantWrapper: React.FC = () => {
                     key={suggestion}
                     type="button"
                     onClick={() => handleAsk(suggestion)}
-                    className="inter group flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-[#0d1117]/[0.08] bg-white px-4 py-3 text-left text-sm text-[#2b313b] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1a7f5a]/40 hover:shadow-[0_8px_20px_-12px_rgba(13,17,23,0.25)]"
+                    className="inter group border-ink/[0.08] bg-surface text-ink-2 flex cursor-pointer items-center justify-between gap-2 rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#1a7f5a]/40 hover:shadow-[0_8px_20px_-12px_rgba(13,17,23,0.25)]"
                   >
                     {suggestion}
-                    <ArrowUp className="size-3.5 shrink-0 rotate-45 text-[#c4c9d0] transition-colors group-hover:text-[#1a7f5a]" />
+                    <ArrowUp className="text-ink-faint group-hover:text-brand-fg size-3.5 shrink-0 rotate-45 transition-colors" />
                   </button>
                 ))}
               </div>
@@ -226,13 +226,13 @@ const AssistantWrapper: React.FC = () => {
         </div>
 
         {/* Composer */}
-        <div className="border-t border-[#0d1117]/[0.06] bg-[#fbfbfa] px-3 pt-3 pb-2 md:px-6">
+        <div className="border-ink/[0.06] bg-surface-2 border-t px-3 pt-3 pb-2 md:px-6">
           <form
             onSubmit={e => {
               e.preventDefault();
               handleAsk(input);
             }}
-            className="mx-auto flex max-w-3xl items-end gap-2 rounded-xl border border-[#0d1117]/[0.08] bg-white p-1.5 pl-4 shadow-[0_1px_2px_rgba(13,17,23,0.04)] transition-all focus-within:border-[#1a7f5a] focus-within:ring-3 focus-within:ring-[#1a7f5a]/15"
+            className="border-ink/[0.08] bg-surface mx-auto flex max-w-3xl items-end gap-2 rounded-xl border p-1.5 pl-4 shadow-[0_1px_2px_rgba(13,17,23,0.04)] transition-all focus-within:border-[#1a7f5a] focus-within:ring-3 focus-within:ring-[#1a7f5a]/15"
           >
             <textarea
               ref={inputRef}
@@ -247,7 +247,7 @@ const AssistantWrapper: React.FC = () => {
               }}
               placeholder="Ask about your finances…"
               aria-label="Ask the assistant"
-              className="inter [field-sizing:content] max-h-32 min-h-9 flex-1 resize-none bg-transparent py-2 text-sm text-[#0d1117] outline-none placeholder:text-[#8b93a1]"
+              className="inter text-ink placeholder:text-ink-subtle [field-sizing:content] max-h-32 min-h-9 flex-1 resize-none bg-transparent py-2 text-sm outline-none"
             />
 
             <Button
@@ -260,13 +260,13 @@ const AssistantWrapper: React.FC = () => {
             </Button>
           </form>
 
-          <p className="inter mx-auto mt-2 flex max-w-3xl items-center justify-center gap-1.5 text-[11px] text-[#8b93a1]">
+          <p className="inter text-ink-subtle mx-auto mt-2 flex max-w-3xl items-center justify-center gap-1.5 text-[11px]">
             <Lock className="size-3" />
             Read-only — the assistant can&apos;t add, edit, or delete anything.
             <span aria-hidden>·</span>
             <Link
               href={`${PAGE_ROUTES.profile}#ai-keys`}
-              className="inline-flex items-center gap-1 text-[#1a7f5a] hover:underline"
+              className="text-brand-fg inline-flex items-center gap-1 hover:underline"
             >
               <KeyRound className="size-3" />
               Use your own API keys

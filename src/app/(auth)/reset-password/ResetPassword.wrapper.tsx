@@ -53,11 +53,11 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
   };
 
   return (
-    <div className="page-fade w-full rounded-2xl border border-[#0d1117]/[0.06] bg-white p-6 shadow-[0_1px_2px_rgba(13,17,23,0.04),0_24px_48px_-16px_rgba(13,17,23,0.14)] md:p-10">
+    <div className="page-fade border-ink/[0.06] bg-surface w-full rounded-2xl border p-6 shadow-[0_1px_2px_rgba(13,17,23,0.04),0_24px_48px_-16px_rgba(13,17,23,0.14)] md:p-10">
       <TextElement
         as="h1"
         className="mb-2 !text-[30px] !font-bold tracking-tight md:!text-[34px]"
-        style={{ fontFamily: 'Georgia, serif' }}
+        style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
       >
         Reset Password
       </TextElement>
@@ -67,7 +67,7 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
-          <Label className="text-[#0d1117]">{passwordInputField.label}</Label>
+          <Label className="text-ink">{passwordInputField.label}</Label>
           <Controller
             name={passwordInputField.name as 'password'}
             control={control}
@@ -82,7 +82,7 @@ const ResetPasswordWrapper = ({ token }: { token: string }) => {
               <div className="relative flex flex-col">
                 <Input
                   {...field}
-                  className="h-11 bg-[#fafbfa] px-3.5 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15"
+                  className="bg-surface-2 focus-visible:bg-surface h-11 px-3.5 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
                   type={showPassword ? 'text' : 'password'}
                   placeholder={passwordInputField.placeholder}
                 />

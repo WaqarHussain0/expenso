@@ -26,7 +26,7 @@ const SegmentedControl: React.FC<ISegmentedControlProps> = ({
   <div
     role="radiogroup"
     aria-label={ariaLabel}
-    className={`inline-flex items-center gap-0.5 overflow-x-auto rounded-lg bg-[#0d1117]/[0.04] p-0.5 ${className}`}
+    className={`bg-ink/[0.04] inline-flex items-center gap-0.5 overflow-x-auto rounded-lg p-0.5 ${className}`}
   >
     {options.map(option => {
       const active = option.value === value;
@@ -39,8 +39,8 @@ const SegmentedControl: React.FC<ISegmentedControlProps> = ({
           onClick={() => onChange(option.value)}
           className={`inter inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-3 text-xs font-medium whitespace-nowrap capitalize transition-all duration-300 ${
             active
-              ? 'bg-white text-[#0d1117] shadow-[0_1px_3px_rgba(13,17,23,0.1)]'
-              : 'text-[#5a6070] hover:text-[#0d1117]'
+              ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(13,17,23,0.1)]'
+              : 'text-ink-muted hover:text-ink'
           }`}
         >
           {option.color && (

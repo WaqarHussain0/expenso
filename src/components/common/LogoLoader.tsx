@@ -57,7 +57,7 @@ const LogoLoader: React.FC<ILogoLoaderProps> = ({
       </svg>
 
       {/* logo disc */}
-      <div className="absolute inset-[30px] flex items-center justify-center rounded-full bg-white shadow-[0_8px_24px_-8px_rgba(13,17,23,0.25)] ring-1 ring-[#0d1117]/[0.05]">
+      <div className="bg-surface ring-ink/[0.05] absolute inset-[30px] flex items-center justify-center rounded-full shadow-[0_8px_24px_-8px_rgba(13,17,23,0.25)] ring-1">
         <div className="logo-loader-mark relative size-[60px]">
           <Image
             src="/icon.png"
@@ -71,7 +71,7 @@ const LogoLoader: React.FC<ILogoLoaderProps> = ({
       </div>
     </div>
 
-    <p className="inter text-xs font-medium tracking-wide text-[#8b93a1]">
+    <p className="inter text-ink-subtle text-xs font-medium tracking-wide">
       {label}
       <span className="logo-loader-dots" aria-hidden />
     </p>

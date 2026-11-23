@@ -100,7 +100,7 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
                   openEdit(category);
                 }
               }}
-              className="group/row group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-[#0d1117]/[0.06] bg-white p-3.5 transition-all duration-300 outline-none hover:-translate-y-0.5 hover:border-[#0d1117]/[0.1] hover:shadow-[0_10px_24px_-12px_rgba(13,17,23,0.18)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20"
+              className="group/row group border-ink/[0.06] bg-surface hover:border-ink/[0.1] relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl border p-3.5 transition-all duration-300 outline-none hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-12px_rgba(13,17,23,0.18)] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20"
             >
               {/* colour accent on the left edge */}
               <span
@@ -114,7 +114,7 @@ const CategoryTable: React.FC<ICategoryTableProps> = ({
               />
 
               <div className="min-w-0 flex-1">
-                <p className="inter truncate text-sm font-semibold text-[#0d1117] capitalize">
+                <p className="inter text-ink truncate text-sm font-semibold capitalize">
                   {category?.name}
                 </p>
                 <CategoryTypeBadge type={category.type} className="mt-1" />

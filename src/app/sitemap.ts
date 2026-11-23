@@ -12,9 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
 
     {
-      url: `${appURL}/share`,
+      url: `${appURL}/guide`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
+      changeFrequency: 'monthly',
       priority: 0.9,
     },
     {

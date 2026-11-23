@@ -37,7 +37,7 @@ type FormValues = {
 };
 
 const fieldClass =
-  'h-10 bg-[#fafbfa] px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15';
+  'h-10 bg-surface-2 px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-surface focus-visible:ring-[#1a7f5a]/15';
 
 const TransactionDialog: React.FC<ITransactionDialogProps> = ({
   onClose,
@@ -128,10 +128,10 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Amount — the hero field */}
-          <div className="rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] px-4 pt-3 pb-2 transition-colors focus-within:border-[#1a7f5a] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#1a7f5a]/15">
+          <div className="border-ink/[0.06] bg-surface-2 focus-within:bg-surface rounded-xl border px-4 pt-3 pb-2 transition-colors focus-within:border-[#1a7f5a] focus-within:ring-3 focus-within:ring-[#1a7f5a]/15">
             <Label
               htmlFor="trx-amount"
-              className="text-[11px] font-semibold tracking-wider text-[#8b93a1] uppercase"
+              className="text-ink-subtle text-[11px] font-semibold tracking-wider uppercase"
             >
               Amount
             </Label>
@@ -143,7 +143,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
               disabled={isSubmitting}
               aria-invalid={!!errors.amount}
               onFocus={e => e.currentTarget.select()}
-              className="manrope w-full [appearance:textfield] bg-transparent py-1 text-3xl font-bold tracking-tight text-[#0d1117] tabular-nums outline-none placeholder:text-[#c4c9d0] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="manrope text-ink placeholder:text-ink-faint w-full [appearance:textfield] bg-transparent py-1 text-3xl font-bold tracking-tight tabular-nums outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               {...register('amount', {
                 required: 'Amount is required',
                 min: {
@@ -198,7 +198,7 @@ const TransactionDialog: React.FC<ITransactionDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="trx-note">
                 Note{' '}
-                <span className="font-normal text-[#8b93a1]">(optional)</span>
+                <span className="text-ink-subtle font-normal">(optional)</span>
               </Label>
               <Input
                 id="trx-note"

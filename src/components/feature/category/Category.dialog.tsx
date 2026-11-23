@@ -176,7 +176,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Live preview */}
-          <div className="flex items-center gap-3 rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] p-3">
+          <div className="border-ink/[0.06] bg-surface-2 flex items-center gap-3 rounded-xl border p-3">
             <CategoryIconTile
               category={{ icon: watchedIcon, color: watchedColor }}
               className="size-11 rounded-xl transition-colors duration-300 [&>svg]:size-5"
@@ -184,14 +184,14 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
             <div className="min-w-0 flex-1">
               <p
                 className={`inter truncate text-sm font-semibold capitalize ${
-                  watchedName?.trim() ? 'text-[#0d1117]' : 'text-[#c4c9d0]'
+                  watchedName?.trim() ? 'text-ink' : 'text-ink-faint'
                 }`}
               >
                 {watchedName?.trim() || 'Category name'}
               </p>
               <CategoryTypeBadge type={watchedType} className="mt-1" />
             </div>
-            <span className="inter text-[10px] font-semibold tracking-widest text-[#c4c9d0] uppercase">
+            <span className="inter text-ink-faint text-[10px] font-semibold tracking-widest uppercase">
               Preview
             </span>
           </div>
@@ -205,7 +205,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               placeholder="e.g. Groceries, Salary, SIP"
               disabled={isSubmitting}
               aria-invalid={!!errors.name}
-              className="h-10 bg-[#fafbfa] px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15"
+              className="bg-surface-2 focus-visible:bg-surface h-10 px-3 focus-visible:border-[#1a7f5a] focus-visible:ring-[#1a7f5a]/15"
               {...register('name', {
                 required: 'Name is required',
                 validate: value =>
@@ -244,7 +244,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                         className={`inter flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-medium capitalize transition-all duration-300 ${
                           isActive
                             ? 'shadow-[0_4px_12px_-6px_rgba(13,17,23,0.2)]'
-                            : 'border-[#0d1117]/[0.08] text-[#5a6070] hover:border-[#0d1117]/[0.16] hover:text-[#0d1117]'
+                            : 'border-ink/[0.08] text-ink-muted hover:border-ink/[0.16] hover:text-ink'
                         }`}
                         style={
                           isActive
@@ -277,7 +277,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               control={control}
               rules={{ required: 'Icon is required' }}
               render={({ field }) => (
-                <div className="grid grid-cols-6 gap-1.5 rounded-xl border border-[#0d1117]/[0.06] bg-[#fafbfa] p-2 sm:grid-cols-9">
+                <div className="border-ink/[0.06] bg-surface-2 grid grid-cols-6 gap-1.5 rounded-xl border p-2 sm:grid-cols-9">
                   {CATEGORY_ICONS.map(item => {
                     const Icon = item.icon;
                     const isActive = field.value === item.name;
@@ -291,8 +291,8 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                         onClick={() => field.onChange(item.name)}
                         className={`flex aspect-square cursor-pointer items-center justify-center rounded-lg transition-all duration-200 ${
                           isActive
-                            ? 'bg-white'
-                            : 'text-[#8b93a1] hover:bg-white hover:text-[#0d1117]'
+                            ? 'bg-surface'
+                            : 'text-ink-subtle hover:bg-surface hover:text-ink'
                         }`}
                         style={
                           isActive
@@ -338,7 +338,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
                         style={{
                           backgroundColor: color,
                           boxShadow: isActive
-                            ? `0 0 0 2px #fff, 0 0 0 4px ${color}`
+                            ? `0 0 0 2px var(--surface), 0 0 0 4px ${color}`
                             : undefined,
                         }}
                       >

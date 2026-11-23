@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Lock, Sparkles, Timer } from 'lucide-react';
 import PAGE_ROUTES from '../constants/page-routes.constant';
+import BrandLogo from '@/components/common/BrandLogo';
+import ThemeToggle from '@/components/common/ThemeToggle';
 import AuroraGlow from '@/components/feature/landing-page/AuroraGlow';
 
 const BREAKDOWN = [
@@ -19,9 +21,9 @@ const TRUST_POINTS = [
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-[#f6f7f5] lg:h-screen lg:flex-row">
+    <div className="bg-canvas flex min-h-screen w-full flex-col lg:h-screen lg:flex-row">
       {/* ───────────── Brand / showcase panel ───────────── */}
-      <aside className="relative hidden overflow-hidden bg-[#0d1117] lg:flex lg:w-[46%] xl:w-1/2">
+      <aside className="bg-panel relative hidden overflow-hidden lg:flex lg:w-[46%] xl:w-1/2">
         <div className="fr-grid-bg pointer-events-none absolute inset-0" />
         <AuroraGlow />
         <div
@@ -61,7 +63,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <h2
               className="mb-4 text-[clamp(34px,3.4vw,48px)] leading-[1.1] font-bold text-[#f4f4f4]"
-              style={{ fontFamily: 'Georgia, serif' }}
+              style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
             >
               Know exactly where
               <br />
@@ -73,14 +75,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </em>
             </h2>
 
-            <p className="inter mb-10 max-w-[440px] text-[14px] leading-relaxed text-[#8b93a1]">
+            <p className="inter text-ink-subtle mb-10 max-w-[440px] text-[14px] leading-relaxed">
               Log a transaction in seconds, see your month at a glance, and
               finally answer &ldquo;where did my salary go?&rdquo;
             </p>
 
             {/* Preview card */}
             <div className="animate-float rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md">
-              <p className="mb-5 text-[10px] font-semibold tracking-[0.18em] text-[#6b7280] uppercase">
+              <p className="text-ink-subtle mb-5 text-[10px] font-semibold tracking-[0.18em] uppercase">
                 This month&rsquo;s breakdown
               </p>
               <div className="space-y-3.5">
@@ -106,12 +108,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 ))}
               </div>
               <div className="mt-5 flex items-end justify-between border-t border-white/[0.06] pt-4">
-                <span className="inter text-xs text-[#6b7280]">
+                <span className="inter text-ink-subtle text-xs">
                   Total spent
                 </span>
                 <span
                   className="text-2xl text-[#f4f4f4] tabular-nums"
-                  style={{ fontFamily: 'Georgia, serif' }}
+                  style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
                 >
                   55,500
                 </span>
@@ -124,7 +126,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {TRUST_POINTS.map(({ icon: Icon, label }) => (
               <span
                 key={label}
-                className="inter inline-flex items-center gap-2 text-xs text-[#8b93a1]"
+                className="inter text-ink-subtle inline-flex items-center gap-2 text-xs"
               >
                 <Icon size={14} className="text-[#34d399]" />
                 {label}
@@ -136,20 +138,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* ───────────── Form panel ───────────── */}
       <main className="relative flex w-full flex-1 flex-col items-center justify-center overflow-x-hidden overflow-y-auto">
+        <ThemeToggle className="absolute top-4 right-4 z-20" />
         {/* soft background accents */}
 
         {/* Top bar */}
         <header className="relative z-10 flex items-center justify-center px-5 pt-5 md:px-4 md:py-6 lg:hidden">
           <Link href={PAGE_ROUTES.home} className="lg:invisible">
-            <div className="relative h-[34px] w-[104px]">
-              <Image
-                src="/dark-logo.png"
-                alt="Expenso"
-                fill
-                className="object-contain object-left"
-                priority
-              />
-            </div>
+            <BrandLogo className="h-[34px] w-[104px]" sizes="104px" priority />
           </Link>
         </header>
 

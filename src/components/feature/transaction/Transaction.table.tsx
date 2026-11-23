@@ -158,7 +158,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
     <div className={className}>
       {transactions.length > 0 ? (
         <Table containerClassName="lg:overflow-visible">
-          <TableHeader className="sticky top-0 z-20 bg-white/85 backdrop-blur-md">
+          <TableHeader className="sticky top-0 z-20 bg-surface/85 backdrop-blur-md">
             <TableRow className="hover:bg-transparent">
               <TableHead>Category</TableHead>
               <TableHead className="hidden md:table-cell">Note</TableHead>
@@ -175,19 +175,19 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
               <TableRow className="border-b-0 hover:bg-transparent">
                 <TableCell
                   colSpan={4}
-                  className="bg-[#f8f9f7]/95 py-2 shadow-[inset_0_-1px_0_rgba(13,17,23,0.05),inset_0_1px_0_rgba(13,17,23,0.05)] backdrop-blur-sm lg:sticky lg:top-10 lg:z-10"
+                  className="bg-surface-2/95 py-2 shadow-[inset_0_-1px_0_rgba(13,17,23,0.05),inset_0_1px_0_rgba(13,17,23,0.05)] backdrop-blur-sm lg:sticky lg:top-10 lg:z-10"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="inter text-xs font-semibold text-[#0d1117]">
+                    <span className="inter text-ink text-xs font-semibold">
                       {dayLabel(group.date)}
-                      <span className="ml-2 font-normal text-[#8b93a1]">
+                      <span className="text-ink-subtle ml-2 font-normal">
                         {group.items.length}{' '}
                         {group.items.length === 1 ? 'entry' : 'entries'}
                       </span>
                     </span>
                     <span
                       className={`manrope text-xs font-semibold tabular-nums ${
-                        group.net >= 0 ? 'text-[#059669]' : 'text-[#5a6070]'
+                        group.net >= 0 ? 'text-success' : 'text-ink-muted'
                       }`}
                       title="Net for the day (income − expenses − investments)"
                     >
@@ -214,7 +214,7 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
                       animationFillMode: 'both',
                     } as React.CSSProperties
                   }
-                  className="animate-in fade-in slide-in-from-bottom-1 cursor-pointer duration-300 outline-none hover:shadow-[inset_3px_0_0_var(--row-accent)] focus-visible:bg-[#f6f7f5] focus-visible:shadow-[inset_3px_0_0_var(--row-accent)]"
+                  className="animate-in fade-in slide-in-from-bottom-1 focus-visible:bg-canvas cursor-pointer duration-300 outline-none hover:shadow-[inset_3px_0_0_var(--row-accent)] focus-visible:shadow-[inset_3px_0_0_var(--row-accent)]"
                 >
                   <TableCell>
                     <TransactionCategoryCell
@@ -224,8 +224,8 @@ const TransactionTable: React.FC<ITransactionTableProps> = ({
                     />
                   </TableCell>
 
-                  <TableCell className="hidden max-w-[420px] truncate text-sm text-[#5a6070] capitalize md:table-cell">
-                    {trx?.note || <span className="text-[#c4c9d0]">—</span>}
+                  <TableCell className="text-ink-muted hidden max-w-[420px] truncate text-sm capitalize md:table-cell">
+                    {trx?.note || <span className="text-ink-faint">—</span>}
                   </TableCell>
 
                   <TableCell className="text-right text-sm">

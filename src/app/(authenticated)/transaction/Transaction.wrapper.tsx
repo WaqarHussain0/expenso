@@ -206,7 +206,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
 
       {/* List */}
       <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
-        <div className="flex flex-col gap-3 border-b border-[#0d1117]/[0.06] p-3 md:p-4 xl:flex-row xl:items-center">
+        <div className="border-ink/[0.06] flex flex-col gap-3 border-b p-3 md:p-4 xl:flex-row xl:items-center">
           <SearchInput
             value={searchInput}
             onChange={handleSearch}
@@ -233,7 +233,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleClearFilter}
-              className="w-fit text-[#5a6070] xl:ml-auto"
+              className="text-ink-muted w-fit xl:ml-auto"
             >
               <X className="size-3.5" />
               Clear filters

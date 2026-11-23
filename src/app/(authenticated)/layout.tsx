@@ -13,7 +13,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     (await cookies()).get(SIDEBAR_COOKIE)?.value === 'true';
 
   return (
-    <div className="flex h-screen w-full bg-[#f6f7f5]">
+    <div className="bg-canvas flex h-screen w-full">
       <Navbar className="h-full" defaultCollapsed={sidebarCollapsed} />
 
       <main className="no-scrollbar relative flex h-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">

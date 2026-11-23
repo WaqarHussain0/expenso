@@ -254,11 +254,11 @@ const PreferenceWrapper = () => {
                     variant={'outline'}
                     className={`cursor-pointer p-3 ${
                       isSelected?.type === CategoryTypeEnum.INVESTMENT
-                        ? 'bg-yellow-100 text-yellow-600'
+                        ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400'
                         : isSelected?.type === CategoryTypeEnum.INCOME
-                          ? 'bg-green-100 text-green-600'
+                          ? 'bg-green-100 text-green-600 dark:bg-green-500/15 dark:text-green-400'
                           : isSelected?.type === CategoryTypeEnum.EXPENSE
-                            ? 'bg-red-100 text-red-600'
+                            ? 'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400'
                             : ''
                     }`}
                     onClick={() => toggleCategory(cat)}

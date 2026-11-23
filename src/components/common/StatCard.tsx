@@ -55,7 +55,7 @@ const ProgressRing: React.FC<{ percent: number; color: string }> = ({
           cy={RING_SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke="#eef0f2"
+          stroke="var(--ring-track)"
           strokeWidth={STROKE}
         />
         <circle
@@ -73,7 +73,7 @@ const ProgressRing: React.FC<{ percent: number; color: string }> = ({
           }}
         />
       </svg>
-      <span className="manrope absolute inset-0 flex items-center justify-center text-[13px] font-bold text-[#0d1117] tabular-nums">
+      <span className="manrope text-ink absolute inset-0 flex items-center justify-center text-[13px] font-bold tabular-nums">
         {percent.toFixed(0)}%
       </span>
     </div>
@@ -119,18 +119,18 @@ const StatCard: React.FC<IStatCardProps> = ({ isLoading = false, stat }) => {
                 boxShadow: `0 0 0 3px ${stat.color}22`,
               }}
             />
-            <span className="inter truncate text-xs font-medium text-[#5a6070]">
+            <span className="inter text-ink-muted truncate text-xs font-medium">
               {stat.label}
             </span>
           </div>
 
-          <p className="manrope mt-3 truncate text-2xl font-bold tracking-tight text-[#0d1117] capitalize tabular-nums md:text-[26px]">
+          <p className="manrope text-ink mt-3 truncate text-2xl font-bold tracking-tight capitalize tabular-nums md:text-[26px]">
             {typeof stat.value === 'number'
               ? formatCompactAmount(stat.value)
               : stat.value}
           </p>
           {stat.hint && (
-            <p className="inter mt-0.5 truncate text-[11px] text-[#8b93a1]">
+            <p className="inter text-ink-subtle mt-0.5 truncate text-[11px]">
               {stat.hint}
             </p>
           )}

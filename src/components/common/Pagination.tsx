@@ -9,7 +9,7 @@ interface PaginationProps {
 }
 
 const navButtonClass =
-  'flex size-8 cursor-pointer items-center justify-center rounded-lg border border-[#0d1117]/[0.08] bg-white text-[#5a6070] transition-all duration-300 hover:border-[#1a7f5a]/40 hover:text-[#1a7f5a] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#0d1117]/[0.08] disabled:hover:text-[#5a6070]';
+  'flex size-8 cursor-pointer items-center justify-center rounded-lg border border-ink/[0.08] bg-surface text-ink-muted transition-all duration-300 hover:border-[#1a7f5a]/40 hover:text-brand-fg disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink/[0.08] disabled:hover:text-ink-muted';
 
 const Pagination = ({
   page = 0,
@@ -23,10 +23,10 @@ const Pagination = ({
 
   return (
     <div
-      className={`flex w-full items-center justify-between gap-3 border-t border-[#0d1117]/[0.06] bg-[#fbfbfa] px-4 py-3 md:px-5 ${className}`}
+      className={`border-ink/[0.06] bg-surface-2 flex w-full items-center justify-between gap-3 border-t px-4 py-3 md:px-5 ${className}`}
     >
-      <p className="inter text-xs text-[#8b93a1]">
-        <span className="font-semibold text-[#0d1117] tabular-nums">
+      <p className="inter text-ink-subtle text-xs">
+        <span className="text-ink font-semibold tabular-nums">
           {totalRecords}
         </span>{' '}
         {totalRecords === 1 ? 'record' : 'records'}
@@ -43,8 +43,8 @@ const Pagination = ({
           <ChevronLeft className="size-4" />
         </button>
 
-        <span className="inter min-w-[64px] text-center text-xs text-[#5a6070] tabular-nums">
-          Page <span className="font-semibold text-[#0d1117]">{page}</span> of{' '}
+        <span className="inter text-ink-muted min-w-[64px] text-center text-xs tabular-nums">
+          Page <span className="text-ink font-semibold">{page}</span> of{' '}
           {totalPage}
         </span>
 

@@ -30,7 +30,7 @@ const RowActions: React.FC<{ actions: IRowAction[]; label?: string }> = ({
         type="button"
         aria-label={label}
         onClick={e => e.stopPropagation()}
-        className="flex size-8 cursor-pointer items-center justify-center rounded-lg text-[#8b93a1] transition-all duration-200 outline-none hover:bg-[#0d1117]/[0.05] hover:text-[#0d1117] focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20 data-[state=open]:bg-[#0d1117]/[0.05] data-[state=open]:text-[#0d1117] pointer-fine:opacity-0 pointer-fine:group-focus-within/row:opacity-100 pointer-fine:group-hover/row:opacity-100 pointer-fine:focus-visible:opacity-100 pointer-fine:data-[state=open]:opacity-100"
+        className="text-ink-subtle hover:bg-ink/[0.05] hover:text-ink data-[state=open]:bg-ink/[0.05] data-[state=open]:text-ink flex size-8 cursor-pointer items-center justify-center rounded-lg transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[#1a7f5a]/20 pointer-fine:opacity-0 pointer-fine:group-focus-within/row:opacity-100 pointer-fine:group-hover/row:opacity-100 pointer-fine:focus-visible:opacity-100 pointer-fine:data-[state=open]:opacity-100"
       >
         <MoreHorizontal className="size-4" />
       </button>

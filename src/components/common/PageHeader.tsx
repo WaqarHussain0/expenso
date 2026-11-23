@@ -30,13 +30,13 @@ const PageHeader: React.FC<IPageHeaderProps> = ({
           <CustomBreadcrumb items={breadcrumbs} className="mb-2" />
         )}
         <h1
-          className="text-[26px] leading-tight font-bold tracking-tight text-[#0d1117] md:text-[30px]"
-          style={{ fontFamily: 'Georgia, serif' }}
+          className="text-ink text-[26px] leading-tight font-bold tracking-tight md:text-[30px]"
+          style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
         >
           {title}
         </h1>
         {description && (
-          <p className="inter mt-1 max-w-2xl text-sm text-[#5a6070]">
+          <p className="inter text-ink-muted mt-1 max-w-2xl text-sm">
             {description}
           </p>
         )}

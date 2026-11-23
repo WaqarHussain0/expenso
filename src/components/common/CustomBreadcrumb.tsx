@@ -26,7 +26,7 @@ interface CommonBreadcrumbProps {
 export function CustomBreadcrumb({
   items,
   separator = (
-    <BreadcrumbSeparator className="text-[#c4c9d0] [&>svg]:size-3">
+    <BreadcrumbSeparator className="text-ink-faint [&>svg]:size-3">
       <ChevronRight />
     </BreadcrumbSeparator>
   ),
@@ -41,14 +41,14 @@ export function CustomBreadcrumb({
               {item.linkTo ? (
                 <BreadcrumbLink asChild>
                   <Link
-                    className="text-[#8b93a1] capitalize transition-colors hover:text-[#1a7f5a]"
+                    className="text-ink-subtle hover:text-brand-fg capitalize transition-colors"
                     href={item.linkTo}
                   >
                     {item.label}
                   </Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage className="font-medium text-[#5a6070] capitalize">
+                <BreadcrumbPage className="text-ink-muted font-medium capitalize">
                   {item.label}
                 </BreadcrumbPage>
               )}

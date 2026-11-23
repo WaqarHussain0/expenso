@@ -60,7 +60,7 @@ const Transactions: React.FC<ITransactionsProps> = ({
                       }
                       className={
                         item.category.type === CategoryTypeEnum.INVESTMENT
-                          ? 'bg-yellow-100 text-yellow-500'
+                          ? 'bg-yellow-100 text-yellow-500 dark:bg-yellow-500/15'
                           : ''
                       }
                     >

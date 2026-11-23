@@ -157,7 +157,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
     <div className="page-fade flex w-full flex-col gap-4 md:gap-5">
       <div className="grid w-full grid-cols-1 gap-4 md:gap-5 xl:grid-cols-3">
         {/* ───────── Hero: free cash ───────── */}
-        <section className="relative overflow-hidden rounded-2xl bg-[#0d1117] p-6 text-white shadow-[0_20px_40px_-20px_rgba(13,17,23,0.5)] md:p-8 xl:col-span-2">
+        <section className="bg-panel relative overflow-hidden rounded-2xl p-6 text-white shadow-[0_20px_40px_-20px_rgba(13,17,23,0.5)] md:p-8 xl:col-span-2">
           <div className="fr-grid-bg pointer-events-none absolute inset-0" />
           <div
             className="pointer-events-none absolute -top-24 -right-16 h-[320px] w-[420px]"
@@ -176,7 +176,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
                 </p>
                 <h2
                   className="mt-1 text-2xl font-bold text-[#f4f4f4] md:text-[28px]"
-                  style={{ fontFamily: 'Georgia, serif' }}
+                  style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
                 >
                   Your{' '}
                   <em
@@ -242,10 +242,10 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
         {/* ───────── Quick actions ───────── */}
         <Card className="flex gap-0 p-2">
           <div className="px-3 pt-3 pb-2">
-            <p className="inter text-sm font-semibold text-[#0d1117]">
+            <p className="inter text-ink text-sm font-semibold">
               Quick actions
             </p>
-            <p className="inter text-xs text-[#8b93a1]">
+            <p className="inter text-ink-subtle text-xs">
               Jump straight into the common stuff
             </p>
           </div>
@@ -261,7 +261,7 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
                     key={action.title}
                     type="button"
                     onClick={action.onClick}
-                    className="group flex w-full cursor-pointer items-center gap-3.5 rounded-xl p-3 text-left transition-colors duration-300 hover:bg-[#f6f7f5]"
+                    className="group hover:bg-canvas flex w-full cursor-pointer items-center gap-3.5 rounded-xl p-3 text-left transition-colors duration-300"
                   >
                     <span
                       className="flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105"
@@ -273,14 +273,14 @@ const DashboardWrapper: React.FC<IDashboardWrapperProps> = ({
                       <Icon className="size-[18px]" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="inter block text-sm font-medium text-[#0d1117]">
+                      <span className="inter text-ink block text-sm font-medium">
                         {action.title}
                       </span>
-                      <span className="inter block text-xs leading-relaxed text-[#8b93a1]">
+                      <span className="inter text-ink-subtle block text-xs leading-relaxed">
                         {action.description}
                       </span>
                     </span>
-                    <ChevronRight className="size-4 shrink-0 text-[#c4c9d0] transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-[#1a7f5a]" />
+                    <ChevronRight className="text-ink-faint group-hover:text-brand-fg size-4 shrink-0 transition-all duration-300 group-hover:translate-x-0.5" />
                   </button>
                 );
               })}

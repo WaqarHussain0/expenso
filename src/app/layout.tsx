@@ -1,14 +1,22 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from 'sonner';
 import NextAuthProvider from '@/components/providers/NextAuth.provider';
-import { Poppins, Manrope, Inter } from 'next/font/google';
+import ThemeProvider from '@/components/providers/Theme.provider';
+import ThemedToaster from '@/components/providers/ThemedToaster';
+import { Fraunces, Manrope, Inter } from 'next/font/google';
 import { connection } from 'next/server';
+import { cookies, headers } from 'next/headers';
+import {
+  THEME_COOKIE,
+  isThemePreference,
+} from '@/app/constants/theme.constant';
 
-const poppins = Poppins({
+// Display serif for headings and the italic accents (replaces the Georgia
+// system font, which isn't installed on most Android devices)
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-poppins',
+  style: ['normal', 'italic'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -102,14 +110,38 @@ export default async function RootLayout({
   // rendered per request for Next.js to stamp the nonce on its scripts.
   await connection();
 
-  return (
-    <html lang="en">
-      <body
-        className={`${poppins.variable} ${inter.variable} ${manrope.variable} antialiased`}
-      >
-        <Toaster position="bottom-right" richColors />
+  // Theme from cookie → correct class on first paint (no light/dark flash)
+  const stored = (await cookies()).get(THEME_COOKIE)?.value;
+  const theme = isThemePreference(stored) ? stored : 'system';
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
 
-        <NextAuthProvider>{children}</NextAuthProvider>
+  return (
+    <html
+      lang="en"
+      className={theme === 'dark' ? 'dark' : undefined}
+      style={{ colorScheme: theme === 'dark' ? 'dark' : 'light' }}
+      // the inline script below may add .dark before React hydrates
+      suppressHydrationWarning
+    >
+      <head>
+        {theme === 'system' && (
+          // "System" can only be resolved in the browser: apply it before paint.
+          // Carries the CSP nonce, so it's allowed by the strict policy.
+          <script
+            nonce={nonce}
+            dangerouslySetInnerHTML={{
+              __html: `try{if(matchMedia('(prefers-color-scheme: dark)').matches){var d=document.documentElement;d.classList.add('dark');d.style.colorScheme='dark'}}catch(e){}`,
+            }}
+          />
+        )}
+      </head>
+      <body
+        className={`${fraunces.variable} ${inter.variable} ${manrope.variable} antialiased`}
+      >
+        <ThemeProvider initialTheme={theme}>
+          <ThemedToaster />
+          <NextAuthProvider>{children}</NextAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -44,7 +44,7 @@ const CollapsedTooltip: React.FC<{ label: string; show: boolean }> = ({
   show,
 }) =>
   show ? (
-    <span className="inter pointer-events-none absolute top-1/2 left-full z-50 ml-3 -translate-x-1 -translate-y-1/2 rounded-md bg-[#0d1117] px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 group-hover/nav:translate-x-0 group-hover/nav:opacity-100 group-focus-visible/nav:translate-x-0 group-focus-visible/nav:opacity-100">
+    <span className="inter bg-panel pointer-events-none absolute top-1/2 left-full z-50 ml-3 -translate-x-1 -translate-y-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-all duration-200 group-hover/nav:translate-x-0 group-hover/nav:opacity-100 group-focus-visible/nav:translate-x-0 group-focus-visible/nav:opacity-100">
       {label}
     </span>
   ) : null;
@@ -156,7 +156,7 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
       {/* Desktop Sidebar */}
       <aside
         data-collapsed={collapsed}
-        className={`relative hidden shrink-0 bg-[#0d1117] text-white transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex ${
+        className={`bg-panel relative hidden shrink-0 text-white transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex ${
           collapsed ? 'w-[76px]' : 'w-64'
         } ${className} flex-col`}
       >
@@ -337,7 +337,7 @@ const Navbar: React.FC<INavbar> = ({ className = '', defaultCollapsed }) => {
       </aside>
 
       {/* Mobile Bottom Tab Bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/[0.06] bg-[#0d1117]/95 px-1 pt-2 pb-[calc(--spacing(2)+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+      <nav className="bg-panel/95 fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/[0.06] px-1 pt-2 pb-[calc(--spacing(2)+env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
         {visibleNavItems.map(item => {
           const isActive = isActiveRoute(item.linkTo);
           const Icon = item.icon;

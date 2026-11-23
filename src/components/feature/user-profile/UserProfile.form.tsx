@@ -38,7 +38,7 @@ const GENDER_OPTIONS = [
 ];
 
 const fieldClass =
-  'h-10 bg-[#fafbfa] px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-white focus-visible:ring-[#1a7f5a]/15';
+  'h-10 bg-surface-2 px-3 focus-visible:border-[#1a7f5a] focus-visible:bg-surface focus-visible:ring-[#1a7f5a]/15';
 
 const toFormValues = (user?: IUser): FormValues => ({
   email: user?.email || '',
@@ -128,7 +128,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
   return (
     <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
       {/* ───────── Identity card ───────── */}
-      <aside className="relative h-fit overflow-hidden rounded-2xl bg-[#0d1117] p-6 text-white shadow-[0_20px_40px_-20px_rgba(13,17,23,0.5)]">
+      <aside className="bg-panel relative h-fit overflow-hidden rounded-2xl p-6 text-white shadow-[0_20px_40px_-20px_rgba(13,17,23,0.5)]">
         <div className="fr-grid-bg pointer-events-none absolute inset-0" />
         <div
           className="pointer-events-none absolute -top-24 -right-16 h-[280px] w-[360px]"
@@ -141,7 +141,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
         <div className="relative z-10">
           <div className="flex flex-col items-center text-center">
             <div className="rounded-full bg-gradient-to-br from-[#34d399] to-[#1a7f5a] p-[3px] shadow-[0_10px_30px_-10px_rgba(52,211,153,0.6)]">
-              <div className="flex size-20 items-center justify-center rounded-full bg-[#0d1117] ring-2 ring-[#0d1117]">
+              <div className="bg-panel ring-ink flex size-20 items-center justify-center rounded-full ring-2">
                 <span className="manrope text-2xl font-bold text-white">
                   {getInitials(name || user?.name || '')}
                 </span>
@@ -150,7 +150,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
 
             <h2
               className="mt-4 max-w-full truncate text-xl font-bold text-[#f4f4f4] capitalize"
-              style={{ fontFamily: 'Georgia, serif' }}
+              style={{ fontFamily: 'var(--font-display), Georgia, serif' }}
             >
               {name?.trim() || 'Your name'}
             </h2>
@@ -184,13 +184,13 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
       {/* ───────── Form ───────── */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1 ring-[#0d1117]/[0.06]"
+        className="bg-surface ring-ink/[0.06] flex flex-col overflow-hidden rounded-2xl shadow-[0_1px_2px_rgba(13,17,23,0.04)] ring-1"
       >
-        <div className="border-b border-[#0d1117]/[0.06] px-6 py-5">
-          <p className="inter text-sm font-semibold text-[#0d1117]">
+        <div className="border-ink/[0.06] border-b px-6 py-5">
+          <p className="inter text-ink text-sm font-semibold">
             Personal details
           </p>
-          <p className="inter text-xs text-[#8b93a1]">
+          <p className="inter text-ink-subtle text-xs">
             Used to personalise your experience across Expenso.
           </p>
         </div>
@@ -227,9 +227,9 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
                 className={`${fieldClass} pr-9 disabled:opacity-70`}
                 {...register('email')}
               />
-              <Lock className="pointer-events-none absolute top-1/2 right-3 size-3.5 -translate-y-1/2 text-[#8b93a1]" />
+              <Lock className="text-ink-subtle pointer-events-none absolute top-1/2 right-3 size-3.5 -translate-y-1/2" />
             </div>
-            <p className="inter text-[11px] text-[#8b93a1]">
+            <p className="inter text-ink-subtle text-[11px]">
               Your sign-in email can&apos;t be changed.
             </p>
           </div>
@@ -238,7 +238,7 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
           <div className="space-y-2">
             <Label htmlFor="profile-contact">Contact number</Label>
             <div className="relative">
-              <Phone className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#8b93a1]" />
+              <Phone className="text-ink-subtle pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
               <Input
                 id="profile-contact"
                 type="tel"
@@ -282,10 +282,12 @@ const UserProfileForm: React.FC<IUserProfileFormProps> = ({ user }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col-reverse gap-3 border-t border-[#0d1117]/[0.06] bg-[#fafbfa] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-ink/[0.06] bg-surface-2 flex flex-col-reverse gap-3 border-t px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p
             className={`inter flex items-center gap-2 text-xs transition-opacity duration-300 ${
-              isDirty ? 'text-[#b45309] opacity-100' : 'opacity-0'
+              isDirty
+                ? 'text-[#b45309] opacity-100 dark:text-[#fbbf24]'
+                : 'opacity-0'
             }`}
             aria-live="polite"
           >

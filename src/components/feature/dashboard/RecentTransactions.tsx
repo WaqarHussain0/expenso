@@ -32,17 +32,17 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
     <Card className={`gap-0 py-0 ${className}`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-4">
         <div>
-          <p className="inter text-sm font-semibold text-[#0d1117]">
+          <p className="inter text-ink text-sm font-semibold">
             Recent transactions
           </p>
-          <p className="inter text-xs text-[#8b93a1]">
+          <p className="inter text-ink-subtle text-xs">
             Your latest {transactions.length || ''} entries
           </p>
         </div>
 
         <Link
           href={PAGE_ROUTES.transaction}
-          className="inter group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-[#1a7f5a] transition-colors duration-300 hover:bg-[#1a7f5a]/[0.08]"
+          className="inter group text-brand-fg inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-300 hover:bg-[#1a7f5a]/[0.08]"
         >
           View all
           <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -70,11 +70,11 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
                   />
                 </TableCell>
 
-                <TableCell className="hidden max-w-[320px] truncate text-sm text-[#5a6070] capitalize md:table-cell">
-                  {trx?.note || <span className="text-[#c4c9d0]">—</span>}
+                <TableCell className="text-ink-muted hidden max-w-[320px] truncate text-sm capitalize md:table-cell">
+                  {trx?.note || <span className="text-ink-faint">—</span>}
                 </TableCell>
 
-                <TableCell className="hidden text-sm text-[#5a6070] sm:table-cell">
+                <TableCell className="text-ink-muted hidden text-sm sm:table-cell">
                   {formatTransactionDate(trx.date)}
                 </TableCell>
 
@@ -90,10 +90,10 @@ const RecentTransactions: React.FC<IRecentTransactionsProps> = ({
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={4} className="h-32 text-center">
                 <div className="flex flex-col items-center gap-2">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-[#f6f7f5] text-[#8b93a1]">
+                  <span className="bg-canvas text-ink-subtle flex size-10 items-center justify-center rounded-xl">
                     <Receipt className="size-5" />
                   </span>
-                  <p className="inter text-sm text-[#8b93a1]">
+                  <p className="inter text-ink-subtle text-sm">
                     No transactions yet
                   </p>
                 </div>
