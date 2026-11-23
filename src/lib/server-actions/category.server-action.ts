@@ -1,8 +1,9 @@
 'use server';
 
 import 'reflect-metadata';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { CategoryService } from '@/backend/modules/category/category.service';
+import { categoryStatsTag } from '@/backend/modules/category/category-stats.cache';
 import { CreateCategoryDto } from '@/backend/modules/category/dto/create-category.dto';
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
@@ -32,6 +33,7 @@ export async function createCategoryAction(
     const user = await requireUser();
     const dto = await validateDto(CreateCategoryDto, payload);
     await categoryService.create(dto, user.objectId);
+    updateTag(categoryStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -49,6 +51,7 @@ export async function updateCategoryAction(
     const dto = await validateDto(CreateCategoryDto, payload);
     // Service only matches categories owned by this user
     await categoryService.update(categoryId, dto, user.objectId);
+    updateTag(categoryStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -61,6 +64,7 @@ export async function deleteCategoryAction(id: string): Promise<ActionResult> {
     const user = await requireUser();
     const categoryId = toObjectId(id, 'category id');
     await categoryService.delete(categoryId, user.objectId);
+    updateTag(categoryStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -121,6 +125,8 @@ export async function setPreferencesAction(payload: CategoryPayload[]) {
     );
 
     await categoryService.setPreferences(user.objectId, validated);
+
+    updateTag(categoryStatsTag(user.id));
 
     revalidatePath('/');
     return { success: true };

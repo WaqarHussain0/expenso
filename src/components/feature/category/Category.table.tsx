@@ -1,3 +1,5 @@
+'use client';
+
 import { Pencil, Tags, Trash2 } from 'lucide-react';
 import { useCallback, useState, useTransition } from 'react';
 

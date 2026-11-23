@@ -3,36 +3,22 @@
 import { COLOR_CODES } from '@/app/constants/app.constant';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
-import Pagination from '@/components/common/Pagination';
 import SearchInput from '@/components/common/SearchInput';
 import SegmentedControl from '@/components/common/SegmentedControl';
-import StatWrapper from '@/components/common/Stat.wrapper';
 import { LazyCategoryDialog } from '@/components/feature/lazy-dialogs';
-import CategoryTable from '@/components/feature/category/Category.table';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
-import { CategoryTypeEnum, ICategory } from '@/types/category.type';
+import { CategoryTypeEnum } from '@/types/category.type';
 import { PlusIcon, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
-
-export interface ICategoryStats {
-  income: number;
-  investment: number;
-  expense: number;
-}
+import { ReactNode, useCallback, useState } from 'react';
 
 interface ICategoryWrapperProps {
-  categories: ICategory[];
-  meta: {
-    totalPages: number;
-    totalRecords: number;
-    page: number;
-  };
-  currentPage: number;
-
-  categoryStats: ICategoryStats;
+  /** Streamed stats cards (server component inside Suspense) */
+  stats: ReactNode;
+  /** Streamed category grid + pagination (server component inside Suspense) */
+  list: ReactNode;
 }
 
 const TYPE_OPTIONS = [
@@ -54,12 +40,12 @@ const TYPE_OPTIONS = [
   },
 ];
 
-const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
-  categories,
-  currentPage,
-  meta,
-  categoryStats,
-}) => {
+/**
+ * Client shell for the category page: header, add dialog and filter toolbar.
+ * Data sections arrive as `stats` / `list` slots so they can stream in
+ * independently while this renders immediately.
+ */
+const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({ stats, list }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -96,10 +82,6 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       onDebouncedChange: value => updateQueryParams(1, value, currentType()),
     });
 
-  const handlePageChange = (newPage: number) => {
-    updateQueryParams(newPage, debouncedSearch, currentType());
-  };
-
   const handleTypeChange = useCallback(
     (value: string) => {
       setSelectedType(value);
@@ -135,38 +117,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
       />
 
       {/* Stats */}
-      <StatWrapper
-        stats={(() => {
-          const { income, expense, investment } = categoryStats;
-          const total = income + expense + investment;
-          const pct = (n: number) => (total ? (n / total) * 100 : 0);
-          const hint = `of ${total} ${total === 1 ? 'category' : 'categories'}`;
-          return [
-            {
-              label: 'Income',
-              value: income,
-              percent: pct(income),
-              color: COLOR_CODES.income,
-              hint,
-            },
-            {
-              label: 'Expense',
-              value: expense,
-              percent: pct(expense),
-              color: COLOR_CODES.expense,
-              hint,
-            },
-            {
-              label: 'Investment',
-              value: investment,
-              percent: pct(investment),
-              color: COLOR_CODES.investment,
-              hint,
-            },
-          ];
-        })()}
-        className="grid-cols-1 sm:grid-cols-3"
-      />
+      {stats}
 
       {/* List */}
       <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
@@ -199,19 +150,7 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({
           )}
         </div>
 
-        <CategoryTable
-          className="scroll-area bg-surface-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
-          categories={categories || []}
-        />
-
-        {categories && categories.length !== 0 && (
-          <Pagination
-            page={currentPage}
-            totalRecords={meta?.totalRecords}
-            onPageChange={handlePageChange}
-            totalPage={meta?.totalPages}
-          />
-        )}
+        {list}
       </Card>
 
       {showCategoryDialog && (
