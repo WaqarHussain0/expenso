@@ -3,38 +3,23 @@
 import { COLOR_CODES } from '@/app/constants/app.constant';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
-import Pagination from '@/components/common/Pagination';
 import SearchInput from '@/components/common/SearchInput';
 import SegmentedControl from '@/components/common/SegmentedControl';
-import StatWrapper from '@/components/common/Stat.wrapper';
 import { LazyTransactionDialog } from '@/components/feature/lazy-dialogs';
-import TransactionTable from '@/components/feature/transaction/Transaction.table';
 import { CategorySelect } from '@/components/select/Category.select';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
-import { buildCashflowStats } from '@/lib/stats.util';
 import { CategoryTypeEnum } from '@/types/category.type';
-import { ITransaction } from '@/types/transaction.type';
 import { PlusIcon, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
-
-export interface IMonthTransactionStats {
-  income: number;
-  investment: number;
-  expense: number;
-}
+import { ReactNode, useCallback, useState } from 'react';
 
 interface ITransactionWrapperProps {
-  transactions: ITransaction[];
-  meta: {
-    totalPages: number;
-    totalRecords: number;
-    page: number;
-  };
-  currentPage: number;
-  monthStats: IMonthTransactionStats;
+  /** Streamed monthly stats cards (server component inside Suspense) */
+  stats: ReactNode;
+  /** Streamed transaction table + pagination (server component inside Suspense) */
+  list: ReactNode;
 }
 
 const TYPE_OPTIONS = [
@@ -56,11 +41,14 @@ const TYPE_OPTIONS = [
   },
 ];
 
+/**
+ * Client shell for the transaction page: header, add dialog and filter
+ * toolbar. Data sections arrive as `stats` / `list` slots so they can stream
+ * in independently while this renders immediately.
+ */
 const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
-  currentPage,
-  meta,
-  transactions,
-  monthStats,
+  stats,
+  list,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -117,15 +105,6 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
         updateQueryParams(1, value, currentType(), selectedCategory),
     });
 
-  const handlePageChange = (newPage: number) => {
-    updateQueryParams(
-      newPage,
-      debouncedSearch,
-      currentType(),
-      selectedCategory,
-    );
-  };
-
   const handleClearFilter = () => {
     clearSearch();
     setSelectedType('all');
@@ -168,10 +147,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
       />
 
       {/* Stats */}
-      <StatWrapper
-        stats={buildCashflowStats(monthStats, 'This month')}
-        className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
-      />
+      {stats}
 
       {/* List */}
       <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
@@ -210,19 +186,7 @@ const TransactionWrapper: React.FC<ITransactionWrapperProps> = ({
           )}
         </div>
 
-        <TransactionTable
-          className="scroll-area lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
-          transactions={transactions || []}
-        />
-
-        {transactions && transactions?.length !== 0 && (
-          <Pagination
-            page={currentPage}
-            totalRecords={meta?.totalRecords}
-            onPageChange={handlePageChange}
-            totalPage={meta?.totalPages}
-          />
-        )}
+        {list}
       </Card>
 
       {showTransactionDialog && (

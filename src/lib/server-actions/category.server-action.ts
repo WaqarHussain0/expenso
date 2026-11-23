@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { revalidatePath, updateTag } from 'next/cache';
 import { CategoryService } from '@/backend/modules/category/category.service';
 import { categoryStatsTag } from '@/backend/modules/category/category-stats.cache';
+import { transactionStatsTag } from '@/backend/modules/transaction/transaction-stats.cache';
 import { CreateCategoryDto } from '@/backend/modules/category/dto/create-category.dto';
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
@@ -52,6 +53,8 @@ export async function updateCategoryAction(
     // Service only matches categories owned by this user
     await categoryService.update(categoryId, dto, user.objectId);
     updateTag(categoryStatsTag(user.id));
+    // Monthly totals are grouped by category type, which an update can change
+    updateTag(transactionStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {

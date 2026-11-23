@@ -1,9 +1,10 @@
 'use server';
 
 import 'reflect-metadata';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { TransactionService } from '@/backend/modules/transaction/transaction.service';
+import { transactionStatsTag } from '@/backend/modules/transaction/transaction-stats.cache';
 import { CreateTransactionDto } from '@/backend/modules/transaction/dto/create-transaction.dto';
 import { requireUser, toObjectId } from './action-guard';
 
@@ -32,6 +33,7 @@ export async function createTransactionAction(
     const dto = await validateDto(CreateTransactionDto, payload);
     // Service checks the category belongs to this user
     await transactionService.create(dto, user.objectId);
+    updateTag(transactionStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -49,6 +51,7 @@ export async function updateTransactionAction(
     const dto = await validateDto(CreateTransactionDto, payload);
     // Service only matches transactions (and categories) owned by this user
     await transactionService.update(transactionId, dto, user.objectId);
+    updateTag(transactionStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -63,6 +66,7 @@ export async function deleteTransactionAction(
     const user = await requireUser();
     const transactionId = toObjectId(id, 'transaction id');
     await transactionService.delete(transactionId, user.objectId);
+    updateTag(transactionStatsTag(user.id));
     revalidatePath('/');
     return { success: true };
   } catch (error) {
