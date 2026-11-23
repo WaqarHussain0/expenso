@@ -1,16 +1,18 @@
+import { ReactNode } from 'react';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import UserProfileForm from '@/components/feature/user-profile/UserProfile.form';
-import { IUser } from '@/types/user.type';
 import PageHeader from '@/components/common/PageHeader';
-import AiKeysCard from '@/components/feature/user-profile/AiKeys.card';
-import { IAiKeySummary } from '@/app/constants/ai-providers.constant';
 
 interface IProfileWrapperProps {
-  user?: IUser;
-  aiKeys: IAiKeySummary[];
+  /** Streamed profile form (server component inside Suspense) */
+  profile: ReactNode;
+  /** Streamed AI provider keys card (server component inside Suspense) */
+  aiKeys: ReactNode;
 }
 
-const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user, aiKeys }) => {
+const ProfileWrapper: React.FC<IProfileWrapperProps> = ({
+  profile,
+  aiKeys,
+}) => {
   return (
     <div className="page-fade flex w-full flex-col gap-5">
       <PageHeader
@@ -22,9 +24,9 @@ const ProfileWrapper: React.FC<IProfileWrapperProps> = ({ user, aiKeys }) => {
         ]}
       />
 
-      <UserProfileForm user={user} />
+      {profile}
 
-      <AiKeysCard keys={aiKeys} />
+      {aiKeys}
     </div>
   );
 };

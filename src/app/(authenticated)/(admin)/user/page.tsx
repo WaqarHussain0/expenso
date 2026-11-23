@@ -1,20 +1,21 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import { Suspense } from 'react';
 import { requireAdminPage } from '@/lib/admin-page-guard';
-import {
-  UserInsightsService,
+import type {
   UserSortOption,
   UserStatusFilter,
 } from '@/backend/modules/user/services/user-insights.service';
 import { UserGenderEnum } from '@/types/user-profile.type';
 import UserWrapper from './User.wrapper';
+import {
+  UserInsightsSection,
+  UserInsightsSkeleton,
+  UserStatsSection,
+  UserStatsSkeleton,
+} from './UserOverview.sections';
+import UserListSection, { UserListSkeleton } from './UserList.section';
 
 export const metadata: Metadata = { title: 'Users' };
-
-const insightsService = new UserInsightsService();
-
-const PAGE_SIZE = 10;
 
 type SearchParams = Promise<{
   page?: string;
@@ -32,6 +33,10 @@ const SORTS: UserSortOption[] = ['newest', 'oldest', 'recent', 'transactions'];
 const pick = <T extends string>(value: string | undefined, allowed: T[]) =>
   allowed.includes(value as T) ? (value as T) : undefined;
 
+/**
+ * Renders the shell (header, view switch, filters) right away and streams the
+ * overview stats, insights and the users table separately.
+ */
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   await requireAdminPage();
 
@@ -42,34 +47,40 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const status = pick(params.status, STATUSES);
   const sort = pick(params.sort, SORTS) ?? 'newest';
 
-  const [list, overview] = await Promise.all([
-    insightsService.listUsers({
-      page,
-      limit: PAGE_SIZE,
-      search,
-      gender,
-      status,
-      sort,
-    }),
-    insightsService.getOverview(),
-  ]);
-
-  // Past the last page (e.g. after deleting the last user on it) → first page
-  if (list.data.length === 0 && page > 1 && list.meta.totalPages > 0) {
-    redirect(PAGE_ROUTES.user);
-  }
-
   return (
     <UserWrapper
-      users={list.data}
-      meta={list.meta}
-      overview={overview}
       filters={{
         search,
         gender: gender ?? 'all',
         status: status ?? 'all',
         sort,
       }}
+      stats={
+        <Suspense fallback={<UserStatsSkeleton />}>
+          <UserStatsSection />
+        </Suspense>
+      }
+      insights={
+        <Suspense fallback={<UserInsightsSkeleton />}>
+          <UserInsightsSection />
+        </Suspense>
+      }
+      list={
+        // A new key per filter combination shows the table skeleton while
+        // the next page/search/filter/sort loads, instead of stale rows.
+        <Suspense
+          key={`${page}|${search}|${gender ?? 'all'}|${status ?? 'all'}|${sort}`}
+          fallback={<UserListSkeleton />}
+        >
+          <UserListSection
+            page={page}
+            search={search}
+            gender={gender}
+            status={status}
+            sort={sort}
+          />
+        </Suspense>
+      }
     />
   );
 };

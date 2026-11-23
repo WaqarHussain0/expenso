@@ -2,9 +2,10 @@
 'use server';
 
 import 'reflect-metadata';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 
 import { UserService } from '@/backend/modules/user/user.service';
+import { ADMIN_OVERVIEW_TAG } from '@/backend/modules/user/services/admin-overview.cache';
 import { UserGenderEnum } from '@/types/user-profile.type';
 import { CreateUserProfileDto } from '@/backend/modules/user/dto/create-user-profile.dto';
 import { UserProfileService } from '@/backend/modules/user/services/user-profile.service';
@@ -46,6 +47,7 @@ export async function toggleUserStatusAction(
 
     await userService.toggleUserStatus(userId);
 
+    updateTag(ADMIN_OVERVIEW_TAG);
     revalidatePath('/');
     return { success: true };
   } catch (error: any) {
@@ -71,6 +73,7 @@ export async function setUserProfileAction(
 
     await userProfileService.CreateOrUpdateUserProfile(userId, dto);
 
+    updateTag(ADMIN_OVERVIEW_TAG);
     revalidatePath('/');
     return { success: true };
   } catch (error: any) {
@@ -87,6 +90,7 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
     }
     await userService.delete(userId);
 
+    updateTag(ADMIN_OVERVIEW_TAG);
     revalidatePath('/');
     return { success: true };
   } catch (error: any) {

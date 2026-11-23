@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 import { TransactionService } from './transaction.service';
 
 const transactionService = new TransactionService();
@@ -31,3 +32,17 @@ export const getCachedMonthlyStats = (userId: string) =>
     ['transaction-monthly-stats', userId, currentMonthKey()],
     { tags: [transactionStatsTag(userId)], revalidate: 3600 },
   )();
+
+/**
+ * All-time income / expense / investment / free-cash totals for a user
+ * (dashboard). Shares the transaction-stats tag, so the same transaction and
+ * category actions keep it fresh. `cache()` dedupes the call when several
+ * dashboard sections read it in one render.
+ */
+export const getCachedUserStats = cache((userId: string) =>
+  unstable_cache(
+    () => transactionService.getUserStats(userId),
+    ['transaction-user-stats', userId],
+    { tags: [transactionStatsTag(userId)], revalidate: 3600 },
+  )(),
+);

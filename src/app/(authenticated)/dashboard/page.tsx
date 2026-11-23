@@ -1,41 +1,57 @@
-import PAGE_ROUTES from '@/app/constants/page-routes.constant';
-import { TransactionService } from '@/backend/modules/transaction/transaction.service';
-import { getServerSideSession } from '@/lib/next-auth.util';
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import DashboardWrapper from './Dashboard.wrapper';
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
+import { getServerSideSession } from '@/lib/next-auth.util';
 import { UserService } from '@/backend/modules/user/user.service';
+import DashboardWrapper from './Dashboard.wrapper';
+import {
+  DashboardStatsSection,
+  DashboardStatsSkeleton,
+  FreeCashSection,
+  FreeCashSkeleton,
+  RecentTransactionsSection,
+  RecentTransactionsSkeleton,
+} from './Dashboard.sections';
 
-const transactionService = new TransactionService();
 const userService = new UserService();
 
+/**
+ * Renders the shell (greeting, quick actions) right away and streams the
+ * free-cash hero figures, stat cards and recent transactions separately.
+ */
 const Page = async () => {
-  // Get the user session on the server
   const session = await getServerSideSession();
+  const userId = session?.user?.id;
 
-  const activeUser = session?.user;
-
-  // If user is already authenticated, redirect to dashboard
-  if (!session?.user) {
+  if (!userId) {
     redirect(PAGE_ROUTES.login);
   }
 
-  const transactionPayload = {
-    page: 1,
-    limit: 5,
-    userId: activeUser?.id || '',
-  };
-
-  const [data, stats, isFirstLogin] = await Promise.all([
-    transactionService.findAll(transactionPayload),
-    transactionService.getUserStats(activeUser?.id || ''),
-    userService.isFirstLogin(session.user.id),
-  ]);
+  // Not awaited: the quick actions read it with use(), so the shell doesn't
+  // wait on it. A failed lookup just hides the "Setup Workspace" action.
+  const isFirstLogin = userService
+    .isFirstLogin(userId)
+    .then(Boolean)
+    .catch(() => false);
 
   return (
     <DashboardWrapper
-      transactions={data.data || []}
-      totals={stats.totals}
       isFirstLogin={isFirstLogin}
+      freeCash={
+        <Suspense fallback={<FreeCashSkeleton />}>
+          <FreeCashSection userId={userId} />
+        </Suspense>
+      }
+      stats={
+        <Suspense fallback={<DashboardStatsSkeleton />}>
+          <DashboardStatsSection userId={userId} />
+        </Suspense>
+      }
+      recent={
+        <Suspense fallback={<RecentTransactionsSkeleton />}>
+          <RecentTransactionsSection userId={userId} />
+        </Suspense>
+      }
     />
   );
 };

@@ -3,11 +3,12 @@ import { redirect } from 'next/navigation';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { StatsService } from '@/backend/modules/stats/stats.service';
 import { FilterOptionEnum } from '@/lib/rtk/services/dashboard.rtk.service';
-import { TransactionService } from '@/backend/modules/transaction/transaction.service';
 import SharedStatsWrapper from './SharedStats.wrapper';
+import SharedStatsSection from './SharedStats.section';
+import SharedStatsView from './SharedStats.view';
 import mongoose from 'mongoose';
 import type { Metadata } from 'next';
-import { cache } from 'react';
+import { Suspense, cache } from 'react';
 
 type IUser = {
   _id: string;
@@ -20,7 +21,6 @@ type SearchParams = Promise<{
 }>;
 
 const statsService = new StatsService();
-const transactionService = new TransactionService();
 
 // generateMetadata and the page both need the share record — cache() makes
 // that one database lookup per request instead of two.
@@ -102,6 +102,10 @@ export async function generateMetadata({
     },
   };
 }
+/**
+ * Validates the share link (one quick lookup) and renders the header right
+ * away; the report data streams in behind a loading view of the same layout.
+ */
 const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { m } = await searchParams;
 
@@ -118,7 +122,14 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
   const { filter, userId } = stat;
   const { type, startDate, endDate, year } = filter;
 
-  if (!type || (type === FilterOptionEnum.MONTH && (!startDate || !endDate))) {
+  // Validate everything the report needs up front: redirects must happen
+  // before streaming starts, not from inside the streamed section.
+  const isValid =
+    (type === FilterOptionEnum.MONTH && !!startDate && !!endDate) ||
+    (type === FilterOptionEnum.YEAR && year !== undefined) ||
+    (type === FilterOptionEnum.CUSTOM && !!startDate && !!endDate);
+
+  if (!isValid) {
     redirect(PAGE_ROUTES.stats);
   }
 
@@ -127,48 +138,29 @@ const Page = async ({ searchParams }: { searchParams: SearchParams }) => {
       ? new mongoose.Types.ObjectId(userId)
       : new mongoose.Types.ObjectId(userId?._id); // wrap string _id as ObjectId
 
-  let response;
-  switch (type) {
-    case FilterOptionEnum.MONTH:
-      response = await transactionService.getMonthlyDashboardData(
-        startDate!,
-        endDate!,
-        userObjectId,
-      );
-      break;
-    case FilterOptionEnum.YEAR:
-      if (year === undefined) redirect(PAGE_ROUTES.stats);
-      response = await transactionService.getYearlyDashboardData(
-        userObjectId,
-        year,
-      );
-      break;
-    case FilterOptionEnum.CUSTOM:
-      if (!startDate || !endDate) redirect(PAGE_ROUTES.stats);
-      response = await transactionService.getCustomDateDashboardData(
-        userObjectId,
-        startDate,
-        endDate,
-      );
-      break;
-    default:
-      redirect(PAGE_ROUTES.stats);
-  }
-
   // Safely get name
   const userName = isUser(userId) ? userId.name : 'User';
 
   return (
     <SharedStatsWrapper
       filterType={type}
-      response={response}
       userName={userName}
       dateRange={{
-        startDate: stat.filter.startDate?.toISOString(),
-        endDate: stat.filter.endDate?.toISOString(),
-        year: stat.filter.year,
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
+        year,
       }}
-    />
+    >
+      <Suspense fallback={<SharedStatsView filterType={type} isLoading />}>
+        <SharedStatsSection
+          type={type}
+          userObjectId={userObjectId}
+          startDate={startDate}
+          endDate={endDate}
+          year={year}
+        />
+      </Suspense>
+    </SharedStatsWrapper>
   );
 };
 

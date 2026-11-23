@@ -1,17 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useOptimistic, useState, useTransition } from 'react';
+import { ReactNode, useOptimistic, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
-import Pagination from '@/components/common/Pagination';
 import SearchInput from '@/components/common/SearchInput';
 import SegmentedControl from '@/components/common/SegmentedControl';
-import StatWrapper from '@/components/common/Stat.wrapper';
-import UserTable from '@/components/feature/user/User.table';
-import { Panel, RatioRow, SplitBar } from '@/components/feature/user/admin-ui';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -23,16 +18,6 @@ import {
 } from '@/components/ui/select';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { UserGenderEnum } from '@/types/user-profile.type';
-import type {
-  IAdminOverview,
-  IAdminUserRow,
-} from '@/backend/modules/user/services/user-insights.service';
-
-// Charts only load when the Insights view is opened
-const UserGrowthChart = dynamic(
-  () => import('@/components/feature/user/UserGrowthChart'),
-  { ssr: false, loading: () => <div className="h-[260px]" /> },
-);
 
 interface IUserFilters {
   search: string;
@@ -42,10 +27,13 @@ interface IUserFilters {
 }
 
 interface IUserWrapperProps {
-  users: IAdminUserRow[];
-  meta: { totalPages: number; totalRecords: number; page: number };
-  overview: IAdminOverview;
   filters: IUserFilters;
+  /** Streamed overview stat cards (server component inside Suspense) */
+  stats: ReactNode;
+  /** Streamed Insights view panels (server component inside Suspense) */
+  insights: ReactNode;
+  /** Streamed users table + pagination (server component inside Suspense) */
+  list: ReactNode;
 }
 
 const VIEW_OPTIONS = [
@@ -91,18 +79,19 @@ const toQuery = (filters: IUserFilters, page = 1) => {
   return query ? `${PAGE_ROUTES.user}?${query}` : PAGE_ROUTES.user;
 };
 
-const pct = (value: number, total: number) =>
-  total ? (value / total) * 100 : 0;
-
+/**
+ * Client shell for the admin users page: header, view switch and filter
+ * toolbar. Overview stats, insights and the table arrive as streamed slots.
+ */
 const UserWrapper: React.FC<IUserWrapperProps> = ({
-  users,
-  meta,
-  overview,
   filters,
+  stats,
+  insights,
+  list,
 }) => {
   const router = useRouter();
   const [view, setView] = useState('users');
-  const [isNavigating, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   // The URL is the source of truth; show the new filter instantly while the
   // server renders the matching list.
@@ -131,10 +120,6 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
     shownFilters.gender !== 'all' ||
     shownFilters.status !== 'all';
 
-  const { totals, signInMethods, genders, trend } = overview;
-  const users$ = totals.users;
-  const hint = `of ${users$} ${users$ === 1 ? 'user' : 'users'}`;
-
   return (
     <div
       className={`page-fade flex w-full flex-col gap-5 ${
@@ -158,143 +143,10 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
         }
       />
 
-      <StatWrapper
-        stats={[
-          {
-            label: 'Total users',
-            value: users$,
-            percent: users$ ? 100 : 0,
-            color: '#0ea5e9',
-            hint: `+${totals.newThisMonth} new this month`,
-          },
-          {
-            label: `Active · last ${totals.activeWindowDays} days`,
-            value: totals.activeRecently,
-            percent: pct(totals.activeRecently, users$),
-            color: '#1a7f5a',
-            hint,
-          },
-          {
-            label: 'Tracking money',
-            value: totals.withTransactions,
-            percent: pct(totals.withTransactions, users$),
-            color: '#6366f1',
-            hint: 'Logged a transaction',
-          },
-          {
-            label: 'Deactivated',
-            value: totals.deactivated,
-            percent: pct(totals.deactivated, users$),
-            color: '#f43f5e',
-            hint,
-          },
-        ]}
-        className="grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
-      />
+      {stats}
 
       {view === 'insights' ? (
-        <div className="grid gap-5 lg:grid-cols-3">
-          <Panel
-            title="Growth"
-            description="New users and transactions logged per month, last 12 months."
-            className="lg:col-span-2"
-          >
-            <UserGrowthChart data={trend} />
-          </Panel>
-
-          <Panel
-            title="Engagement"
-            description="How far users have got with the app."
-            bodyClassName="space-y-4"
-          >
-            <RatioRow
-              label="Finished first-time setup"
-              value={totals.onboarded}
-              total={users$}
-            />
-            <RatioRow
-              label="Logged at least one transaction"
-              value={totals.withTransactions}
-              total={users$}
-              color="#6366f1"
-            />
-            <RatioRow
-              label={`Active in the last ${totals.activeWindowDays} days`}
-              value={totals.activeRecently}
-              total={users$}
-              color="#0ea5e9"
-            />
-            <RatioRow
-              label="Using their own AI keys"
-              value={totals.withOwnAiKeys}
-              total={users$}
-              color="#f59e0b"
-            />
-            <dl className="border-ink/[0.06] grid grid-cols-3 gap-3 border-t pt-4">
-              {[
-                { label: 'Transactions', value: totals.transactions },
-                { label: 'This month', value: totals.transactionsThisMonth },
-                { label: 'Share links', value: totals.shareLinks },
-              ].map(item => (
-                <div key={item.label}>
-                  <dt className="inter text-ink-subtle text-[11px]">
-                    {item.label}
-                  </dt>
-                  <dd className="manrope text-ink text-lg font-bold tabular-nums">
-                    {item.value.toLocaleString()}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Panel>
-
-          <Panel
-            title="Sign-in method"
-            description="How each account was created."
-          >
-            <SplitBar
-              segments={[
-                {
-                  label: 'Email',
-                  value: signInMethods.email,
-                  color: '#1a7f5a',
-                },
-                {
-                  label: 'Google',
-                  value: signInMethods.google,
-                  color: '#4285F4',
-                },
-              ]}
-            />
-          </Panel>
-
-          <Panel title="Gender" description="From users' profiles.">
-            <SplitBar
-              segments={[
-                { label: 'Male', value: genders.male, color: '#0ea5e9' },
-                { label: 'Female', value: genders.female, color: '#ec4899' },
-                { label: 'Other', value: genders.other, color: '#a78bfa' },
-                { label: 'Not set', value: genders.notSet, color: '#94a3b8' },
-              ]}
-            />
-          </Panel>
-
-          <Panel
-            title="Account status"
-            description="Deactivated users can't sign in; their data is kept."
-          >
-            <SplitBar
-              segments={[
-                { label: 'Active', value: totals.active, color: '#059669' },
-                {
-                  label: 'Deactivated',
-                  value: totals.deactivated,
-                  color: '#f43f5e',
-                },
-              ]}
-            />
-          </Panel>
-        </div>
+        insights
       ) : (
         <Card className="gap-0 overflow-hidden py-0 lg:min-h-0 lg:flex-1">
           <div className="border-ink/[0.06] flex flex-col gap-3 border-b p-3 md:p-4 xl:flex-row xl:items-center">
@@ -364,27 +216,9 @@ const UserWrapper: React.FC<IUserWrapperProps> = ({
                 </Button>
               )}
             </div>
-
-            <p className="inter text-ink-subtle text-xs xl:ml-auto">
-              {meta.totalRecords.toLocaleString()}{' '}
-              {meta.totalRecords === 1 ? 'user' : 'users'}
-            </p>
           </div>
 
-          <UserTable
-            className="scroll-area lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
-            users={users}
-            isRefreshing={isNavigating}
-          />
-
-          {users.length > 0 && (
-            <Pagination
-              page={meta.page}
-              totalRecords={meta.totalRecords}
-              totalPage={meta.totalPages}
-              onPageChange={page => applyFilters({}, page)}
-            />
-          )}
+          {list}
         </Card>
       )}
     </div>

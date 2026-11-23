@@ -2,17 +2,15 @@
 
 'use client';
 import FinalCta from '@/components/feature/marketing/landing/FinalCta';
-import CustomDateStatsWrapper from '@/components/feature/stats/CustomDateStats.wrapper';
-import MonthStatsWrapper from '@/components/feature/stats/MonthStats.wrapper';
-import YearStatsWrapper from '@/components/feature/stats/YearStats.wrapper';
-import { FilterOptionEnum } from '@/lib/rtk/services/dashboard.rtk.service';
 import { CalendarDays, TrendingUp, BarChart3 } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface ISharedStatsWrapperProps {
   filterType?: string;
-  response: any;
   userName?: string;
   dateRange?: { startDate?: string; endDate?: string; year?: number };
+  /** Streamed report body (server component inside Suspense) */
+  children: ReactNode;
 }
 
 const initials = (name?: string) =>
@@ -31,12 +29,10 @@ const filterMeta: Record<string, { label: string; Icon: any }> = {
 
 const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
   filterType = 'custom',
-  response,
   userName,
   dateRange,
+  children,
 }) => {
-  const totals = response?.totals ?? {};
-
   const { label, Icon } = filterMeta[filterType] ?? filterMeta.custom;
 
   const dateLabel = (() => {
@@ -66,43 +62,6 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
 
     return null;
   })();
-
-  const renderData = (opt: FilterOptionEnum) => {
-    switch (opt) {
-      case FilterOptionEnum.MONTH:
-        return (
-          <MonthStatsWrapper
-            allTransactions={response?.monthAllTransactions}
-            categoryBreakdown={response?.categoryBreakdown}
-            isLoading={false}
-            totals={totals}
-          />
-        );
-      case FilterOptionEnum.YEAR:
-        return (
-          <YearStatsWrapper
-            isLoading={false}
-            monthlySeries={response?.monthlySeries}
-            expenseBreakdown={response?.expenseBreakdown}
-            incomeBreakdown={response?.incomeBreakdown}
-            investmentBreakdown={response?.investmentBreakdown}
-            totals={totals}
-          />
-        );
-      case FilterOptionEnum.CUSTOM:
-      default:
-        return (
-          <CustomDateStatsWrapper
-            isLoading={false}
-            totals={totals}
-            counts={response?.counts}
-            expenseBreakdown={response?.expenseBreakdown}
-            savingsRate={response?.savingsRate}
-            topExpenseCategory={response?.topExpenseCategory}
-          />
-        );
-    }
-  };
 
   return (
     <div className="bg-canvas min-h-screen w-full">
@@ -145,9 +104,7 @@ const SharedStatsWrapper: React.FC<ISharedStatsWrapperProps> = ({
 
       {/* ── Stats content ── */}
       <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 md:px-6 md:py-8">
-        <div className="space-y-3">
-          {renderData(filterType as FilterOptionEnum)}
-        </div>
+        <div className="space-y-3">{children}</div>
 
         <FinalCta variant="compact" />
       </main>
