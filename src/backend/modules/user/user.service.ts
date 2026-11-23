@@ -9,6 +9,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { after } from 'next/server';
 import { sendEmail } from '@/lib/email.util';
+import { appUrl } from '@/lib/app-url.util';
+import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import { forgotPasswordEmailTemplate } from '@/app/constants/email-templates/forgot-password.email-template';
 import { welcomeEmailTemplate } from '@/app/constants/email-templates/welcome.email-template';
 import UserProfileEntity from './entities/user-profile.entity';
@@ -67,12 +69,12 @@ export class UserService {
       isFirstLogin: true,
     });
 
-    const loginPageLink = `${process.env.NEXTAUTH_URL}login}`;
-
     // prepare email template
     const html = welcomeEmailTemplate({
       name: savedUser?.name || 'there',
-      loginPageLink,
+      email: savedUser?.email,
+      // Signed-out visitors are sent to login first by the auth proxy
+      dashboardLink: appUrl(PAGE_ROUTES.dashboard),
     });
 
     after(async () => {
@@ -133,7 +135,7 @@ export class UserService {
     // Save new token + expiry (15 minutes)
     await this.saveUserResetToken(user._id, resetToken);
 
-    const resetLink = `${process.env.NEXTAUTH_URL}reset-password?token=${resetToken}`;
+    const resetLink = appUrl(`/reset-password?token=${resetToken}`);
 
     // prepare email template
     const html = forgotPasswordEmailTemplate({

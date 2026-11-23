@@ -2,6 +2,7 @@
 import { initDB } from '@/backend/utils/dbInit.util';
 import StatEntity from './entities/stats.entity';
 import crypto from 'crypto';
+import { appUrl } from '@/lib/app-url.util';
 
 const normalizeFilter = (filter: any) => {
   return {
@@ -42,7 +43,7 @@ export class StatsService {
     const existing = await this.statEntity.findOne(filterQuery);
 
     if (existing) {
-      return `${process.env.NEXTAUTH_URL}share?m=${existing.token}`;
+      return appUrl(`/share?m=${existing.token}`);
     }
 
     // 🆕 Create new token
@@ -54,7 +55,7 @@ export class StatsService {
       token,
     });
 
-    return `${process.env.NEXTAUTH_URL}share?m=${token}`;
+    return appUrl(`/share?m=${token}`);
   }
 
   async getStatsByToken(token: string) {
