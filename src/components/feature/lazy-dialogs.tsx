@@ -17,3 +17,8 @@ export const LazyTransactionDialog = dynamic(
   () => import('./transaction/Transaction.dialog'),
   { ssr: false },
 );
+
+export const LazyCategoryImportDialog = dynamic(
+  () => import('./category/CategoryImport.dialog'),
+  { ssr: false },
+);

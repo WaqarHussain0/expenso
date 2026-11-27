@@ -679,6 +679,49 @@ export class TransactionService {
     };
   }
 
+  /** Number of a user's transactions dated within [start, end]. */
+  async countInRange(userId: mongoose.Types.ObjectId, start: Date, end: Date) {
+    await initDB();
+    return this.transactionEntity.countDocuments({
+      userId,
+      date: { $gte: start, $lte: end },
+    });
+  }
+
+  /**
+   * A user's transactions dated within [start, end], oldest first, flattened
+   * for export (category name/type instead of the populated document).
+   */
+  async findForExport(
+    userId: mongoose.Types.ObjectId,
+    start: Date,
+    end: Date,
+    /** Hard cap on rows (rows added after the caller's count can't exceed it) */
+    maxRows: number,
+  ) {
+    await initDB();
+
+    const transactions = await this.transactionEntity
+      .find({ userId, date: { $gte: start, $lte: end } })
+      .select('amount date note categoryId')
+      .sort({ date: 1, createdAt: 1 })
+      .limit(maxRows)
+      .populate({ path: 'categoryId', select: 'name type' })
+      .lean();
+
+    return transactions.map(tx => {
+      const category = tx.categoryId as ICategory | null;
+
+      return {
+        date: tx.date,
+        type: category?.type as CategoryTypeEnum | undefined,
+        category: category?.name ?? '',
+        amount: tx.amount,
+        note: tx.note ?? '',
+      };
+    });
+  }
+
   // Get all the income, expense and investment total for a user
   async getUserStats(userId: string) {
     await initDB();

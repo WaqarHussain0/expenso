@@ -4,6 +4,35 @@ import CategoryEntity, { CategoryTypeEnum } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import mongoose from 'mongoose';
 import { UserService } from '../user/user.service';
+import {
+  CATEGORY_COLORS,
+  DEFAULT_CATEGORY_ICON,
+} from '@/app/constants/app.constant';
+import {
+  CATEGORY_EXPORT_MAX_ROWS,
+  MAX_CATEGORIES_PER_USER,
+} from '../rate-limit/limits.constant';
+
+/** The import would take the user past MAX_CATEGORIES_PER_USER. */
+export class CategoryLimitError extends Error {
+  name = 'CategoryLimitError';
+}
+
+export interface ICategoryImportRow {
+  /** Lowercased, trimmed */
+  name: string;
+  type: CategoryTypeEnum;
+  /** Hex colour, or undefined to keep the current one / pick a default */
+  color?: string;
+}
+
+export interface ICategoryImportResult {
+  created: number;
+  updated: number;
+  /** Previously deleted categories brought back */
+  restored: number;
+  unchanged: number;
+}
 
 const userService = new UserService();
 export class CategoryService {
@@ -182,6 +211,114 @@ export class CategoryService {
       { name, type, color, icon },
       { new: true }, // return updated document
     );
+  }
+
+  /**
+   * Create-or-update categories from an import, matched by name + type:
+   * - no match → created (default icon; given colour or one from the palette)
+   * - deleted match → restored (and recoloured if a colour is given)
+   * - active match with a different colour → colour updated
+   * - active match otherwise → left unchanged
+   * Rows must already be validated and free of duplicates.
+   */
+  async importMany(
+    userId: mongoose.Types.ObjectId,
+    rows: ICategoryImportRow[],
+  ): Promise<ICategoryImportResult> {
+    await initDB();
+
+    const existing = await this.categoryEntity
+      .find({ userId, name: { $in: rows.map(row => row.name) } })
+      .select('_id name type color isActive')
+      .lean();
+
+    // If the same name + type exists more than once, prefer the active one
+    const byKey = new Map<string, (typeof existing)[number]>();
+    for (const category of existing) {
+      const key = `${category.name}|${category.type}`;
+      const current = byKey.get(key);
+      if (!current || (!current.isActive && category.isActive)) {
+        byKey.set(key, category);
+      }
+    }
+
+    const result: ICategoryImportResult = {
+      created: 0,
+      updated: 0,
+      restored: 0,
+      unchanged: 0,
+    };
+    const operations: mongoose.AnyBulkWriteOperation[] = [];
+
+    rows.forEach((row, index) => {
+      const match = byKey.get(`${row.name}|${row.type}`);
+
+      if (!match) {
+        result.created++;
+        operations.push({
+          insertOne: {
+            document: {
+              name: row.name,
+              type: row.type,
+              userId,
+              icon: DEFAULT_CATEGORY_ICON,
+              color:
+                row.color ?? CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+              isActive: true,
+            },
+          },
+        });
+        return;
+      }
+
+      const recolour =
+        !!row.color && row.color.toLowerCase() !== match.color?.toLowerCase();
+
+      if (match.isActive === false) {
+        result.restored++;
+      } else if (recolour) {
+        result.updated++;
+      } else {
+        result.unchanged++;
+        return;
+      }
+
+      operations.push({
+        updateOne: {
+          filter: { _id: match._id, userId },
+          update: {
+            $set: { isActive: true, ...(recolour && { color: row.color }) },
+          },
+        },
+      });
+    });
+
+    if (result.created > 0) {
+      const total = await this.categoryEntity.countDocuments({ userId });
+      if (total + result.created > MAX_CATEGORIES_PER_USER) {
+        throw new CategoryLimitError(
+          `This import would create ${result.created} categories, taking you past the limit of ${MAX_CATEGORIES_PER_USER.toLocaleString('en-US')} (you have ${total.toLocaleString('en-US')}, including deleted ones). Nothing was imported.`,
+        );
+      }
+    }
+
+    if (operations.length) {
+      await this.categoryEntity.bulkWrite(operations, { ordered: true });
+    }
+
+    return result;
+  }
+
+  /** All of a user's active categories, for export (by type, then name). */
+  async findAllForExport(userId: mongoose.Types.ObjectId) {
+    await initDB();
+
+    return this.categoryEntity
+      .find({ userId, isActive: true })
+      .select('name type color')
+      .sort({ type: 1, name: 1 })
+      .limit(CATEGORY_EXPORT_MAX_ROWS)
+      .lean();
   }
 
   async getCategoryStats(userId: string) {

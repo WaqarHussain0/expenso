@@ -23,30 +23,13 @@ import {
   ShoppingCartIcon,
 } from 'lucide-react';
 import { CATEGORY_ICONS } from '@/app/constants/category-icons.constant';
+import { CATEGORY_COLORS } from '@/app/constants/app.constant';
 import {
   createCategoryAction,
   updateCategoryAction,
 } from '@/lib/server-actions/category.server-action';
 import CategoryTypeBadge, { CATEGORY_TYPE_COLORS } from './CategoryTypeBadge';
 import { CategoryIconTile } from '../transaction/TransactionDisplay';
-
-const COLORS = [
-  '#FF6B35',
-  '#3B82F6',
-  '#8B5CF6',
-  '#F59E0B',
-  '#EF4444',
-  '#22C55E',
-  '#14B8A6',
-  '#84CC16',
-  '#6366F1',
-  '#06B6D4',
-  '#EAB308',
-  '#EC4899',
-  '#795548',
-  '#10B981',
-  '#F97316',
-];
 
 interface ICategoryDialogProps {
   open: boolean;
@@ -310,7 +293,7 @@ const CategoryDialog: React.FC<ICategoryDialogProps> = ({
               rules={{ required: 'Color is required' }}
               render={({ field }) => (
                 <div className="flex flex-wrap gap-2.5">
-                  {COLORS.map(color => {
+                  {CATEGORY_COLORS.map(color => {
                     const isActive = field.value === color;
 
                     return (

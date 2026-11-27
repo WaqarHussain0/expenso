@@ -25,8 +25,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Copy, Send } from 'lucide-react';
+import { Copy, FileDown, Send } from 'lucide-react';
+import { toast } from 'sonner';
 import { getStatsLinkAction } from '@/lib/server-actions/user.server-action';
+import { exportStatsAction } from '@/lib/server-actions/stats.server-action';
 import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
 import dynamic from 'next/dynamic';
@@ -81,6 +83,7 @@ const getRangeForYear = (year: number) => ({
 
 const Page = () => {
   const [isPending, startTransition] = useTransition();
+  const [isExporting, startExport] = useTransition();
 
   // Captured once per mount (not at module load, which on the server would
   // be whenever the process started)
@@ -178,6 +181,40 @@ const Page = () => {
     investment: [],
   };
 
+  // Whether the current view has any transactions to export, and whether
+  // that answer is still loading
+  const sumTotals = (t?: {
+    income?: number;
+    expense?: number;
+    investment?: number;
+  }) => (t?.income ?? 0) + (t?.expense ?? 0) + (t?.investment ?? 0);
+
+  const { hasExportData, isViewLoading } = (() => {
+    switch (filterOption) {
+      case FilterOptionEnum.YEAR:
+        // The year view only returns totals; any transaction moves one of them
+        return {
+          hasExportData: sumTotals(yearData?.response?.totals) > 0,
+          isViewLoading: yearDataFetching,
+        };
+      case FilterOptionEnum.CUSTOM:
+        return {
+          hasExportData: sumTotals(customDateData?.response?.counts) > 0,
+          isViewLoading: customDateDataFetching,
+        };
+      case FilterOptionEnum.MONTH:
+      default:
+        return {
+          hasExportData:
+            allTransactions.income.length +
+              allTransactions.expense.length +
+              allTransactions.investment.length >
+            0,
+          isViewLoading: isFetching,
+        };
+    }
+  })();
+
   const renderData = (filterOption: FilterOptionEnum) => {
     switch (filterOption) {
       case FilterOptionEnum.MONTH:
@@ -237,6 +274,26 @@ const Page = () => {
     });
   };
 
+  // Email a CSV of the transactions in the current filter (sent in the background)
+  const handleExport = () => {
+    startExport(async () => {
+      const result = await exportStatsAction({
+        type: filterOption,
+        startDate,
+        endDate,
+        year,
+      });
+
+      if (result.success) {
+        toast.success('Export on its way', {
+          description: `We're emailing the CSV to ${result.email}. It should arrive in a minute.`,
+        });
+      } else {
+        toast.error(result.error || 'Could not export your stats');
+      }
+    });
+  };
+
   const handleCopy = async () => {
     if (!shareUrl) return;
 
@@ -262,7 +319,7 @@ const Page = () => {
         <CardContent className="flex flex-wrap items-end gap-2">
           {/* Filter type selector — always visible */}
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="stats-filter">Filter By</Label>
 
             <Select
@@ -292,7 +349,7 @@ const Page = () => {
           {/* ── MONTH filter inputs ── */}
           {filterOption === FilterOptionEnum.MONTH && (
             <>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="stats-month">Month</Label>
                 <Select
                   value={String(month)}
@@ -317,7 +374,7 @@ const Page = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="stats-month-year">Year</Label>
                 <Select
                   value={String(year)}
@@ -340,7 +397,7 @@ const Page = () => {
 
           {/* ── YEAR filter inputs ── */}
           {filterOption === FilterOptionEnum.YEAR && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="stats-year">Year</Label>
               <Select
                 value={String(year)}
@@ -363,7 +420,7 @@ const Page = () => {
           {/* ── CUSTOM filter inputs ── */}
           {filterOption === FilterOptionEnum.CUSTOM && (
             <>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="stats-from">From </Label>
                 <Input
                   id="stats-from"
@@ -373,7 +430,7 @@ const Page = () => {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="stats-to">To </Label>
                 <Input
                   id="stats-to"
@@ -386,10 +443,25 @@ const Page = () => {
             </>
           )}
 
-          <Button onClick={handleOpenDialog}>
-            <Send />
-            Share
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleOpenDialog}>
+              <Send />
+              Share
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={isExporting || isViewLoading || !hasExportData}
+              title={
+                !isViewLoading && !hasExportData
+                  ? 'No income, expenses or investments in this period to export'
+                  : undefined
+              }
+            >
+              <FileDown />
+              {isExporting ? 'Exporting...' : 'Export CSV'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

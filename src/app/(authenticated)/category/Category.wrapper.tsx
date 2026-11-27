@@ -5,14 +5,20 @@ import PAGE_ROUTES from '@/app/constants/page-routes.constant';
 import PageHeader from '@/components/common/PageHeader';
 import SearchInput from '@/components/common/SearchInput';
 import SegmentedControl from '@/components/common/SegmentedControl';
-import { LazyCategoryDialog } from '@/components/feature/lazy-dialogs';
+import {
+  LazyCategoryDialog,
+  LazyCategoryImportDialog,
+} from '@/components/feature/lazy-dialogs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useDebouncedSearch } from '@/hooks/useDebouncedSearch.hook';
 import { CategoryTypeEnum } from '@/types/category.type';
-import { PlusIcon, X } from 'lucide-react';
+import { Download, PlusIcon, Upload, X } from 'lucide-react';
+import { toast } from 'sonner';
+import { exportCategoriesAction } from '@/lib/server-actions/category.server-action';
+import { downloadCsv } from '@/lib/download.util';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useCallback, useState, useTransition } from 'react';
 
 interface ICategoryWrapperProps {
   /** Streamed stats cards (server component inside Suspense) */
@@ -59,6 +65,24 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({ stats, list }) => {
     () => setShowCategoryDialog(prev => !prev),
     [],
   );
+
+  const [showImportDialog, setShowImportDialog] = useState(false);
+
+  // Export runs as a server action in a transition, so the page stays
+  // responsive while the CSV is built; the file downloads when it's ready
+  const [isExporting, startExport] = useTransition();
+  const handleExport = () => {
+    startExport(async () => {
+      const result = await exportCategoriesAction();
+
+      if (result.success && result.csv && result.fileName) {
+        downloadCsv(result.csv, result.fileName);
+        toast.success('Categories exported');
+      } else {
+        toast.error(result.error || 'Could not export your categories');
+      }
+    });
+  };
 
   // Function to update URL query params
   const updateQueryParams = useCallback(
@@ -109,10 +133,29 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({ stats, list }) => {
           { label: 'Categories' },
         ]}
         actions={
-          <Button className="h-9 px-4" onClick={handleCloseDialog}>
-            <PlusIcon className="size-4" />
-            Add Category
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              className="h-9 px-4"
+              onClick={() => setShowImportDialog(true)}
+            >
+              <Upload className="size-4" />
+              Import
+            </Button>
+            <Button
+              variant="outline"
+              className="h-9 px-4"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              <Download className="size-4" />
+              {isExporting ? 'Exporting...' : 'Export'}
+            </Button>
+            <Button className="h-9 px-4" onClick={handleCloseDialog}>
+              <PlusIcon className="size-4" />
+              Add Category
+            </Button>
+          </>
         }
       />
 
@@ -155,6 +198,13 @@ const CategoryWrapper: React.FC<ICategoryWrapperProps> = ({ stats, list }) => {
 
       {showCategoryDialog && (
         <LazyCategoryDialog onClose={handleCloseDialog} open />
+      )}
+
+      {showImportDialog && (
+        <LazyCategoryImportDialog
+          open
+          onClose={() => setShowImportDialog(false)}
+        />
       )}
     </div>
   );

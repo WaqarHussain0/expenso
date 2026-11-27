@@ -2,13 +2,23 @@
 
 import 'reflect-metadata';
 import { revalidatePath, updateTag } from 'next/cache';
-import { CategoryService } from '@/backend/modules/category/category.service';
+import {
+  CategoryService,
+  ICategoryImportResult,
+} from '@/backend/modules/category/category.service';
+import { buildCategoriesCsv, parseCategoryCsv } from '@/lib/category-csv.util';
 import { categoryStatsTag } from '@/backend/modules/category/category-stats.cache';
 import { transactionStatsTag } from '@/backend/modules/transaction/transaction-stats.cache';
 import { CreateCategoryDto } from '@/backend/modules/category/dto/create-category.dto';
 import { validateDto } from '@/backend/utils/input-validator.util';
 import { CategoryTypeEnum, ICategory } from '@/types/category.type';
-import { requireUser, toObjectId } from './action-guard';
+import {
+  enforceRateLimit,
+  RateLimitError,
+  withLock,
+} from '@/backend/modules/rate-limit/rate-limit.service';
+import { LIMITS } from '@/backend/modules/rate-limit/limits.constant';
+import { ActionAuthError, requireUser, toObjectId } from './action-guard';
 
 const categoryService = new CategoryService();
 
@@ -135,5 +145,121 @@ export async function setPreferencesAction(payload: CategoryPayload[]) {
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
+  }
+}
+
+/** Messages we wrote ourselves are safe to show; anything else (e.g. a
+ * database error) is logged and replaced with a generic message. */
+class CategoryCsvError extends Error {}
+
+const safeErrorMessage = (error: unknown, context: string) => {
+  if (
+    error instanceof CategoryCsvError ||
+    error instanceof RateLimitError ||
+    error instanceof ActionAuthError
+  ) {
+    return error.message;
+  }
+  console.error(`${context} failed:`, error);
+  return 'Something went wrong. Please try again.';
+};
+
+interface IImportCategoriesResult extends ActionResult {
+  /** Validation problems, one per line (when the file is rejected) */
+  errors?: string[];
+  summary?: ICategoryImportResult;
+}
+
+/**
+ * Import categories from the CSV template. The file is validated again here
+ * with the same rules the browser used — never trust the client. New
+ * categories are created, existing ones (same name + type) updated.
+ */
+export async function importCategoriesAction(
+  csvText: string,
+): Promise<IImportCategoriesResult> {
+  try {
+    const user = await requireUser();
+
+    if (typeof csvText !== 'string') {
+      throw new CategoryCsvError('Choose a CSV file to import.');
+    }
+
+    const { rows, errors } = parseCategoryCsv(csvText);
+
+    if (errors.length) {
+      return { success: false, error: 'The file has problems.', errors };
+    }
+
+    await enforceRateLimit({
+      action: 'category-import',
+      subject: user.id,
+      ...LIMITS.categoryImport,
+      message: `You can import up to ${LIMITS.categoryImport.limit} files every 10 minutes.`,
+    });
+
+    // One import per user at a time — two racing imports could both decide
+    // a category is new and create it twice
+    const summary = await withLock(
+      `category-import:${user.id}`,
+      60,
+      'Another import is still running. Wait for it to finish.',
+      () => categoryService.importMany(user.objectId, rows),
+    ).catch(error => {
+      if (error?.name === 'CategoryLimitError') {
+        throw new CategoryCsvError(error.message);
+      }
+      throw error;
+    });
+
+    if (summary.created || summary.restored) {
+      updateTag(categoryStatsTag(user.id));
+    }
+    revalidatePath('/');
+
+    return { success: true, summary };
+  } catch (error) {
+    return {
+      success: false,
+      error: safeErrorMessage(error, 'Category import'),
+    };
+  }
+}
+
+interface IExportCategoriesResult extends ActionResult {
+  csv?: string;
+  fileName?: string;
+}
+
+/** All of the signed-in user's categories as CSV (same columns as import). */
+export async function exportCategoriesAction(): Promise<IExportCategoriesResult> {
+  try {
+    const user = await requireUser();
+
+    await enforceRateLimit({
+      action: 'category-export',
+      subject: user.id,
+      ...LIMITS.categoryExport,
+      message: `You can export up to ${LIMITS.categoryExport.limit} times every 10 minutes.`,
+    });
+
+    const categories = await categoryService.findAllForExport(user.objectId);
+
+    if (categories.length === 0) {
+      return { success: false, error: 'You have no categories to export yet.' };
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    return {
+      success: true,
+      csv: buildCategoriesCsv(categories),
+      fileName: `expenso-categories-${today}.csv`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: safeErrorMessage(error, 'Category export'),
+    };
   }
 }

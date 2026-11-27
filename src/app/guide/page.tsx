@@ -126,7 +126,7 @@ const STRUCTURED_DATA = {
       image: absoluteUrl('/guide/opengraph-image'),
       inLanguage: 'en',
       proficiencyLevel: 'Beginner',
-      dateModified: '2026-11-23',
+      dateModified: '2026-11-27',
       author: { '@type': 'Person', name: 'Waqar Hussain' },
       publisher: {
         '@type': 'Organization',
@@ -255,7 +255,7 @@ const GuidePage = async () => {
               <Callout type="note">
                 <Ui>Setup Workspace</Ui> is offered only on your first sign-in.
                 You can always add or remove categories later on the Categories
-                page.
+                page — or import a whole list from a CSV file.
               </Callout>
             </div>
 
@@ -369,6 +369,86 @@ const GuidePage = async () => {
                 type — Expenso restores the original instead of making a
                 duplicate.
               </Callout>
+            </div>
+
+            <div className="space-y-4">
+              <GuideH3>Import categories from a CSV file</GuideH3>
+              <P>
+                Have a list already — in a spreadsheet, or exported from another
+                app? Add them all at once.
+              </P>
+              <Steps
+                items={[
+                  <>
+                    On <Ui>Category</Ui>, click <Ui>Import</Ui>, then{' '}
+                    <Ui>Template</Ui> to download the CSV template.
+                  </>,
+                  <>
+                    Open it in Excel, Google Sheets or Numbers and add one
+                    category per row under the header. Save it as CSV.
+                  </>,
+                  <>
+                    Back in <Ui>Import</Ui>, choose your file. Expenso checks it
+                    straight away and lists anything to fix, row by row.
+                  </>,
+                  <>
+                    When it says the categories are ready, click <Ui>Import</Ui>
+                    . You’ll see how many were created, updated, restored or
+                    left unchanged.
+                  </>,
+                ]}
+              />
+              <FieldTable
+                rows={[
+                  [
+                    'Name',
+                    'Required, up to 50 characters. Capitals don’t matter — “Groceries” and “groceries” are the same category.',
+                  ],
+                  [
+                    'Type',
+                    'Required: income, expense or investment. Nothing else is accepted.',
+                  ],
+                  [
+                    'Color',
+                    'Optional hex colour such as #22C55E. Leave it blank and Expenso picks one (or keeps the current colour).',
+                  ],
+                ]}
+              />
+              <Bullets
+                items={[
+                  <>
+                    The file must have exactly these three columns — no more, no
+                    fewer. Their order doesn’t matter.
+                  </>,
+                  <>
+                    Each category can appear only once per file (same name and
+                    type).
+                  </>,
+                  <>
+                    A row that matches a category you already have updates its
+                    colour instead of making a duplicate. A row that matches a
+                    deleted category brings it back.
+                  </>,
+                  <>
+                    Imported categories get the wallet icon — change it any time
+                    with <Ui>Edit</Ui>.
+                  </>,
+                ]}
+              />
+              <Callout type="note" title="Limits">
+                Up to 500 rows and 512 KB per file, 10 imports every 10 minutes,
+                and 1,000 categories per account (deleted ones included). If a
+                file would go over the limit, nothing in it is imported.
+              </Callout>
+            </div>
+
+            <div className="space-y-4">
+              <GuideH3>Export your categories</GuideH3>
+              <P>
+                Click <Ui>Export</Ui> on the Categories page to download every
+                category as a CSV in the same format as the template — handy as
+                a backup, or to edit in bulk and import back.
+              </P>
             </div>
           </GuideSection>
 
@@ -525,6 +605,52 @@ const GuidePage = async () => {
               Savings rate = (income − expenses) ÷ income. Investments count as
               money kept, so they don’t lower it.
             </Callout>
+
+            <div className="space-y-4">
+              <GuideH3>Export a period to CSV</GuideH3>
+              <Steps
+                items={[
+                  <>
+                    Choose the month, year or date range you want with{' '}
+                    <Ui>Filter By</Ui>.
+                  </>,
+                  <>
+                    Click <Ui>Export CSV</Ui>. You can keep using the app — the
+                    file is prepared in the background.
+                  </>,
+                  <>
+                    Within a minute or two you’ll get an email at your account
+                    address with the CSV attached and a summary of the totals.
+                  </>,
+                ]}
+              />
+              <FieldTable
+                rows={[
+                  ['Date', 'The transaction date, as YYYY-MM-DD.'],
+                  ['Type', 'Income, Expense or Investment.'],
+                  ['Category', 'The category name.'],
+                  [
+                    'Amount',
+                    'A plain number, ready to add up in a spreadsheet.',
+                  ],
+                  ['Note', 'Your note, if any.'],
+                ]}
+              />
+              <Bullets
+                items={[
+                  'The file holds exactly the transactions in the period you chose — nothing before or after it.',
+                  <>
+                    <Ui>Export CSV</Ui> is greyed out when the period has no
+                    transactions.
+                  </>,
+                  'The email only ever goes to your own account address.',
+                ]}
+              />
+              <Callout type="note" title="Limits">
+                Up to 5 exports an hour, and 20,000 transactions per export —
+                for more, export shorter periods.
+              </Callout>
+            </div>
           </GuideSection>
 
           {/* 6 ─ Sharing */}
@@ -705,6 +831,8 @@ const GuidePage = async () => {
                 'You stay signed in while you use the app: access tokens last 15 minutes and renew automatically. After 7 days without visiting, you’ll be asked to sign in again.',
                 'Logging out ends your session on the server, not just in the browser.',
                 'Saved AI keys are encrypted, and the assistant can never change your data.',
+                'Stats exports are emailed only to your own account address. Imported files are checked again on the server, and imports and exports are rate-limited to stop abuse.',
+                'Exported CSV files are made safe to open in Excel and Google Sheets — text that looks like a formula is stored as plain text, so it can’t run.',
               ]}
             />
           </GuideSection>
@@ -737,6 +865,26 @@ const GuidePage = async () => {
                 [
                   '“Amount must be greater than 0”',
                   'Enter a positive amount — the category’s type decides whether it counts as money in or out.',
+                ],
+                [
+                  'My category import shows errors',
+                  'Each message names the row and the problem. Fix those rows, save as CSV, and choose the file again — nothing is imported until the whole file is valid. Starting from the Template avoids most column problems.',
+                ],
+                [
+                  '“Another import is still running”',
+                  'Only one import per account runs at a time. Wait a few seconds for the first one to finish.',
+                ],
+                [
+                  '“You can import / export up to …”',
+                  'You’ve reached a limit for now. The message tells you how long to wait.',
+                ],
+                [
+                  'My stats export email hasn’t arrived',
+                  'It usually takes under a minute. Check your spam or promotions folder, and that the period you exported had transactions.',
+                ],
+                [
+                  '“Exports are limited to 20,000 transactions”',
+                  'Choose a shorter period — for example, export a year month by month or quarter by quarter.',
                 ],
                 [
                   '“Account is inactive”',

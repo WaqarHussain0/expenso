@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project docs
+
+- [CSV import & export](docs/import-export.md) — stats export by email,
+  category import/export, file formats, rate limits and security notes.
+- User-facing help lives in the app at `/guide`.
+
 ## Getting Started
 
 First, run the development server:
